@@ -1,10 +1,5 @@
-# Beceriler v32
+# Beceriler v35
 
-Döner: disk, ilim, sinir, kart, bellek, harman, gorsel, github, bag, saat, karsi.
+Döner: disk, ilim, sinir, kart, bellek, harman, gorsel, github, bag, saat, karsi, bagimsiz, yayin, eylem.
 
-- github: https://github.com/sahincelil/karicim-gpt
-- bag: hasat host listesi
-- saat: ISO + nabız
-- karsi: feribot sayı çelişkisi
-
-C: yok. Tavan yok.
+Kalıcı: GitHub. Önizleme kapanınca GitHub durur. C: yok.
