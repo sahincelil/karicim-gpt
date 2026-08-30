@@ -42,10 +42,13 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Runner info
+      - name: Resources
         run: |
+          Write-Host "label=windows-2022 (public: 4 vCPU / 16GB / 14GB SSD)"
           Write-Host "os=$env:RUNNER_OS arch=$env:RUNNER_ARCH name=$env:RUNNER_NAME"
-          Write-Host "tool=$env:RUNNER_TOOL_CACHE workspace=$env:GITHUB_WORKSPACE"
+          Get-CimInstance Win32_Processor | Select-Object Name, NumberOfCores, NumberOfLogicalProcessors | Format-List
+          $ram = [math]::Round((Get-CimInstance Win32_ComputerSystem).TotalPhysicalMemory / 1GB, 2)
+          Write-Host "ram_gb=$ram"
           Get-PSDrive -PSProvider FileSystem | Format-Table -AutoSize Name,Used,Free,Root
 
       - name: Run kopru.ps1

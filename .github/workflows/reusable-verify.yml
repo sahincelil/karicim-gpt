@@ -36,6 +36,14 @@ jobs:
         with:
           persist-credentials: false
 
+      - name: Resources
+        run: |
+          set -euo pipefail
+          echo "label=ubuntu-24.04 (public: 4 vCPU / 16GB / 14GB)"
+          echo "nproc=$(nproc)"
+          free -h
+          df -h /
+
       - name: Build verify image
         run: |
           set -euo pipefail
