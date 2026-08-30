@@ -1,10 +1,20 @@
 name: ci
 
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 on:
   push:
     branches: [main]
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
   workflow_dispatch:
+    inputs:
+      verbose:
+        description: Ağaç listesini yazdır
+        type: boolean
+        default: true
 
 jobs:
   tree:
@@ -14,6 +24,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: list
+        if: ${{ github.event_name != 'workflow_dispatch' || inputs.verbose }}
         run: |
+          echo "event ${GITHUB_EVENT_NAME}"
           echo "sha ${GITHUB_SHA}"
           find . -type f -not -path './.git/*' | sort

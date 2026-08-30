@@ -1,17 +1,17 @@
 ---
 name: github-actions
-description: Create or edit GitHub Actions workflow YAML under .github/workflows. Use when the user asks for CI, schedule, or SKILL.md validation.
+description: Edit GitHub Actions triggers and jobs under .github/workflows. Use when customizing on.push, pull_request types, cron, workflow_dispatch inputs, or repository_dispatch.
 ---
 
 # github-actions
 
-Dosyalar:
-- `.github/workflows/ci.yml` — push/PR, ağaç listesi
-- `.github/workflows/skills.yml` — SKILL.md YAML `name` + `description`
-- `.github/workflows/nabiz.yml` — günlük 20:00 UTC; grok çalıştırmaz
+Tetikleyiciler (bu repo):
+
+- ci: `push` main, `pull_request` (opened/synchronize/reopened/ready_for_review), `workflow_dispatch`
+- skills: path filter `.github/skills/**` + `skills/**`, aynı PR tipleri, `workflow_dispatch.min`
+- nabiz: cron `0 4-20 * * *` (07–23 TR), `workflow_dispatch.konu`, `repository_dispatch` type `karicim-nabiz`
 
 Kurallar:
-- `actions/checkout@v4`
-- `permissions.contents: read` (yazma gerekmedikçe)
-- Runner xAI değil. Secret yoksa olgu uydurma.
-- C: yok.
+- cron UTC. TR yaz = UTC+3.
+- `concurrency` + cancel-in-progress.
+- Runner xAI değil. C: yok.

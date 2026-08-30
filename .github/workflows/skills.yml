@@ -1,14 +1,27 @@
 name: skills
 
+concurrency:
+  group: skills-${{ github.ref }}
+  cancel-in-progress: true
+
 on:
   push:
+    branches: [main]
     paths:
       - ".github/skills/**"
       - ".github/workflows/skills.yml"
+      - "skills/**"
   pull_request:
+    types: [opened, synchronize, reopened]
     paths:
       - ".github/skills/**"
+      - "skills/**"
   workflow_dispatch:
+    inputs:
+      min:
+        description: En az kaç SKILL.md
+        type: string
+        default: "1"
 
 jobs:
   validate:
@@ -18,6 +31,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: SKILL.md frontmatter
+        env:
+          MIN: ${{ github.event.inputs.min || '1' }}
         run: |
           set -euo pipefail
           n=0
@@ -28,5 +43,5 @@ jobs:
             echo "ok $f"
             n=$((n+1))
           done
-          test "$n" -ge 1
-          echo "skills $n"
+          test "$n" -ge "$MIN"
+          echo "skills $n (min $MIN)"

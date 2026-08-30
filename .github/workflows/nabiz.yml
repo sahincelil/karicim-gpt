@@ -1,9 +1,21 @@
 name: nabiz
 
 on:
+  # 07:00–23:00 Europe/Istanbul = 04:00–20:00 UTC (yaz saati)
   schedule:
-    - cron: "0 20 * * *"
+    - cron: "0 4-20 * * *"
   workflow_dispatch:
+    inputs:
+      konu:
+        description: Konu (runner grok değil; sadece kayıt)
+        required: false
+        default: Turkiye guncel
+      force:
+        description: Kontrolü zorla
+        type: boolean
+        default: true
+  repository_dispatch:
+    types: [karicim-nabiz]
 
 jobs:
   note:
@@ -13,8 +25,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: hatirlatma
+        env:
+          KONU: ${{ github.event.inputs.konu || github.event.client_payload.konu || 'Turkiye guncel' }}
+          EVENT: ${{ github.event_name }}
         run: |
-          echo "Bu runner grok-4.5 değil. Nabız sohbet tarafında (web_search + x_search)."
-          echo "XAI_API_KEY yoksa olgu yazma. C: yok."
+          echo "event $EVENT konu $KONU"
+          echo "Bu runner grok-4.5 değil. Nabız sohbet tarafında."
+          echo "C: yok."
           test -f NABIZ.md
           test -f .github/skills/karicim-nabiz/SKILL.md
