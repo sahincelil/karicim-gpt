@@ -27,7 +27,7 @@ defaults:
 jobs:
   run:
     runs-on: ubuntu-24.04
-    timeout-minutes: 5
+    timeout-minutes: 8
     permissions:
       contents: read
     steps:
@@ -36,44 +36,25 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Tree
-        if: ${{ inputs.task == 'tree' }}
+      - name: Build verify image
+        run: |
+          set -euo pipefail
+          docker build -t karicim-verify:local .github/containers/verify
+
+      - name: Run in container
         env:
+          TASK: ${{ inputs.task }}
+          MIN: ${{ inputs.min }}
+          KONU: ${{ inputs.konu }}
           EVENT: ${{ github.event_name }}
           SHA: ${{ github.sha }}
         run: |
           set -euo pipefail
-          echo "event ${EVENT}"
-          echo "sha ${SHA}"
-          find . -type f -not -path './.git/*' | sort
-
-      - name: Skills
-        if: ${{ inputs.task == 'skills' }}
-        env:
-          MIN: ${{ inputs.min }}
-        run: |
-          set -euo pipefail
-          n=0
-          shopt -s nullglob
-          for f in .github/skills/*/SKILL.md; do
-            test -f "$f"
-            grep -q '^name:' "$f"
-            grep -q '^description:' "$f"
-            echo "ok $f"
-            n=$((n+1))
-          done
-          test "$n" -ge "$MIN"
-          echo "skills $n (min $MIN)"
-
-      - name: Nabiz
-        if: ${{ inputs.task == 'nabiz' }}
-        env:
-          KONU: ${{ inputs.konu }}
-          EVENT: ${{ github.event_name }}
-        run: |
-          set -euo pipefail
-          echo "event ${EVENT}"
-          echo "konu ${KONU}"
-          echo "Bu runner grok-4.5 değil. C: yok."
-          test -f NABIZ.md
-          test -f .github/skills/karicim-nabiz/SKILL.md
+          docker run --rm \
+            -v "$PWD:/src:ro" \
+            -w /src \
+            -e TASK -e MIN -e KONU -e EVENT -e SHA \
+            --network none \
+            --read-only \
+            --tmpfs /tmp \
+            karicim-verify:local

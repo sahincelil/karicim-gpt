@@ -1,26 +1,17 @@
-# GitHub Actions YAML
+# GitHub Actions YAML + Docker
 
-Üst düzey anahtarlar:
+Job host: `ubuntu-24.04` (Docker motoru burada).
+Konteyner: `karicim-verify:local` ← `.github/containers/verify`.
 
 ```yaml
-name: string
-run-name: string
-permissions: {}          # deny-by-default
-concurrency:
-  group: string
-  cancel-in-progress: true
-on:                      # tetik
-defaults:
-  run:
-    shell: bash
 jobs:
-  id:
-    uses: ./.github/workflows/reusable-verify.yml
-    with:
-      task: tree|skills|nabiz
+  run:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@…
+      - run: docker build -t karicim-verify:local .github/containers/verify
+      - run: docker run --rm -v "$PWD:/src:ro" --network none --read-only karicim-verify:local
 ```
 
-`workflow_call` girişleri: `task` (zorunlu), `min`, `konu`.
-Checkout pin: `actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1` # v7.0.1
-
+`jobs.container` yok: checkout JS action Node ister.
 C: yok.
