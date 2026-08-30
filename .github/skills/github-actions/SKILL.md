@@ -1,18 +1,12 @@
 ---
 name: github-actions
-description: Edit GitHub Actions under .github/workflows using hardened defaults. Use when changing triggers, pinning actions, or permissions.
+description: Configure GitHub Actions YAML (name, on, permissions, concurrency, defaults, jobs.uses workflow_call). Use when editing .github/workflows.
 ---
 
 # github-actions
 
-Uygulanan kurallar:
-- `permissions: {}` workflow; job `contents: read`
-- action SHA pin (`actions/checkout@3d3c42e…` = v7.0.1)
-- `persist-credentials: false`
-- `timeout-minutes: 5`
-- `ubuntu-24.04` (latest değil)
-- girdi → `env`, `run:` içine `${{ }}` yok
-- `pull_request_target` yok
-- Dependabot: `.github/dependabot.yml` (github-actions, weekly)
+Şablon: `.github/workflows/reusable-verify.yml` (`on.workflow_call`).
+Çağıranlar: ci.yml, skills.yml, nabiz.yml — `jobs.*.uses` + `with.task`.
 
-C: yok. Runner xAI değil.
+YAML sırası: name → run-name → permissions → concurrency → on → defaults → jobs.
+C: yok.

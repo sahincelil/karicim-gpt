@@ -1,0 +1,79 @@
+name: reusable-verify
+
+on:
+  workflow_call:
+    inputs:
+      task:
+        description: tree | skills | nabiz
+        required: true
+        type: string
+      min:
+        description: En az SKILL.md (task=skills)
+        required: false
+        type: string
+        default: "1"
+      konu:
+        description: Nabız konusu (task=nabiz)
+        required: false
+        type: string
+        default: Turkiye guncel
+
+permissions: {}
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  run:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Tree
+        if: ${{ inputs.task == 'tree' }}
+        env:
+          EVENT: ${{ github.event_name }}
+          SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          echo "event ${EVENT}"
+          echo "sha ${SHA}"
+          find . -type f -not -path './.git/*' | sort
+
+      - name: Skills
+        if: ${{ inputs.task == 'skills' }}
+        env:
+          MIN: ${{ inputs.min }}
+        run: |
+          set -euo pipefail
+          n=0
+          shopt -s nullglob
+          for f in .github/skills/*/SKILL.md; do
+            test -f "$f"
+            grep -q '^name:' "$f"
+            grep -q '^description:' "$f"
+            echo "ok $f"
+            n=$((n+1))
+          done
+          test "$n" -ge "$MIN"
+          echo "skills $n (min $MIN)"
+
+      - name: Nabiz
+        if: ${{ inputs.task == 'nabiz' }}
+        env:
+          KONU: ${{ inputs.konu }}
+          EVENT: ${{ github.event_name }}
+        run: |
+          set -euo pipefail
+          echo "event ${EVENT}"
+          echo "konu ${KONU}"
+          echo "Bu runner grok-4.5 değil. C: yok."
+          test -f NABIZ.md
+          test -f .github/skills/karicim-nabiz/SKILL.md

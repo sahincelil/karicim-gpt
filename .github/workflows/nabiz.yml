@@ -1,4 +1,5 @@
 name: nabiz
+run-name: nabiz / ${{ github.event_name }}
 
 permissions: {}
 
@@ -12,37 +13,15 @@ on:
   workflow_dispatch:
     inputs:
       konu:
-        description: Konu (runner grok değil; sadece kayıt)
+        description: Konu (runner grok değil)
         required: false
         default: Turkiye guncel
-      force:
-        description: Kontrolü zorla
-        type: boolean
-        default: true
   repository_dispatch:
     types: [karicim-nabiz]
 
 jobs:
   note:
-    runs-on: ubuntu-24.04
-    timeout-minutes: 5
-    permissions:
-      contents: read
-    steps:
-      - name: Checkout
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          persist-credentials: false
-      - name: Hatirlatma
-        shell: bash
-        env:
-          KONU: ${{ github.event.inputs.konu || github.event.client_payload.konu || 'Turkiye guncel' }}
-          EVENT: ${{ github.event_name }}
-        run: |
-          set -euo pipefail
-          echo "event ${EVENT}"
-          echo "konu ${KONU}"
-          echo "Bu runner grok-4.5 değil. Nabız sohbet tarafında."
-          echo "C: yok."
-          test -f NABIZ.md
-          test -f .github/skills/karicim-nabiz/SKILL.md
+    uses: ./.github/workflows/reusable-verify.yml
+    with:
+      task: nabiz
+      konu: ${{ inputs.konu || github.event.client_payload.konu || 'Turkiye guncel' }}

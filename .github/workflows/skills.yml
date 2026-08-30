@@ -1,4 +1,5 @@
 name: skills
+run-name: skills / ${{ github.event_name }}
 
 permissions: {}
 
@@ -12,6 +13,7 @@ on:
     paths:
       - ".github/skills/**"
       - ".github/workflows/skills.yml"
+      - ".github/workflows/reusable-verify.yml"
       - "skills/**"
   pull_request:
     types: [opened, synchronize, reopened]
@@ -27,29 +29,7 @@ on:
 
 jobs:
   validate:
-    runs-on: ubuntu-24.04
-    timeout-minutes: 5
-    permissions:
-      contents: read
-    steps:
-      - name: Checkout
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          persist-credentials: false
-      - name: SKILL.md frontmatter
-        shell: bash
-        env:
-          MIN: ${{ github.event.inputs.min || '1' }}
-        run: |
-          set -euo pipefail
-          n=0
-          shopt -s nullglob
-          for f in .github/skills/*/SKILL.md; do
-            test -f "$f"
-            grep -q '^name:' "$f"
-            grep -q '^description:' "$f"
-            echo "ok $f"
-            n=$((n+1))
-          done
-          test "$n" -ge "$MIN"
-          echo "skills $n (min $MIN)"
+    uses: ./.github/workflows/reusable-verify.yml
+    with:
+      task: skills
+      min: ${{ inputs.min || '1' }}

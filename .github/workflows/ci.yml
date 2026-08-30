@@ -1,4 +1,5 @@
 name: ci
+run-name: ci / ${{ github.event_name }} / ${{ github.sha }}
 
 permissions: {}
 
@@ -14,29 +15,12 @@ on:
   workflow_dispatch:
     inputs:
       verbose:
-        description: Ağaç listesini yazdır
+        description: Ağaç (reusable tree her zaman listeler)
         type: boolean
         default: true
 
 jobs:
   tree:
-    runs-on: ubuntu-24.04
-    timeout-minutes: 5
-    permissions:
-      contents: read
-    steps:
-      - name: Checkout
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          persist-credentials: false
-      - name: List tree
-        if: ${{ github.event_name != 'workflow_dispatch' || inputs.verbose }}
-        shell: bash
-        env:
-          EVENT: ${{ github.event_name }}
-          SHA: ${{ github.sha }}
-        run: |
-          set -euo pipefail
-          echo "event ${EVENT}"
-          echo "sha ${SHA}"
-          find . -type f -not -path './.git/*' | sort
+    uses: ./.github/workflows/reusable-verify.yml
+    with:
+      task: tree
