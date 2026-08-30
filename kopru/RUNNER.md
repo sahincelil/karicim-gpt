@@ -1,27 +1,25 @@
-# Runner yapılandırması
+# Self-hosted runner kurulumu
 
-| Tür | `runs-on` | C: neresi |
-|---|---|---|
-| Varsayılan | `windows-2022` | GitHub VM |
-| Self-hosted | `[self-hosted, Windows, karicim]` | senin PC — **yalnız özel repo** |
+**Public repo + self-hosted = hayır.** Bu repo public. Önce özel yap:
+https://github.com/sahincelil/karicim-gpt/settings → Change visibility → Private.
 
-Bu repo şu an **public**. Public repoda self-hosted runner PR ile ele geçirilebilir. Takma.
+Sonra token al:
+https://github.com/sahincelil/karicim-gpt/settings/actions/runners/new
 
-## GitHub-hosted (kayıtlı)
+Windows x64, runner **v2.337.0**, klasör `C:\actions-runner`.
 
-- İmaj: `windows-2022`
-- Kabuk: `pwsh`
-- Timeout: 10 dk
-- Etiket: yok (hosted)
+PowerShell (yönetici gerekmez):
 
-## Self-hosted (repo özel olduktan sonra)
-
-Repo → Settings → Actions → Runners → New self-hosted runner (Windows x64).
-
-```text
-.\config.cmd --labels windows,karicim --unattended --name KARICIM-PC
-.\run.cmd
+```powershell
+irm https://raw.githubusercontent.com/sahincelil/karicim-gpt/main/kopru/install-runner.ps1 -OutFile install-runner.ps1
+.\install-runner.ps1 -Token PASTE
+C:\actions-runner\run.cmd
 ```
 
-Servis olarak gizlice kurma. `run.cmd` görünür kalsın.
-`.credentials` commit etme.
+SHA256 zip: `1150692afa94e71f872017e254ea55b6eece1eece3fe7e3a6d4c93d0a1b85cfc`
+
+Etiketler: `self-hosted`, `Windows`, `karicim` → `kopru.yml` bunlarla eşleşir.
+
+- Servis yok (`run.cmd` görünür kalsın)
+- `.credentials` / `.runner` commit etme
+- Fork PR bu makinede çalışmasın (repo özel olsun)
