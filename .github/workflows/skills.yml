@@ -1,0 +1,32 @@
+name: skills
+
+on:
+  push:
+    paths:
+      - ".github/skills/**"
+      - ".github/workflows/skills.yml"
+  pull_request:
+    paths:
+      - ".github/skills/**"
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: SKILL.md frontmatter
+        run: |
+          set -euo pipefail
+          n=0
+          for f in .github/skills/*/SKILL.md; do
+            test -f "$f"
+            grep -q '^name:' "$f"
+            grep -q '^description:' "$f"
+            echo "ok $f"
+            n=$((n+1))
+          done
+          test "$n" -ge 1
+          echo "skills $n"

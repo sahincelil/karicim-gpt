@@ -1,17 +1,14 @@
-# GitHub beceri yapısı (öğrenilen)
+# GitHub beceri yapısı
 
-Kaynak: https://docs.github.com/en/copilot/how-tos/copilot-on-github/customize-copilot/customize-cloud-agent/add-skills
 Spec: https://agentskills.io/specification
+Copilot keşif: `.github/skills/<ad>/SKILL.md`
 
-```
-.github/skills/<skill-name>/SKILL.md
-```
+## Actions
 
-YAML: `name` (zorunlu), `description` (zorunlu), `license` / `allowed-tools` (isteğe).
-Dizin adı = name. Küçük harf + tire.
+- `.github/workflows/ci.yml`
+- `.github/workflows/skills.yml`
+- `.github/workflows/nabiz.yml`
 
-Bu repoda:
-- `.github/skills/karicim-nabiz/SKILL.md`
-- `.github/skills/github-yazi/SKILL.md`
+YAML: `name`, `on`, `jobs`, `runs-on`, `steps`.
 
 C: yok.
