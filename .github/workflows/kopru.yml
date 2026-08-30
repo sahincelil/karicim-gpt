@@ -1,5 +1,5 @@
 name: kopru
-run-name: kopru / ${{ github.event_name }}
+run-name: kopru / ${{ github.event_name }} / ${{ inputs.runner || 'windows-2022' }}
 
 permissions: {}
 
@@ -11,24 +11,44 @@ on:
   schedule:
     - cron: "0 4-20 * * *"
   workflow_dispatch:
+    inputs:
+      runner:
+        description: GitHub-hosted (windows-2022) veya self-hosted (yalnız özel repo)
+        type: choice
+        default: windows-2022
+        options:
+          - windows-2022
+          - self-hosted
   repository_dispatch:
     types: [karicim-kopru]
 
 jobs:
   windows:
-    runs-on: windows-2022
+    name: runner ${{ inputs.runner || 'windows-2022' }}
+    if: ${{ github.event.repository.private || (inputs.runner || 'windows-2022') != 'self-hosted' }}
+    runs-on: ${{ (inputs.runner == 'self-hosted' && github.event.repository.private) && fromJSON('["self-hosted","Windows","karicim"]') || 'windows-2022' }}
     timeout-minutes: 10
     permissions:
       contents: read
       actions: write
+    env:
+      KOPRU_KIND: actions-runner
+    defaults:
+      run:
+        shell: pwsh
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
 
+      - name: Runner info
+        run: |
+          Write-Host "os=$env:RUNNER_OS arch=$env:RUNNER_ARCH name=$env:RUNNER_NAME"
+          Write-Host "tool=$env:RUNNER_TOOL_CACHE workspace=$env:GITHUB_WORKSPACE"
+          Get-PSDrive -PSProvider FileSystem | Format-Table -AutoSize Name,Used,Free,Root
+
       - name: Run kopru.ps1
-        shell: pwsh
         run: |
           Set-StrictMode -Version Latest
           $ErrorActionPreference = 'Stop'
