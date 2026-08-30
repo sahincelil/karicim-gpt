@@ -1,0 +1,2 @@
+# karicim-gpt
+KaricimGPT nabiz
