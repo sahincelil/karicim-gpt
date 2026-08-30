@@ -1,17 +1,9 @@
-# GitHub Actions YAML + Docker
+# GitHub Actions YAML + Docker + kopru
 
-Job host: `ubuntu-24.04` (Docker motoru burada).
-Konteyner: `karicim-verify:local` ← `.github/containers/verify`.
+Linux verify: `ubuntu-24.04` + Docker `karicim-verify`.
+Windows kopru: `windows-2022` + `kopru/karicim-kopru.ps1` (runner C:, ev PC değil).
 
-```yaml
-jobs:
-  run:
-    runs-on: ubuntu-24.04
-    steps:
-      - uses: actions/checkout@…
-      - run: docker build -t karicim-verify:local .github/containers/verify
-      - run: docker run --rm -v "$PWD:/src:ro" --network none --read-only karicim-verify:local
-```
+`kopru.yml` tetik: cron 07–23 TR, workflow_dispatch, repository_dispatch `karicim-kopru`.
+Artifact: `kopru-nabiz` (5 gün).
 
-`jobs.container` yok: checkout JS action Node ister.
-C: yok.
+C: önizlemede yok.

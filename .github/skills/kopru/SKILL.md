@@ -1,11 +1,12 @@
 ---
 name: kopru
-description: Explain and ship the Windows C: bridge script. Use when the user wants C: access. The preview never mounts C:. The user must run kopru/karicim-kopru.ps1 on their PC.
+description: Windows C: bridge. Preview has no C:. Home PC C: only if the user runs kopru/karicim-kopru.ps1. GitHub Actions kopru.yml runs the same script on windows-2022 (GitHub VM C:, not the user's PC).
 ---
 
 # kopru
 
-Önizleme C: yok.
-Çözüm: `kopru/karicim-kopru.ps1` kullanıcının Windows oturumunda.
-Çıktı: `%USERPROFILE%\Karicim\nabiz.md`
-Gizli görev yok. Admin yok. AV kapatmaz.
+İki C:
+- Ev PC: kullanıcı scripti çalıştırır → `%USERPROFILE%\Karicim\nabiz.md`
+- Actions: `.github/workflows/kopru.yml` · `windows-2022` · artifact `kopru-nabiz`
+
+Actions ev diski değil. Admin yok. AV yok.

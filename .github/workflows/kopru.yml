@@ -1,0 +1,46 @@
+name: kopru
+run-name: kopru / ${{ github.event_name }}
+
+permissions: {}
+
+concurrency:
+  group: kopru-${{ github.event_name }}
+  cancel-in-progress: true
+
+on:
+  schedule:
+    - cron: "0 4-20 * * *"
+  workflow_dispatch:
+  repository_dispatch:
+    types: [karicim-kopru]
+
+jobs:
+  windows:
+    runs-on: windows-2022
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      actions: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Run kopru.ps1
+        shell: pwsh
+        run: |
+          Set-StrictMode -Version Latest
+          $ErrorActionPreference = 'Stop'
+          & .\kopru\karicim-kopru.ps1
+          $src = Join-Path $env:USERPROFILE 'Karicim\nabiz.md'
+          if (-not (Test-Path $src)) { throw 'nabiz.md yazilmadi' }
+          Copy-Item -Force $src .\kopru\last-runner.md
+
+      - name: Upload nabiz
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: kopru-nabiz
+          path: kopru/last-runner.md
+          if-no-files-found: error
+          retention-days: 5
