@@ -1,7 +1,12 @@
 name: nabiz
 
+permissions: {}
+
+concurrency:
+  group: nabiz-${{ github.event_name }}
+  cancel-in-progress: true
+
 on:
-  # 07:00–23:00 Europe/Istanbul = 04:00–20:00 UTC (yaz saati)
   schedule:
     - cron: "0 4-20 * * *"
   workflow_dispatch:
@@ -19,17 +24,24 @@ on:
 
 jobs:
   note:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@v4
-      - name: hatirlatma
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Hatirlatma
+        shell: bash
         env:
           KONU: ${{ github.event.inputs.konu || github.event.client_payload.konu || 'Turkiye guncel' }}
           EVENT: ${{ github.event_name }}
         run: |
-          echo "event $EVENT konu $KONU"
+          set -euo pipefail
+          echo "event ${EVENT}"
+          echo "konu ${KONU}"
           echo "Bu runner grok-4.5 değil. Nabız sohbet tarafında."
           echo "C: yok."
           test -f NABIZ.md

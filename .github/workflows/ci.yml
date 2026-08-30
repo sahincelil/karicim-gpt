@@ -1,5 +1,7 @@
 name: ci
 
+permissions: {}
+
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -18,14 +20,23 @@ on:
 
 jobs:
   tree:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@v4
-      - name: list
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: List tree
         if: ${{ github.event_name != 'workflow_dispatch' || inputs.verbose }}
+        shell: bash
+        env:
+          EVENT: ${{ github.event_name }}
+          SHA: ${{ github.sha }}
         run: |
-          echo "event ${GITHUB_EVENT_NAME}"
-          echo "sha ${GITHUB_SHA}"
+          set -euo pipefail
+          echo "event ${EVENT}"
+          echo "sha ${SHA}"
           find . -type f -not -path './.git/*' | sort

@@ -1,17 +1,18 @@
 ---
 name: github-actions
-description: Edit GitHub Actions triggers and jobs under .github/workflows. Use when customizing on.push, pull_request types, cron, workflow_dispatch inputs, or repository_dispatch.
+description: Edit GitHub Actions under .github/workflows using hardened defaults. Use when changing triggers, pinning actions, or permissions.
 ---
 
 # github-actions
 
-Tetikleyiciler (bu repo):
+Uygulanan kurallar:
+- `permissions: {}` workflow; job `contents: read`
+- action SHA pin (`actions/checkout@3d3c42e…` = v7.0.1)
+- `persist-credentials: false`
+- `timeout-minutes: 5`
+- `ubuntu-24.04` (latest değil)
+- girdi → `env`, `run:` içine `${{ }}` yok
+- `pull_request_target` yok
+- Dependabot: `.github/dependabot.yml` (github-actions, weekly)
 
-- ci: `push` main, `pull_request` (opened/synchronize/reopened/ready_for_review), `workflow_dispatch`
-- skills: path filter `.github/skills/**` + `skills/**`, aynı PR tipleri, `workflow_dispatch.min`
-- nabiz: cron `0 4-20 * * *` (07–23 TR), `workflow_dispatch.konu`, `repository_dispatch` type `karicim-nabiz`
-
-Kurallar:
-- cron UTC. TR yaz = UTC+3.
-- `concurrency` + cancel-in-progress.
-- Runner xAI değil. C: yok.
+C: yok. Runner xAI değil.
