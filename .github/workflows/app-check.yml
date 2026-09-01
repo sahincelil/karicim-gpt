@@ -23,17 +23,22 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
       - name: Check JavaScript syntax
-        run: |
-          set -euo pipefail
-          node --check app.js
-          node --check api/chat.js
-      - name: Check required files
+        run: npm run check
+      - name: Check required files and secret boundaries
         run: |
           set -euo pipefail
           test -f index.html
           test -f app.js
           test -f api/chat.js
+          test -f api/agent.js
+          test -f lib/security.js
           test -f vercel.json
           ! grep -q 'api.x.ai' index.html
+          ! grep -q 'OPENROUTER_API_KEY' index.html
           ! grep -q 'XAI_API_KEY' index.html
+          ! grep -R -nE '(^|[^A-Za-z])OPENROUTER_API_KEY\s*=|(^|[^A-Za-z])XAI_API_KEY\s*=' --exclude-dir=.git . || true
