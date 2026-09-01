@@ -27,7 +27,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: npm
       - name: Check JavaScript syntax
         run: npm run check
       - name: Check required files and secret boundaries
