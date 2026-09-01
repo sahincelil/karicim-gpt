@@ -29,7 +29,9 @@ jobs:
           node --check app.js
           node --check api/chat.js
           node --check api/agent.js
+          node --check api/health.js
           node --check lib/security.js
+          node --check lib/github.js
       - name: Check required files and secret boundaries
         run: |
           set -euo pipefail
@@ -37,7 +39,9 @@ jobs:
           test -f app.js
           test -f api/chat.js
           test -f api/agent.js
+          test -f api/health.js
           test -f lib/security.js
+          test -f lib/github.js
           test -f vercel.json
           ! grep -q 'api.x.ai' index.html
           ! grep -q 'OPENROUTER_API_KEY' index.html
@@ -63,3 +67,9 @@ jobs:
           grep -q "type: 'openrouter:web_fetch'" api/chat.js
           grep -q 'models' api/chat.js
           grep -q "DEFAULT_FREE_MODEL = 'openrouter/free'" api/chat.js
+      - name: Check GitHub tool boundaries
+        run: |
+          set -euo pipefail
+          grep -q 'MAX_FILE_BYTES = 120000' lib/github.js
+          grep -q 'Yalnızca tekil public dosyalar okunabilir' lib/github.js
+          grep -q "path.startsWith('/')" lib/github.js
