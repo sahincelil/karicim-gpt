@@ -6,6 +6,7 @@ const MAX_MESSAGE_CHARS = 12000;
 const MAX_OUTPUT_TOKENS = 4096;
 const MAX_REQUEST_BYTES = 180000;
 const MAX_TOOL_ROUNDS = 4;
+const MAX_TOOL_CALLS_TOTAL = 6;
 const DEFAULT_MODEL = 'openrouter/free';
 
 function send(res, status, body, extra = {}) {
@@ -34,9 +35,9 @@ const tools = [
         type: 'object',
         additionalProperties: false,
         properties: {
-          owner: { type: 'string', description: 'GitHub owner, e.g. sahincelil' },
-          repo: { type: 'string', description: 'Repository name' },
-          path: { type: 'string', description: 'File path inside the repository' }
+          owner: { type: 'string' },
+          repo: { type: 'string' },
+          path: { type: 'string' }
         },
         required: ['owner', 'repo', 'path']
       }
@@ -78,7 +79,8 @@ async function callModel(model, messages, apiKey, controller) {
 
 async function runCustomTool(call) {
   if (call?.function?.name !== 'github_read_public_file') throw new Error('Bilinmeyen araç.');
-  const args = JSON.parse(call.function.arguments || '{}');
+  let args;
+  try { args = JSON.parse(call.function.arguments || '{}'); } catch { throw new Error('Tool parametreleri geçersiz JSON.'); }
   return readPublicGitHubFile(args);
 }
 
@@ -99,6 +101,7 @@ export default async function handler(req, res) {
   const models = configuredModel === DEFAULT_MODEL ? [DEFAULT_MODEL] : [configuredModel, DEFAULT_MODEL];
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 60000);
+  let totalToolCalls = 0;
 
   try {
     for (const model of models) {
@@ -106,7 +109,7 @@ export default async function handler(req, res) {
       for (let round = 0; round < MAX_TOOL_ROUNDS; round++) {
         const { response, data } = await callModel(model, messages, apiKey, controller);
         if (!response.ok) {
-          if (response.status === 404 || response.status === 429) break;
+          if ((response.status === 404 || response.status === 429 || response.status === 400) && model !== DEFAULT_MODEL) break;
           return send(res, response.status >= 400 && response.status < 500 ? response.status : 502, { error: 'Agent sağlayıcısı isteği başarısız oldu.' });
         }
 
@@ -118,8 +121,14 @@ export default async function handler(req, res) {
           return send(res, 200, { output, model: data?.model || model, agent: true, webTools: true }, { 'X-RateLimit-Remaining': limit.remaining });
         }
 
+        if (totalToolCalls + toolCalls.length > MAX_TOOL_CALLS_TOTAL) {
+          messages.push({ role: 'assistant', content: 'Tool çağrısı sınırına ulaşıldı. Mevcut bilgilerle en iyi cevabı ver.' });
+          continue;
+        }
+
         messages.push(message);
         for (const call of toolCalls.slice(0, 2)) {
+          totalToolCalls += 1;
           let result;
           try { result = await runCustomTool(call); }
           catch (error) { result = `Tool error: ${error?.message || 'işlem başarısız'}`; }
