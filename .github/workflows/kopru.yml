@@ -1,7 +1,8 @@
 name: kopru
 run-name: kopru / ${{ github.event_name }} / ${{ inputs.runner || 'windows-2022' }}
 
-permissions: {}
+permissions:
+  contents: read
 
 concurrency:
   group: kopru-${{ github.event_name }}
@@ -30,7 +31,6 @@ jobs:
     timeout-minutes: 10
     permissions:
       contents: read
-      actions: write
     env:
       KOPRU_KIND: actions-runner
     defaults:
