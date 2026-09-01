@@ -44,8 +44,8 @@ jobs:
       - name: Check agent guardrails
         run: |
           set -euo pipefail
-          grep -q 'max_tool_calls' api/agent.js
           grep -q 'openrouter:web_search' api/agent.js
           grep -q 'openrouter:web_fetch' api/agent.js
+          grep -q 'max_total_results' api/agent.js
           grep -q 'parallel_tool_calls: false' api/agent.js
           grep -q 'rateLimit' api/agent.js
