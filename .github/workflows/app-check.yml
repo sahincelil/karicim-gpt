@@ -38,6 +38,16 @@ jobs:
             node --check "$file"
           done
 
+      - name: Check module imports
+        run: |
+          set -euo pipefail
+          node -e "Promise.all(['./api/chat.js','./api/agent.js','./api/health.js','./lib/security.js','./lib/github.js'].map((p) => import(p))).then(() => console.log('module imports: ok'))"
+
+      - name: Check configuration
+        run: |
+          set -euo pipefail
+          node -e "JSON.parse(require('fs').readFileSync('package.json','utf8')); JSON.parse(require('fs').readFileSync('vercel.json','utf8')); console.log('json config: ok')"
+
       - name: Check required files and secret boundaries
         run: |
           set -euo pipefail
