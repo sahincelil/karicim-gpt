@@ -1,7 +1,8 @@
 name: skills
 run-name: skills / ${{ github.event_name }}
 
-permissions: {}
+permissions:
+  contents: read
 
 concurrency:
   group: skills-${{ github.ref }}
