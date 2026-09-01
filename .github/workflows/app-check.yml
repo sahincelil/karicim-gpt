@@ -52,6 +52,14 @@ jobs:
           grep -q "DEFAULT_MODEL = 'openrouter/free'" api/agent.js
           grep -q 'configuredModel === DEFAULT_MODEL' api/agent.js
           grep -q 'MAX_TOOL_CALLS_TOTAL = 6' api/agent.js
-          grep -q 'totalToolCalls + toolCalls.length' api/agent.js
+          grep -q 'const remaining = MAX_TOOL_CALLS_TOTAL - totalToolCalls' api/agent.js
+          grep -q 'Math.min(2, remaining)' api/agent.js
           grep -q 'rateLimit' api/agent.js
           grep -q 'MAX_BUCKETS' lib/security.js
+      - name: Check chat web tools
+        run: |
+          set -euo pipefail
+          grep -q "type: 'openrouter:web_search'" api/chat.js
+          grep -q "type: 'openrouter:web_fetch'" api/chat.js
+          grep -q 'models' api/chat.js
+          grep -q "DEFAULT_FREE_MODEL = 'openrouter/free'" api/chat.js
