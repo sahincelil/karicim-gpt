@@ -4,7 +4,7 @@ Repo: https://github.com/sahincelil/karicim-gpt
 
 ## AI motoru
 
-KaricimGPT artık API anahtarını tarayıcıya koymadan server-side `/api/chat` üzerinden çalışır. Varsayılan sağlayıcı **OpenRouter Free Models Router**'dır. OpenRouter şu anda ücretsiz modeller için `openrouter/free` router'ını sunuyor; ücretsiz kullanım rate-limitlidir. citeturn0search3turn0search6
+KaricimGPT artık API anahtarını tarayıcıya koymadan server-side `/api/chat` üzerinden çalışır. Varsayılan sağlayıcı **OpenRouter Free Models Router**'dır. OpenRouter ücretsiz modeller için `openrouter/free` router'ını sunuyor; ücretsiz kullanım rate-limitlidir.
 
 Kurulum için Vercel/server ortamında:
 
@@ -23,7 +23,7 @@ Anahtar kesinlikle `index.html`, `app.js` veya GitHub dosyalarına yazılmamalı
 
 ## Yerel / açık modeller
 
-Tamamen kendi bilgisayarında çalıştırmak istersen OpenRouter yerine yerel Ollama gibi bir OpenAI-uyumlu gateway eklenebilir. Bu durumda inference maliyeti sağlayıcıya değil kendi donanımına aittir.
+Tamamen kendi bilgisayarında çalıştırmak istersen OpenRouter yerine yerel Ollama gibi bir gateway eklenebilir. Bu durumda inference maliyeti sağlayıcıya değil kendi donanımına aittir.
 
 ## Güvenlik
 
