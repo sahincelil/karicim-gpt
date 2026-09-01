@@ -33,7 +33,7 @@ jobs:
       - name: Check JavaScript syntax
         run: |
           set -euo pipefail
-          for file in app.js api/chat.js api/agent.js api/health.js lib/security.js lib/github.js; do
+          for file in app.js api/chat.js api/agent.js api/health.js lib/security.js lib/github.js tests/smoke.mjs; do
             echo "Checking $file"
             node --check "$file"
           done
@@ -43,6 +43,9 @@ jobs:
           set -euo pipefail
           node -e "Promise.all(['./api/chat.js','./api/agent.js','./api/health.js','./lib/security.js','./lib/github.js'].map((p) => import(p))).then(() => console.log('module imports: ok'))"
 
+      - name: Run deterministic smoke checks
+        run: node tests/smoke.mjs
+
       - name: Check configuration
         run: |
           set -euo pipefail
@@ -51,7 +54,7 @@ jobs:
       - name: Check required files and secret boundaries
         run: |
           set -euo pipefail
-          required=(index.html app.js api/chat.js api/agent.js api/health.js lib/security.js lib/github.js vercel.json package.json)
+          required=(index.html app.js api/chat.js api/agent.js api/health.js lib/security.js lib/github.js tests/smoke.mjs vercel.json package.json)
           for file in "${required[@]}"; do
             test -s "$file"
           done
