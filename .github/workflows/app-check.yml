@@ -23,55 +23,64 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+
+      - name: Show runtime
+        run: |
+          set -euo pipefail
+          node --version
+          npm --version
+
       - name: Check JavaScript syntax
         run: |
           set -euo pipefail
-          node --check app.js
-          node --check api/chat.js
-          node --check api/agent.js
-          node --check api/health.js
-          node --check lib/security.js
-          node --check lib/github.js
+          for file in app.js api/chat.js api/agent.js api/health.js lib/security.js lib/github.js; do
+            echo "Checking $file"
+            node --check "$file"
+          done
+
       - name: Check required files and secret boundaries
         run: |
           set -euo pipefail
-          test -f index.html
-          test -f app.js
-          test -f api/chat.js
-          test -f api/agent.js
-          test -f api/health.js
-          test -f lib/security.js
-          test -f lib/github.js
-          test -f vercel.json
-          ! grep -q 'api.x.ai' index.html
-          ! grep -q 'OPENROUTER_API_KEY' index.html
-          ! grep -q 'XAI_API_KEY' index.html
+          required=(index.html app.js api/chat.js api/agent.js api/health.js lib/security.js lib/github.js vercel.json package.json)
+          for file in "${required[@]}"; do
+            test -s "$file"
+          done
+          ! grep -Fq 'api.x.ai' index.html
+          ! grep -Fq 'OPENROUTER_API_KEY' index.html
+          ! grep -Fq 'XAI_API_KEY' index.html
+
       - name: Check agent guardrails
         run: |
           set -euo pipefail
-          grep -q "type: 'openrouter:web_search'" api/agent.js
-          grep -q "type: 'openrouter:web_fetch'" api/agent.js
-          grep -q 'max_total_results' api/agent.js
-          grep -q 'parallel_tool_calls: false' api/agent.js
-          grep -q "DEFAULT_MODEL = 'openrouter/free'" api/agent.js
-          grep -q 'configuredModel === DEFAULT_MODEL' api/agent.js
-          grep -q 'MAX_TOOL_CALLS_TOTAL = 6' api/agent.js
-          grep -q 'MAX_TOOL_ROUNDS = 4' api/agent.js
-          grep -q 'MAX_CUSTOM_TOOL_RESULT = 30000' api/agent.js
-          grep -q 'tool_call_id: call.id' api/agent.js
-          grep -q 'readPublicGitHubFile' api/agent.js
-          grep -q 'rateLimit' api/agent.js
-          grep -q 'MAX_BUCKETS' lib/security.js
-      - name: Check chat web tools
+          checks=(
+            "type: 'openrouter:web_search'|api/agent.js"
+            "type: 'openrouter:web_fetch'|api/agent.js"
+            "max_total_results|api/agent.js"
+            "parallel_tool_calls: false|api/agent.js"
+            "DEFAULT_MODEL = 'openrouter/free'|api/agent.js"
+            "configuredModel === DEFAULT_MODEL|api/agent.js"
+            "MAX_TOOL_CALLS_TOTAL = 6|api/agent.js"
+            "MAX_TOOL_ROUNDS = 4|api/agent.js"
+            "MAX_CUSTOM_TOOL_RESULT = 30000|api/agent.js"
+            "tool_call_id: call.id|api/agent.js"
+            "readPublicGitHubFile|api/agent.js"
+            "rateLimit|api/agent.js"
+            "MAX_BUCKETS|lib/security.js"
+          )
+          for item in "${checks[@]}"; do
+            pattern="${item%%|*}"
+            file="${item##*|}"
+            echo "Checking $file for: $pattern"
+            grep -Fq "$pattern" "$file"
+          done
+
+      - name: Check chat and GitHub boundaries
         run: |
           set -euo pipefail
-          grep -q "type: 'openrouter:web_search'" api/chat.js
-          grep -q "type: 'openrouter:web_fetch'" api/chat.js
-          grep -q 'models' api/chat.js
-          grep -q "DEFAULT_FREE_MODEL = 'openrouter/free'" api/chat.js
-      - name: Check GitHub tool boundaries
-        run: |
-          set -euo pipefail
-          grep -q 'MAX_FILE_BYTES = 120000' lib/github.js
-          grep -q 'Yalnızca tekil public dosyalar okunabilir' lib/github.js
-          grep -q "path.startsWith('/')" lib/github.js
+          grep -Fq "type: 'openrouter:web_search'" api/chat.js
+          grep -Fq "type: 'openrouter:web_fetch'" api/chat.js
+          grep -Fq 'models' api/chat.js
+          grep -Fq "DEFAULT_FREE_MODEL = 'openrouter/free'" api/chat.js
+          grep -Fq 'MAX_FILE_BYTES = 120000' lib/github.js
+          grep -Fq 'Yalnızca tekil public dosyalar okunabilir' lib/github.js
+          grep -Fq "path.startsWith('/')" lib/github.js
