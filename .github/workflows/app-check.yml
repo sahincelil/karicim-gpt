@@ -27,6 +27,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: npm
       - name: Check JavaScript syntax
         run: npm run check
       - name: Check required files and secret boundaries
@@ -47,5 +48,7 @@ jobs:
           grep -q 'openrouter:web_search' api/agent.js
           grep -q 'openrouter:web_fetch' api/agent.js
           grep -q 'max_total_results' api/agent.js
+          grep -q 'max_tool_calls' api/agent.js
           grep -q 'parallel_tool_calls: false' api/agent.js
           grep -q 'rateLimit' api/agent.js
+          grep -q 'MAX_BUCKETS' lib/security.js
