@@ -7,6 +7,7 @@ const MAX_OUTPUT_TOKENS = 4096;
 const MAX_REQUEST_BYTES = 180000;
 const MAX_TOOL_ROUNDS = 4;
 const MAX_TOOL_CALLS_TOTAL = 6;
+const MAX_SERVER_TOOL_CALLS = 2;
 const MAX_CUSTOM_TOOL_RESULT = 30000;
 const DEFAULT_MODEL = 'openrouter/free';
 
@@ -25,8 +26,22 @@ function clean(messages) {
 }
 
 const tools = [
-  { type: 'openrouter:web_search', parameters: { engine: 'auto', max_results: 5, max_total_results: 10, search_context_size: 'medium' } },
-  { type: 'openrouter:web_fetch', parameters: { engine: 'openrouter', max_content_tokens: 30000 } },
+  {
+    type: 'openrouter:web_search',
+    parameters: {
+      engine: process.env.OPENROUTER_WEB_ENGINE || 'auto',
+      max_results: 5,
+      max_total_results: 10,
+      search_context_size: 'medium'
+    }
+  },
+  {
+    type: 'openrouter:web_fetch',
+    parameters: {
+      engine: 'openrouter',
+      max_content_tokens: 30000
+    }
+  },
   {
     type: 'function',
     function: {
@@ -69,6 +84,7 @@ async function callModel(model, messages, apiKey, signal) {
       tools,
       tool_choice: 'auto',
       parallel_tool_calls: false,
+      max_tool_calls: MAX_SERVER_TOOL_CALLS,
       temperature: 0.4,
       max_tokens: MAX_OUTPUT_TOKENS
     }),
@@ -119,8 +135,6 @@ async function runModelLoop(model, userMessages, apiKey, signal) {
 
     messages.push(message);
 
-    // OpenRouter server tools are executed by OpenRouter itself. We only execute
-    // our own function tool and return its result with the matching tool_call_id.
     for (const call of localCalls) {
       totalToolCalls += 1;
       let result;
@@ -136,8 +150,6 @@ async function runModelLoop(model, userMessages, apiKey, signal) {
       });
     }
 
-    // A response containing only server-side calls should normally already have
-    // been resolved by OpenRouter. Never fabricate local tool results for them.
     if (!localCalls.length) throw new Error('agent:server-tool-unresolved');
   }
 
