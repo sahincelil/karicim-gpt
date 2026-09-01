@@ -1,7 +1,8 @@
 name: nabiz
 run-name: nabiz / ${{ github.event_name }}
 
-permissions: {}
+permissions:
+  contents: read
 
 concurrency:
   group: nabiz-${{ github.event_name }}
