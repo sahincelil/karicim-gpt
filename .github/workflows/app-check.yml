@@ -41,4 +41,11 @@ jobs:
           ! grep -q 'api.x.ai' index.html
           ! grep -q 'OPENROUTER_API_KEY' index.html
           ! grep -q 'XAI_API_KEY' index.html
-          ! grep -R -nE '(^|[^A-Za-z])OPENROUTER_API_KEY\s*=|(^|[^A-Za-z])XAI_API_KEY\s*=' --exclude-dir=.git . || true
+      - name: Check agent guardrails
+        run: |
+          set -euo pipefail
+          grep -q 'max_tool_calls' api/agent.js
+          grep -q 'openrouter:web_search' api/agent.js
+          grep -q 'openrouter:web_fetch' api/agent.js
+          grep -q 'parallel_tool_calls: false' api/agent.js
+          grep -q 'rateLimit' api/agent.js
