@@ -56,8 +56,10 @@ jobs:
           grep -q "DEFAULT_MODEL = 'openrouter/free'" api/agent.js
           grep -q 'configuredModel === DEFAULT_MODEL' api/agent.js
           grep -q 'MAX_TOOL_CALLS_TOTAL = 6' api/agent.js
-          grep -q 'const remaining = MAX_TOOL_CALLS_TOTAL - totalToolCalls' api/agent.js
-          grep -q 'Math.min(2, remaining)' api/agent.js
+          grep -q 'MAX_TOOL_ROUNDS = 4' api/agent.js
+          grep -q 'MAX_CUSTOM_TOOL_RESULT = 30000' api/agent.js
+          grep -q 'tool_call_id: call.id' api/agent.js
+          grep -q 'readPublicGitHubFile' api/agent.js
           grep -q 'rateLimit' api/agent.js
           grep -q 'MAX_BUCKETS' lib/security.js
       - name: Check chat web tools
