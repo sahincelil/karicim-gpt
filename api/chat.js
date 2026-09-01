@@ -1,6 +1,7 @@
 const MAX_MESSAGE_CHARS = 12000;
 const MAX_MESSAGES = 20;
 const MAX_OUTPUT_TOKENS = 4096;
+const FREE_MODEL = 'z-ai/glm-5.2:free';
 
 function json(res, status, body) {
   res.status(status).setHeader('Content-Type', 'application/json; charset=utf-8');
@@ -16,6 +17,7 @@ function normalizeMessages(messages) {
 }
 
 async function callOpenRouter(messages, apiKey, controller) {
+  const model = process.env.OPENROUTER_MODEL || FREE_MODEL;
   const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
     method: 'POST',
     headers: {
@@ -26,7 +28,7 @@ async function callOpenRouter(messages, apiKey, controller) {
       'X-Title': 'KaricimGPT'
     },
     body: JSON.stringify({
-      model: process.env.OPENROUTER_MODEL || 'openrouter/free',
+      model,
       messages,
       temperature: 0.7,
       max_tokens: MAX_OUTPUT_TOKENS
@@ -35,7 +37,7 @@ async function callOpenRouter(messages, apiKey, controller) {
   });
   const data = await response.json().catch(() => ({}));
   if (!response.ok) throw Object.assign(new Error('OpenRouter request failed'), { status: response.status, data });
-  return { output: data?.choices?.[0]?.message?.content || '', model: data?.model || process.env.OPENROUTER_MODEL || 'openrouter/free' };
+  return { output: data?.choices?.[0]?.message?.content || '', model: data?.model || model };
 }
 
 async function callXai(messages, apiKey, controller) {
