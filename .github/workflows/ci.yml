@@ -1,7 +1,8 @@
 name: ci
 run-name: ci / ${{ github.event_name }} / ${{ github.sha }}
 
-permissions: {}
+permissions:
+  contents: read
 
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
