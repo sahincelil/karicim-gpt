@@ -4,6 +4,7 @@ const MAX_MESSAGE_CHARS = 12000;
 const MAX_MESSAGES = 20;
 const MAX_OUTPUT_TOKENS = 4096;
 const MAX_REQUEST_BYTES = 180000;
+const MAX_SERVER_TOOL_CALLS = 2;
 const DEFAULT_FREE_MODEL = 'openrouter/free';
 
 function json(res, status, body, extra = {}) {
@@ -43,11 +44,12 @@ async function callOpenRouter(messages, apiKey, controller) {
       temperature: 0.7,
       max_tokens: MAX_OUTPUT_TOKENS,
       tools: [
-        { type: 'openrouter:web_search', parameters: { engine: 'auto', max_results: 5, max_total_results: 10, search_context_size: 'medium' } },
+        { type: 'openrouter:web_search', parameters: { engine: process.env.OPENROUTER_WEB_ENGINE || 'auto', max_results: 5, max_total_results: 10, search_context_size: 'medium' } },
         { type: 'openrouter:web_fetch', parameters: { engine: 'openrouter', max_content_tokens: 20000 } }
       ],
       tool_choice: 'auto',
-      parallel_tool_calls: false
+      parallel_tool_calls: false,
+      max_tool_calls: MAX_SERVER_TOOL_CALLS
     }),
     signal: controller.signal
   });
