@@ -7,6 +7,7 @@ const MAX_OUTPUT_TOKENS = 4096;
 const MAX_REQUEST_BYTES = 180000;
 const MAX_TOOL_ROUNDS = 4;
 const MAX_TOOL_CALLS_TOTAL = 6;
+const MAX_CUSTOM_TOOL_RESULT = 30000;
 const DEFAULT_MODEL = 'openrouter/free';
 
 function send(res, status, body, extra = {}) {
@@ -101,12 +102,13 @@ export default async function handler(req, res) {
   const models = configuredModel === DEFAULT_MODEL ? [DEFAULT_MODEL] : [configuredModel, DEFAULT_MODEL];
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 60000);
-  let totalToolCalls = 0;
 
   try {
     for (const model of models) {
       let messages = baseMessages(userMessages);
-      for (let round = 0; round < MAX_TOOL_ROUNDS; round++) {
+      let totalToolCalls = 0;
+
+      for (let round = 0; round < MAX_TOOL_ROUNDS; round += 1) {
         const { response, data } = await callModel(model, messages, apiKey, controller);
         if (!response.ok) {
           if ((response.status === 404 || response.status === 429 || response.status === 400) && model !== DEFAULT_MODEL) break;
@@ -121,18 +123,25 @@ export default async function handler(req, res) {
           return send(res, 200, { output, model: data?.model || model, agent: true, webTools: true }, { 'X-RateLimit-Remaining': limit.remaining });
         }
 
-        if (totalToolCalls + toolCalls.length > MAX_TOOL_CALLS_TOTAL) {
-          messages.push({ role: 'assistant', content: 'Tool çağrısı sınırına ulaşıldı. Mevcut bilgilerle en iyi cevabı ver.' });
-          continue;
+        const remaining = MAX_TOOL_CALLS_TOTAL - totalToolCalls;
+        if (remaining <= 0) {
+          return send(res, 502, { error: 'Agent araç kullanım sınırına ulaştı.' });
         }
 
         messages.push(message);
-        for (const call of toolCalls.slice(0, 2)) {
+        for (const call of toolCalls.slice(0, Math.min(2, remaining))) {
           totalToolCalls += 1;
           let result;
-          try { result = await runCustomTool(call); }
-          catch (error) { result = `Tool error: ${error?.message || 'işlem başarısız'}`; }
-          messages.push({ role: 'tool', tool_call_id: call.id, content: String(result).slice(0, 30000) });
+          try {
+            result = await runCustomTool(call);
+          } catch (error) {
+            result = `Tool error: ${error?.message || 'işlem başarısız'}`;
+          }
+          messages.push({
+            role: 'tool',
+            tool_call_id: call.id,
+            content: String(result).slice(0, MAX_CUSTOM_TOOL_RESULT)
+          });
         }
       }
     }
