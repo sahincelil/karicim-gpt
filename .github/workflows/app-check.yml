@@ -51,5 +51,7 @@ jobs:
           grep -q 'parallel_tool_calls: false' api/agent.js
           grep -q "DEFAULT_MODEL = 'openrouter/free'" api/agent.js
           grep -q 'configuredModel === DEFAULT_MODEL' api/agent.js
+          grep -q 'MAX_TOOL_CALLS_TOTAL = 6' api/agent.js
+          grep -q 'totalToolCalls + toolCalls.length' api/agent.js
           grep -q 'rateLimit' api/agent.js
           grep -q 'MAX_BUCKETS' lib/security.js
