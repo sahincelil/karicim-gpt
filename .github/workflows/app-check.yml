@@ -1,0 +1,39 @@
+name: app-check
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: app-check-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  syntax:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Check JavaScript syntax
+        run: |
+          set -euo pipefail
+          node --check app.js
+          node --check api/chat.js
+      - name: Check required files
+        run: |
+          set -euo pipefail
+          test -f index.html
+          test -f app.js
+          test -f api/chat.js
+          test -f vercel.json
+          ! grep -q 'api.x.ai' index.html
+          ! grep -q 'XAI_API_KEY' index.html
