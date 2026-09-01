@@ -1,45 +1,35 @@
 # KaricimGPT
 
-KaricimGPT, tarayıcıdan Grok ile sohbet etmek için hazırlanmış küçük ve güvenlik odaklı bir web uygulamasıdır.
+Repo: https://github.com/sahincelil/karicim-gpt
 
-## Mimari
+## AI motoru
 
-- `index.html` — web arayüzü
-- `app.js` — istemci tarafı sohbet ve yerel geçmiş
-- `api/chat.js` — sunucu tarafı xAI Responses API proxy'si
-- `vercel.json` — güvenlik başlıkları ve CSP
-- `.github/workflows/app-check.yml` — JavaScript ve güvenlik kontrolleri
-- `.github/workflows/` — CI / skills / nabız doğrulamaları
-- `kopru/` — isteğe bağlı Windows runner/köprü araçları
+KaricimGPT artık API anahtarını tarayıcıya koymadan server-side `/api/chat` üzerinden çalışır. Varsayılan sağlayıcı **OpenRouter Free Models Router**'dır. OpenRouter şu anda ücretsiz modeller için `openrouter/free` router'ını sunuyor; ücretsiz kullanım rate-limitlidir. citeturn0search3turn0search6
+
+Kurulum için Vercel/server ortamında:
+
+```text
+AI_PROVIDER=openrouter
+OPENROUTER_API_KEY=...
+OPENROUTER_MODEL=openrouter/free
+APP_URL=https://site-adresin
+```
+
+Anahtar kesinlikle `index.html`, `app.js` veya GitHub dosyalarına yazılmamalıdır.
+
+### Alternatif
+
+`AI_PROVIDER=xai` ve `XAI_API_KEY` ile xAI backend yolu da kullanılabilir.
+
+## Yerel / açık modeller
+
+Tamamen kendi bilgisayarında çalıştırmak istersen OpenRouter yerine yerel Ollama gibi bir OpenAI-uyumlu gateway eklenebilir. Bu durumda inference maliyeti sağlayıcıya değil kendi donanımına aittir.
 
 ## Güvenlik
 
-xAI API anahtarı artık tarayıcıya gönderilmez ve GitHub kodunda tutulmaz. Sunucu tarafında `XAI_API_KEY` environment variable olarak tanımlanmalıdır. İstemci yalnızca `/api/chat` endpoint'ine istek gönderir.
-
-Sohbet geçmişi yalnızca kullanıcının tarayıcısındaki `localStorage` içinde tutulur; sunucu tarafında kalıcı kullanıcı veritabanı yoktur.
-
-Self-hosted GitHub Actions runner'ı public repository üzerinde kullanmayın. `kopru/install-runner.ps1` yalnızca private repo için tasarlanmıştır.
-
-## Vercel ile çalıştırma
-
-1. Bu repository'yi Vercel'e bağlayın.
-2. Project Environment Variables bölümüne `XAI_API_KEY` ekleyin.
-3. Production deploy başlatın.
-4. Açılan alan adında `/` adresini açın ve bir test mesajı gönderin.
-
-Vercel Functions `api/chat.js` dosyasını otomatik olarak `/api/chat` endpoint'i olarak sunar.
-
-## Yerel test
-
-Node.js ile syntax kontrolü:
-
-```bash
-node --check app.js
-node --check api/chat.js
-```
-
-Yerel çalıştırma için Vercel CLI veya Vercel'in yerel geliştirme sunucusu kullanılabilir.
-
-## Model
-
-Backend varsayılan olarak `grok-4.6` kullanır. xAI API anahtarı yalnızca sunucu ortamında bulunmalıdır.
+- API anahtarları server-side environment variable'dır.
+- Frontend yalnızca `/api/chat` çağırır.
+- Mesaj ve çıktı boyutları sınırlıdır.
+- 45 saniye timeout vardır.
+- GitHub Actions doğrulaması ayrı tutulur.
+- Production'da public self-hosted runner kullanılmamalıdır.
