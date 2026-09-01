@@ -12,16 +12,20 @@ export default async function handler(req, res) {
 
   const provider = (process.env.AI_PROVIDER || 'openrouter').toLowerCase();
   const configuredModel = process.env.OPENROUTER_AGENT_MODEL || process.env.OPENROUTER_MODEL || 'openrouter/free';
+  const webEnabled = Boolean(process.env.OPENROUTER_API_KEY) && process.env.OPENROUTER_WEB_ENABLED !== 'false';
+  const webEngine = process.env.OPENROUTER_WEB_ENGINE || 'auto';
 
   return send(res, 200, {
     ok: true,
     service: 'karicimgpt',
     provider,
     model: configuredModel,
+    mode: configuredModel === 'openrouter/free' ? 'free-router' : 'configured-model',
+    web: { enabled: webEnabled, engine: webEnabled ? webEngine : null },
     features: {
       chat: Boolean(process.env.OPENROUTER_API_KEY || process.env.XAI_API_KEY),
       agent: Boolean(process.env.OPENROUTER_API_KEY),
-      webTools: Boolean(process.env.OPENROUTER_API_KEY),
+      webTools: webEnabled,
       githubRead: Boolean(process.env.OPENROUTER_API_KEY)
     }
   });
