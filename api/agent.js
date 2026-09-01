@@ -4,6 +4,7 @@ const MAX_MESSAGES = 20;
 const MAX_MESSAGE_CHARS = 12000;
 const MAX_OUTPUT_TOKENS = 4096;
 const MAX_REQUEST_BYTES = 180000;
+const MAX_TOOL_CALLS = 4;
 
 function send(res, status, body, extra = {}) {
   securityHeaders(res);
@@ -66,6 +67,7 @@ export default async function handler(req, res) {
         ],
         tool_choice: 'auto',
         parallel_tool_calls: false,
+        max_tool_calls: MAX_TOOL_CALLS,
         temperature: 0.4,
         max_tokens: MAX_OUTPUT_TOKENS
       }),
@@ -91,7 +93,7 @@ export default async function handler(req, res) {
       model: data?.model || model,
       agent: true,
       webTools: true,
-      searchResultBudget: 10
+      maxToolCalls: MAX_TOOL_CALLS
     }, { 'X-RateLimit-Remaining': limit.remaining });
   } catch (error) {
     console.error('Agent error:', { name: error?.name, message: error?.message });
