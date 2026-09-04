@@ -1,8 +1,8 @@
 # pwsh 7 + .NET. powershell.exe 5.1 degil.
+using namespace System.Collections.Generic
 $ErrorActionPreference = "Stop"
 Write-Host ("ps {0}  clr {1}" -f $PSVersionTable.PSVersion, [System.Runtime.InteropServices.RuntimeInformation]::FrameworkDescription)
-Write-Host [datetime]::UtcNow
-using namespace System.Collections.Generic
+Write-Host ([datetime]::UtcNow)
 $list = [List[string]]::new()
 $list.Add('ok')
 Add-Type -TypeDefinition @'
