@@ -1,15 +1,18 @@
 ---
 name: powershell
-description: Write and review PowerShell 7 (pwsh) and Windows PowerShell 5.1 scripts. Use for Windows automation, C: probes, GitHub runner install, scheduled tasks the user can see. Prefer pwsh. Never silently install a Windows service. Never disable antivirus. Never persist without showing the command.
+description: Write PowerShell 7 cmdlets and scripts. Use when the user asks for Get-Command, modules, Windows automation, kopru, runner. Prefer pwsh. This preview cannot run pwsh. Official docs powershell-7.6.
 ---
 
 # powershell
 
-- `$ErrorActionPreference = 'Stop'`
-- UTF8; Türkçe yorum ASCII veya UTF8 BOM
-- Parametre: `param()` üstte
-- Token/secret `Write-Host` etme
-- ExecutionPolicy: kullanıcı `pwsh -File`; script küresel policy değiştirmez
-- C: önizlemede yok; script kullanıcı PC'sinde
+Keşif: `Get-Command`, `Get-Help -Online`, `Get-Member`.
+Modül: `Get-Module -ListAvailable`, `Import-Module`.
+Boru: `Where-Object`, `ForEach-Object`, `Select-Object`.
+Dosya: `Get-ChildItem`, `Get-Content`, `Set-Content`, `Test-Path`.
 
-Dosyalar: `kopru/karicim-kopru.ps1`, `kopru/install-runner.ps1`
+`$ErrorActionPreference = 'Stop'`. Token basma. Servis gizlice kurma.
+
+Kaynak:
+- https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/?view=powershell-7.6
+- https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.management/?view=powershell-7.6
+- https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.utility/?view=powershell-7.6
