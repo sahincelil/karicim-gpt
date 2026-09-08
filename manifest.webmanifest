@@ -1,0 +1,11 @@
+{
+  "name": "KaricimGPT",
+  "short_name": "KaricimGPT",
+  "description": "Güvenli, Türkçe-first AI sohbet ve agent çalışma alanı.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0b0c0e",
+  "theme_color": "#0b0c0e",
+  "lang": "tr",
+  "icons": []
+}
