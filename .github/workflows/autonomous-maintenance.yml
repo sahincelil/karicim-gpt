@@ -1,0 +1,71 @@
+name: Autonomous Maintenance
+
+on:
+  schedule:
+    - cron: '17 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: autonomous-maintenance
+  cancel-in-progress: true
+
+jobs:
+  health-and-regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm install --ignore-scripts
+
+      - name: Static checks and regression tests
+        run: npm test
+
+      - name: Verify required runtime files
+        run: |
+          test -f server.js
+          test -f api/chat.js
+          test -f api/agent.js
+          test -f api/memory.js
+          test -f lib/security.js
+          test -f lib/memory.js
+          test -f lib/heartbeat.js
+
+      - name: Start runtime
+        run: node server.js > /tmp/karicimgpt.log 2>&1 & echo $! > /tmp/karicimgpt.pid
+
+      - name: Runtime health check
+        run: |
+          for i in {1..20}; do
+            if curl --fail --silent http://127.0.0.1:3000/health > /tmp/health.json; then
+              cat /tmp/health.json
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/karicimgpt.log
+          exit 1
+
+      - name: Stop runtime
+        if: always()
+        run: |
+          if test -f /tmp/karicimgpt.pid; then kill "$(cat /tmp/karicimgpt.pid)" || true; fi
+
+      - name: Upload runtime log on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: autonomous-maintenance-log
+          path: /tmp/karicimgpt.log
+          if-no-files-found: ignore
