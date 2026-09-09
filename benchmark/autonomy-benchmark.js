@@ -48,6 +48,17 @@ await check('strategy selection learns from outcomes', async () => {
   assert.equal(fourth.success, true);
 });
 
+await check('learned lesson transfers to a novel goal', async () => {
+  const state = await autonomy.loadAutonomyState();
+  await autonomy.evaluateAttempt({ task: 'regression', strategy: 'baseline', strategyKey: 'regression:baseline', lesson: 'For regression recovery, prefer the baseline strategy before risky alternatives.' }, false);
+  await autonomy.registerGoal('apply the learned baseline recovery lesson to a new maintenance task', 30, 'memory-maintenance', 'baseline recovery');
+  const result = await autonomy.runAutonomyCycle({
+    'memory-maintenance': async ({ lessons }) => lessons.some((lesson) => lesson.text.includes('baseline strategy'))
+  });
+  assert.equal(result.success, true);
+  assert.ok(result.lessons.some((lesson) => lesson.text.includes('baseline strategy')));
+});
+
 await check('concurrent cycles serialize', async () => {
   const [a, b] = await Promise.all([
     autonomy.runAutonomyCycle({ health: async () => true }),
@@ -67,7 +78,7 @@ await check('state remains valid after repeated cycles', async () => {
 const total = checks.length;
 const score = Math.round((passed / total) * 100);
 const report = {
-  benchmark: 'autonomy-core-v2',
+  benchmark: 'autonomy-core-v3',
   score,
   passed,
   total,
