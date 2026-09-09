@@ -12,11 +12,24 @@ const { proposeImprovement, recordImprovementProposal, improvementSnapshot } = a
 test('improvement proposal classifies memory weakness', () => {
   const proposal = proposeImprovement({ summary: 'memory recall regression', failures: [{ name: 'recall' }] });
   assert.equal(proposal.area, 'memory');
+  assert.equal(proposal.decision, 'hold');
   assert.match(proposal.verification, /benchmark/i);
   assert.equal(proposal.status, 'proposed');
 });
 
-test('improvement proposal preserves safety boundary', () => {
+test('accepts a candidate only when measurable improvement clears the gate', () => {
+  const proposal = proposeImprovement({ summary: 'planning benchmark', baselineScore: 0.70, candidateScore: 0.72 });
+  assert.equal(proposal.decision, 'accept');
+  assert.equal(proposal.delta, 0.02);
+});
+
+test('rejects a non-improving candidate', () => {
+  const proposal = proposeImprovement({ summary: 'provider regression', baselineScore: 0.80, candidateScore: 0.79 });
+  assert.equal(proposal.decision, 'reject');
+  assert.equal(proposal.delta, -0.01);
+});
+
+test('preserves safety boundary', () => {
   const proposal = proposeImprovement({ summary: 'provider timeout' });
   assert.equal(proposal.area, 'reliability');
   assert.match(proposal.guardrail, /secrets/i);
