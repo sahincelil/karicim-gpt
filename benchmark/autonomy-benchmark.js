@@ -36,6 +36,18 @@ await check('failure creates a persistent lesson', async () => {
   assert.ok(raw.lessons.length >= 1);
 });
 
+await check('strategy selection learns from outcomes', async () => {
+  await autonomy.registerGoal('strategy learning', 20, 'regression');
+  const executor = async ({ strategy }) => strategy === 'baseline';
+  const first = await autonomy.runAutonomyCycle({ regression: executor });
+  const second = await autonomy.runAutonomyCycle({ regression: executor });
+  const third = await autonomy.runAutonomyCycle({ regression: executor });
+  const fourth = await autonomy.runAutonomyCycle({ regression: executor });
+  assert.deepEqual([first.strategy, second.strategy, third.strategy], ['baseline', 'recovery', 'conservative']);
+  assert.equal(fourth.strategy, 'baseline');
+  assert.equal(fourth.success, true);
+});
+
 await check('concurrent cycles serialize', async () => {
   const [a, b] = await Promise.all([
     autonomy.runAutonomyCycle({ health: async () => true }),
@@ -48,13 +60,20 @@ await check('state remains valid after repeated cycles', async () => {
   for (let i = 0; i < 8; i += 1) await autonomy.runAutonomyCycle({ 'memory-maintenance': async () => i % 2 === 0 });
   const snapshot = await autonomy.autonomySnapshot();
   assert.equal(snapshot.version, 2);
-  assert.ok(snapshot.metrics.cycles >= 12);
+  assert.ok(snapshot.metrics.cycles >= 16);
   assert.ok(Object.keys(snapshot.strategies).length >= 1);
 });
 
 const total = checks.length;
 const score = Math.round((passed / total) * 100);
-const report = { benchmark: 'autonomy-core-v1', score, passed, total, checks, timestamp: new Date().toISOString() };
+const report = {
+  benchmark: 'autonomy-core-v2',
+  score,
+  passed,
+  total,
+  checks,
+  timestamp: new Date().toISOString()
+};
 console.log(JSON.stringify(report, null, 2));
 await rm(dir, { recursive: true, force: true });
 if (score < 100) process.exitCode = 1;
