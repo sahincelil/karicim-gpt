@@ -6,8 +6,10 @@ import { join } from 'node:path';
 const dir = await mkdtemp(join(tmpdir(), 'karicimgpt-benchmark-'));
 process.env.DATA_DIR = dir;
 process.env.AUTONOMY_FILE = join(dir, 'autonomy.json');
+process.env.IMPROVEMENT_FILE = join(dir, 'improvement-proposals.json');
 
 const autonomy = await import(`../lib/autonomy.js?benchmark=${Date.now()}`);
+const improvement = await import(`../lib/self-improvement.js?benchmark=${Date.now()}`);
 let passed = 0;
 const checks = [];
 
@@ -75,14 +77,29 @@ await check('state remains valid after repeated cycles', async () => {
   assert.ok(Object.keys(snapshot.strategies).length >= 1);
 });
 
+await check('benchmark result feeds the self-improvement gate', async () => {
+  const baseline = 0.70;
+  const candidate = 0.72;
+  const proposal = await improvement.recordImprovementProposal({
+    summary: 'autonomy benchmark candidate',
+    baselineScore: baseline,
+    candidateScore: candidate
+  });
+  assert.equal(proposal.decision, 'accept');
+  assert.equal(proposal.delta, 0.02);
+  const snapshot = await improvement.improvementSnapshot();
+  assert.equal(snapshot.metrics.accepted, 1);
+});
+
 const total = checks.length;
 const score = Math.round((passed / total) * 100);
 const report = {
-  benchmark: 'autonomy-core-v3',
+  benchmark: 'autonomy-core-v4-self-improvement-gated',
   score,
   passed,
   total,
   checks,
+  improvementGate: { minimumDelta: 0.01, principle: 'only measurable improvements advance' },
   timestamp: new Date().toISOString()
 };
 console.log(JSON.stringify(report, null, 2));
