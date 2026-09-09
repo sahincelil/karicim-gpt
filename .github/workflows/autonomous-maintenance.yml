@@ -1,6 +1,7 @@
 name: Autonomous Maintenance
 
 on:
+  pull_request:
   schedule:
     - cron: '17 * * * *'
   workflow_dispatch:
@@ -9,7 +10,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: autonomous-maintenance
+  group: autonomous-maintenance-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 jobs:
