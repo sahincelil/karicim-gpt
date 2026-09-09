@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { recallLessons } from '../lib/autonomy.js';
 import { runAutonomyBenchmark } from '../lib/benchmark.js';
 
 test('autonomy benchmark passes a valid state', () => {
@@ -36,4 +37,17 @@ test('autonomy benchmark requires lessons for recorded failures', () => {
   };
   const result = runAutonomyBenchmark(state);
   assert.equal(result.results.find((item) => item.id === 'lesson-persistence').passed, false);
+});
+
+test('lesson retrieval ranks relevant knowledge and stays bounded', () => {
+  const state = {
+    lessons: [
+      { id: 'old', text: 'Use conservative memory maintenance.', source: 'memory-maintenance' },
+      { id: 'relevant', text: 'For regression recovery, prefer the baseline strategy.', source: 'regression' },
+      { id: 'noise', text: 'Health endpoint returned a transient timeout.', source: 'health' }
+    ]
+  };
+  const lessons = recallLessons(state, 'new baseline recovery task', 2);
+  assert.equal(lessons.length, 1);
+  assert.equal(lessons[0].id, 'relevant');
 });
