@@ -28,6 +28,8 @@ jobs:
         run: npm install --ignore-scripts
       - name: Regression suite
         run: npm test
+      - name: Autonomous benchmark
+        run: npm run benchmark
       - name: Start runtime
         run: node server.js > /tmp/karicimgpt.log 2>&1 & echo $! > /tmp/karicimgpt.pid
       - name: Health and autonomy checks
