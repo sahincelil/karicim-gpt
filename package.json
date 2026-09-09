@@ -5,7 +5,7 @@
   "engines": { "node": ">=20" },
   "scripts": {
     "start": "node server.js",
-    "check": "node --check api/chat.js && node --check api/agent.js && node --check api/memory.js && node --check lib/security.js && node --check lib/memory.js && node --check lib/heartbeat.js && node --check lib/autonomy.js && node --check lib/knowledge.js && node --check lib/benchmark.js && node --check app.js && node --check server.js && node --check test/autonomy.test.js && node --check test/benchmark.test.js && node --check benchmark/autonomy-benchmark.js",
+    "check": "node --check api/chat.js && node --check api/agent.js && node --check api/memory.js && node --check lib/security.js && node --check lib/memory.js && node --check lib/heartbeat.js && node --check lib/autonomy.js && node --check lib/knowledge.js && node --check lib/benchmark.js && node --check app.js && node --check server.js && node --check test/autonomy.test.js && node --check test/benchmark.test.js && node --check test/knowledge.test.js && node --check benchmark/autonomy-benchmark.js",
     "test": "npm run check && node --test",
     "benchmark": "node benchmark/autonomy-benchmark.js"
   }
