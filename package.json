@@ -4,6 +4,7 @@
   "type": "module",
   "engines": { "node": ">=20" },
   "scripts": {
-    "check": "node --check api/chat.js && node --check api/agent.js && node --check lib/security.js && node --check app.js"
+    "start": "node server.js",
+    "check": "node --check api/chat.js && node --check api/agent.js && node --check lib/security.js && node --check app.js && node --check server.js"
   }
 }
