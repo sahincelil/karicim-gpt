@@ -25,3 +25,15 @@ test('autonomy benchmark catches inconsistent metrics', () => {
   assert.ok(result.score < 1);
   assert.equal(result.results.find((item) => item.id === 'metrics-consistency').passed, false);
 });
+
+test('autonomy benchmark requires lessons for recorded failures', () => {
+  const state = {
+    goals: [],
+    attempts: [{ success: false, status: 'failed', durationMs: 4, lesson: 'retry with recovery' }],
+    lessons: [],
+    metrics: { cycles: 1, successes: 0, failures: 1 },
+    strategies: { 'regression:baseline': { trials: 1, successes: 0, rate: 0 } }
+  };
+  const result = runAutonomyBenchmark(state);
+  assert.equal(result.results.find((item) => item.id === 'lesson-persistence').passed, false);
+});
