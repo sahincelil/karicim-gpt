@@ -2,12 +2,20 @@ name: check
 on:
   push:
   pull_request:
+permissions:
+  contents: read
 jobs:
-  syntax:
+  verify:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - run: npm run check
+          cache: npm
+      - run: npm install --ignore-scripts
+      - name: Full regression suite
+        run: npm test
+      - name: Autonomous benchmark
+        run: npm run benchmark
