@@ -48,6 +48,12 @@ jobs:
           curl --fail --silent --show-error http://127.0.0.1:3000/api/audit | tee /tmp/audit.json
           node -e "const x=require('fs').readFileSync('/tmp/audit.json','utf8'); const j=JSON.parse(x); if(!j.ok) process.exit(1); console.log('Audit status:',j.status,'fingerprint:',j.fingerprint)"
 
+      - name: Generate improvement proposals
+        if: success()
+        run: |
+          curl --fail --silent --show-error http://127.0.0.1:3000/api/proposals | tee /tmp/proposals.json
+          node -e "const j=JSON.parse(require('fs').readFileSync('/tmp/proposals.json','utf8')); if(!j.ok || !Array.isArray(j.proposals)) process.exit(1); console.log('Proposals:',j.proposals.length)"
+
       - name: Verify evolve endpoint
         if: success()
         run: |
@@ -66,7 +72,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: evolve-audit-report
-          path: /tmp/audit.json
+          path: |
+            /tmp/audit.json
+            /tmp/proposals.json
           if-no-files-found: ignore
 
       - name: Stop runtime
