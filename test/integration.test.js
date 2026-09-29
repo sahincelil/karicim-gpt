@@ -16,7 +16,7 @@ function request(path, { method = 'GET', body, rawBody, headers = {} } = {}) {
       let raw = '';
       res.setEncoding('utf8');
       res.on('data', chunk => { raw += chunk; });
-      res.on('end', () => resolve({ status: res.statusCode, body: raw ? JSON.parse(raw) : null }));
+      res.on('end', () => resolve({ status: res.statusCode, headers: res.headers, body: raw ? JSON.parse(raw) : null }));
     });
     req.on('error', reject);
     if (data) req.write(data);
@@ -35,6 +35,8 @@ function signedHeaders(raw, timestamp = Date.now()) {
 const health = await request('/health');
 assert.equal(health.status, 200);
 assert.equal(health.body.ok, true);
+assert.equal(health.headers?.['x-content-type-options'], 'nosniff');
+assert.equal(health.headers?.['x-frame-options'], 'DENY');
 
 assert.equal((await request('/api/bridge', { method: 'GET' })).status, 404);
 assert.equal((await request('/api/bridge', { method: 'POST', body: { action: 'health' } })).status, 401);
