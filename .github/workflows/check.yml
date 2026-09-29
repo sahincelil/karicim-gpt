@@ -2,12 +2,103 @@ name: check
 on:
   push:
   pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
 jobs:
   syntax:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
         with:
           node-version: 20
-      - run: npm run check
+
+      - name: Check JavaScript syntax
+        run: |
+          set -euo pipefail
+          for file in app.js api/chat.js api/agent.js api/health.js lib/security.js lib/github.js tests/smoke.mjs; do
+            node --check "$file"
+          done
+
+      - name: Check module imports
+        run: |
+          set -euo pipefail
+          node -e "Promise.all(['./api/chat.js','./api/agent.js','./api/health.js','./lib/security.js','./lib/github.js'].map((p) => import(p))).then(() => console.log('module imports: ok'))"
+
+      - name: Run deterministic smoke checks
+        run: node tests/smoke.mjs
+
+      - name: Check configuration and required files
+        run: |
+          set -euo pipefail
+          node -e "JSON.parse(require('fs').readFileSync('package.json','utf8')); JSON.parse(require('fs').readFileSync('vercel.json','utf8')); console.log('json config: ok')"
+          required=(index.html app.js api/chat.js api/agent.js api/health.js lib/security.js lib/github.js tests/smoke.mjs vercel.json package.json server.js)
+          for file in "${required[@]}"; do test -s "$file"; done
+          ! grep -Fq 'api.x.ai' index.html
+          ! grep -Fq 'OPENROUTER_API_KEY' index.html
+          ! grep -Fq 'XAI_API_KEY' index.html
+
+      - name: Check runtime health contract
+        run: |
+          set -euo pipefail
+          node server.js > /tmp/karicimgpt.log 2>&1 & echo $! > /tmp/karicimgpt.pid
+          trap 'kill "$(cat /tmp/karicimgpt.pid)" 2>/dev/null || true' EXIT
+          for i in {1..20}; do
+            if curl --fail --silent http://127.0.0.1:3000/health > /tmp/health.json; then
+              node - <<'NODE'
+const fs = require('fs');
+const health = JSON.parse(fs.readFileSync('/tmp/health.json', 'utf8'));
+if (!health || typeof health !== 'object') throw new Error('health response is not an object');
+if (health.status !== 'ok') throw new Error('health status is not ok');
+if (!health.capabilities || typeof health.capabilities !== 'object') throw new Error('health capabilities missing');
+for (const key of ['chat', 'agent', 'webTools', 'githubRead']) {
+  if (typeof health.capabilities[key] !== 'boolean') throw new Error(`health capabilities.${key} must be boolean`);
+}
+console.log('runtime health contract: ok');
+NODE
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/karicimgpt.log
+          exit 1
+
+      - name: Check agent and security guardrails
+        run: |
+          set -euo pipefail
+          checks=(
+            "type: 'openrouter:web_search'|api/agent.js"
+            "type: 'openrouter:web_fetch'|api/agent.js"
+            "max_total_results|api/agent.js"
+            "parallel_tool_calls: false|api/agent.js"
+            "DEFAULT_MODEL = 'openrouter/free'|api/agent.js"
+            "configuredModel === DEFAULT_MODEL|api/agent.js"
+            "MAX_TOOL_CALLS_TOTAL = 6|api/agent.js"
+            "MAX_TOOL_ROUNDS = 4|api/agent.js"
+            "MAX_CUSTOM_TOOL_RESULT = 30000|api/agent.js"
+            "tool_call_id: call.id|api/agent.js"
+            "readPublicGitHubFile|api/agent.js"
+            "rateLimit|api/agent.js"
+            "MAX_BUCKETS|lib/security.js"
+          )
+          for item in "${checks[@]}"; do
+            pattern="${item%%|*}"
+            file="${item##*|}"
+            grep -Fq "$pattern" "$file"
+          done
+          grep -Fq "type: 'openrouter:web_search'" api/chat.js
+          grep -Fq "type: 'openrouter:web_fetch'" api/chat.js
+          grep -Fq 'models' api/chat.js
+          grep -Fq "DEFAULT_FREE_MODEL = 'openrouter/free'" api/chat.js
+          grep -Fq 'MAX_FILE_BYTES = 120000' lib/github.js
+          grep -Fq 'Yalnızca tekil public dosyalar okunabilir' lib/github.js
+          grep -Fq "path.startsWith('/')" lib/github.js
