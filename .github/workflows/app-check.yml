@@ -62,6 +62,35 @@ jobs:
           ! grep -Fq 'OPENROUTER_API_KEY' index.html
           ! grep -Fq 'XAI_API_KEY' index.html
 
+      - name: Check runtime health contract
+        run: |
+          set -euo pipefail
+          node server.js > /tmp/karicimgpt.log 2>&1 & echo $! > /tmp/karicimgpt.pid
+          trap 'kill "$(cat /tmp/karicimgpt.pid)" 2>/dev/null || true' EXIT
+          for i in {1..20}; do
+            if curl --fail --silent http://127.0.0.1:3000/health > /tmp/health.json; then
+              node - <<'NODE'
+const fs = require('fs');
+const health = JSON.parse(fs.readFileSync('/tmp/health.json', 'utf8'));
+if (!health || typeof health !== 'object') throw new Error('health response is not an object');
+if (health.status !== 'ok') throw new Error('health status is not ok');
+if (!health.capabilities || typeof health.capabilities !== 'object') {
+  throw new Error('health capabilities missing');
+}
+for (const key of ['chat', 'agent', 'webTools', 'githubRead']) {
+  if (typeof health.capabilities[key] !== 'boolean') {
+    throw new Error(`health capabilities.${key} must be boolean`);
+  }
+}
+console.log('runtime health contract: ok');
+NODE
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/karicimgpt.log
+          exit 1
+
       - name: Check agent guardrails
         run: |
           set -euo pipefail
