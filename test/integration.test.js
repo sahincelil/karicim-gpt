@@ -63,12 +63,12 @@ assert.equal((await request('/api/bridge', {
 })).status, 400);
 
 const chatMethod = await request('/api/chat', { method: 'GET' });
-assert.equal(chatMethod.status, 405);
+assert.equal(chatMethod.status, 404);
 assert.equal(chatMethod.headers?.['x-content-type-options'], 'nosniff');
 assert.equal(chatMethod.headers?.['x-frame-options'], 'DENY');
 
 const agentMethod = await request('/api/agent', { method: 'GET' });
-assert.equal(agentMethod.status, 405);
+assert.equal(agentMethod.status, 404);
 assert.equal(agentMethod.headers?.['x-content-type-options'], 'nosniff');
 assert.equal(agentMethod.headers?.['x-frame-options'], 'DENY');
 
