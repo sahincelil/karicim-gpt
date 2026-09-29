@@ -10,14 +10,9 @@ on:
 permissions:
   contents: read
 
-concurrency:
-  group: app-check-${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
-
 jobs:
   checks:
-    if: ${{ !cancelled() }}
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
       - name: Checkout
