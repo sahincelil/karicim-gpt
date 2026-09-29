@@ -81,5 +81,9 @@ assert.equal(evolve.status, 200);
 assert.equal(evolve.body.component, 'evolve');
 assert.equal(evolve.body.automatic.deploy, false);
 assert.equal(evolve.body.guardrails.arbitraryShell, false);
+assert.equal(evolve.body.guardrails.unrestrictedWrites, false);
+assert.equal(evolve.body.guardrails.destructiveActions, false);
+assert.equal(evolve.body.automatic.deploy, false);
+assert.equal(evolve.body.automatic.rollback, false);
 
 console.log('Integration tests passed.');
