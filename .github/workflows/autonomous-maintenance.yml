@@ -42,6 +42,10 @@ jobs:
           test -f lib/security.js
           test -f lib/memory.js
           test -f lib/heartbeat.js
+          test -f lib/health.js
+          test -f api/bridge.js
+          test -f api/evolve.js
+          test -f test/integration.test.js
 
       - name: Start runtime
         env:
@@ -62,6 +66,13 @@ jobs:
           done
           cat /tmp/karicimgpt.log
           exit 1
+
+      - name: Integration tests
+        env:
+          PORT: 3000
+          BRIDGE_SHARED_SECRET: integration-test-secret
+          NODE_ENV: test
+        run: node test/integration.test.js
 
       - name: Stop runtime
         if: always()
