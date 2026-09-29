@@ -62,6 +62,16 @@ assert.equal((await request('/api/bridge', {
   method: 'POST', rawBody: malformedRaw, headers: signedHeaders(malformedRaw)
 })).status, 400);
 
+const chatMethod = await request('/api/chat', { method: 'GET' });
+assert.equal(chatMethod.status, 405);
+assert.equal(chatMethod.headers?.['x-content-type-options'], 'nosniff');
+assert.equal(chatMethod.headers?.['x-frame-options'], 'DENY');
+
+const agentMethod = await request('/api/agent', { method: 'GET' });
+assert.equal(agentMethod.status, 405);
+assert.equal(agentMethod.headers?.['x-content-type-options'], 'nosniff');
+assert.equal(agentMethod.headers?.['x-frame-options'], 'DENY');
+
 const proposals = await request('/api/proposals');
 assert.equal(proposals.status, 200);
 assert.equal(proposals.body.ok, true);
