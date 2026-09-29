@@ -6,9 +6,9 @@ import { spawn } from 'node:child_process';
 const port = 34567;
 const secret = 'integration-test-secret';
 
-function request(path, { method = 'GET', body, headers = {} } = {}) {
+function request(path, { method = 'GET', body, rawBody, headers = {} } = {}) {
   return new Promise((resolve, reject) => {
-    const data = body === undefined ? '' : JSON.stringify(body);
+    const data = rawBody !== undefined ? rawBody : body === undefined ? '' : JSON.stringify(body);
     const req = http.request({ hostname: '127.0.0.1', port, path, method, headers: {
       ...(data ? { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(data) } : {}),
       ...headers
@@ -68,10 +68,11 @@ try {
   });
   assert.equal(badSignature.status, 401);
 
+  const malformedRaw = '{bad-json';
   const malformed = await request('/api/bridge', {
     method: 'POST',
-    headers: { ...signedHeaders('{bad-json') , 'Content-Type': 'application/json', 'Content-Length': 9 },
-    body: undefined
+    rawBody: malformedRaw,
+    headers: { ...signedHeaders(malformedRaw), 'Content-Type': 'application/json' }
   });
   assert.equal(malformed.status, 400);
 
