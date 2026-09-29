@@ -68,6 +68,12 @@ jobs:
           cat /tmp/karicimgpt.log
           exit 1
 
+      - name: Generate audit and improvement report
+        run: |
+          curl --fail --silent --show-error http://127.0.0.1:3000/api/audit > /tmp/audit.json
+          curl --fail --silent --show-error http://127.0.0.1:3000/api/proposals > /tmp/proposals.json
+          node -e "for (const f of ['/tmp/audit.json','/tmp/proposals.json']) { const j=JSON.parse(require('fs').readFileSync(f,'utf8')); if(!j.ok) process.exit(1); } console.log(require('fs').readFileSync('/tmp/audit.json','utf8')); console.log(require('fs').readFileSync('/tmp/proposals.json','utf8'));"
+
       - name: Integration tests
         env:
           PORT: 3000
@@ -80,6 +86,16 @@ jobs:
           if test -f /tmp/karicimgpt.pid; then
             kill "$(cat /tmp/karicimgpt.pid)" || true
           fi
+
+      - name: Upload maintenance reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: autonomous-maintenance-reports
+          path: |
+            /tmp/audit.json
+            /tmp/proposals.json
+          if-no-files-found: ignore
 
       - name: Upload runtime log on failure
         if: failure()
