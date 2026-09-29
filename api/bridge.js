@@ -1,5 +1,6 @@
 import crypto from 'node:crypto';
 import { securityHeaders, rateLimit } from '../lib/security.js';
+import agentHandler from './agent.js';
 
 const MAX_BODY = 180000;
 const MAX_SKEW_MS = 5 * 60 * 1000;
@@ -44,13 +45,17 @@ export default async function handler(req, res) {
   if (action === 'agent') {
     const messages = Array.isArray(input.messages) ? input.messages : [];
     if (!messages.length || messages.length > 20) return send(res, 400, { ok: false, error: 'messages gerekli.' });
-    return send(res, 200, {
-      ok: true,
-      bridge: 'karicimgpt-bridge',
-      accepted: true,
-      forward: '/api/agent',
-      messages: messages.map((m) => ({ role: m?.role === 'assistant' ? 'assistant' : 'user', content: typeof m?.content === 'string' ? m.content.slice(0, 12000) : '' })).filter((m) => m.content).slice(-20)
-    });
+    const cleanMessages = messages.map((m) => ({ role: m?.role === 'assistant' ? 'assistant' : 'user', content: typeof m?.content === 'string' ? m.content.slice(0, 12000) : '' })).filter((m) => m.content).slice(-20);
+    if (!cleanMessages.length || cleanMessages[cleanMessages.length - 1].role !== 'user') return send(res, 400, { ok: false, error: 'Geçerli bir son kullanıcı mesajı gerekli.' });
+    const context = {
+      ...res,
+      req: { ...req, body: { messages: cleanMessages } },
+      body: { messages: cleanMessages },
+      status(code) { res.statusCode = code; return this; },
+      setHeader(name, value) { res.setHeader(name, value); return this; },
+      end(data) { res.end(data); }
+    };
+    return agentHandler(context, res);
   }
   return send(res, 400, { ok: false, error: 'İzin verilen action: health, agent.' });
 }
