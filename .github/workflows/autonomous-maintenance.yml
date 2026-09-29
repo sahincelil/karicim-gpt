@@ -42,12 +42,17 @@ jobs:
           test -f lib/heartbeat.js
 
       - name: Start runtime
-        run: node server.js > /tmp/karicimgpt.log 2>&1 & echo $! > /tmp/karicimgpt.pid
+        env:
+          PORT: 3000
+          NODE_ENV: test
+        run: |
+          node server.js > /tmp/karicimgpt.log 2>&1 &
+          echo $! > /tmp/karicimgpt.pid
 
       - name: Runtime health check
         run: |
-          for i in {1..20}; do
-            if curl --fail --silent http://127.0.0.1:3000/health > /tmp/health.json; then
+          for i in {1..30}; do
+            if curl --fail --silent --show-error http://127.0.0.1:3000/health > /tmp/health.json; then
               cat /tmp/health.json
               exit 0
             fi
@@ -59,7 +64,9 @@ jobs:
       - name: Stop runtime
         if: always()
         run: |
-          if test -f /tmp/karicimgpt.pid; then kill "$(cat /tmp/karicimgpt.pid)" || true; fi
+          if test -f /tmp/karicimgpt.pid; then
+            kill "$(cat /tmp/karicimgpt.pid)" || true
+          fi
 
       - name: Upload runtime log on failure
         if: failure()
