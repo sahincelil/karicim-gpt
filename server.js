@@ -12,11 +12,12 @@ import { memoryHealth } from './lib/memory.js';
 import { healthSnapshot } from './lib/health.js';
 import { buildAudit } from './lib/audit.js';
 import { buildProposals } from './lib/proposals.js';
+import { securityHeaders } from './lib/security.js';
 
 const root = path.dirname(fileURLToPath(import.meta.url));
 const port = Number(process.env.PORT || 3000);
 const startedAt = Date.now();
-function headers(res) { res.setHeader('Access-Control-Allow-Origin', process.env.CORS_ORIGIN || '*'); res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Accept, Authorization, X-Bridge-Timestamp, X-Bridge-Signature'); res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS'); }
+function headers(res) { securityHeaders(res); res.setHeader('Access-Control-Allow-Origin', process.env.CORS_ORIGIN || '*'); res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Accept, Authorization, X-Bridge-Timestamp, X-Bridge-Signature'); res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS'); }
 function send(res, status, body, type = 'application/json; charset=utf-8') { headers(res); res.statusCode = status; res.setHeader('Content-Type', type); res.end(type.startsWith('application/json') ? JSON.stringify(body) : body); }
 async function body(req) { const chunks = []; let size = 0; for await (const chunk of req) { size += chunk.length; if (size > 200_000) throw Object.assign(new Error('Request too large'), { status: 413 }); chunks.push(chunk); } const raw = Buffer.concat(chunks).toString('utf8'); req.rawBody = raw; if (!raw) return {}; try { return JSON.parse(raw); } catch { throw Object.assign(new Error('Invalid JSON'), { status: 400 }); } }
 function adapter(req, res, parsedBody) { return { ...res, method: req.method, headers: req.headers, socket: req.socket, url: req.url, status(code) { res.statusCode = code; return this; }, setHeader(name, value) { res.setHeader(name, value); return this; }, end(data) { res.end(data); }, req, body: parsedBody }; }
