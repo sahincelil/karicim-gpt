@@ -80,7 +80,6 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               state: 'open',
-              labels: 'evolve-failure',
               per_page: 10
             });
             if (!existing.data.some(issue => issue.title === title)) {
@@ -89,6 +88,5 @@ jobs:
                 repo: context.repo.repo,
                 title,
                 body,
-                labels: ['evolve-failure']
               });
             }
