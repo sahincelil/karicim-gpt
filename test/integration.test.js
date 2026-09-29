@@ -60,6 +60,13 @@ assert.equal((await request('/api/bridge', {
   method: 'POST', rawBody: malformedRaw, headers: signedHeaders(malformedRaw)
 })).status, 400);
 
+const audit = await request('/api/audit');
+assert.equal(audit.status, 200);
+assert.equal(audit.body.ok, true);
+assert.equal(typeof audit.body.fingerprint, 'string');
+assert.equal(audit.body.policy.autoSourceModification, false);
+assert.equal(audit.body.policy.autoDeploy, false);
+
 const evolve = await request('/api/evolve');
 assert.equal(evolve.status, 200);
 assert.equal(evolve.body.component, 'evolve');
