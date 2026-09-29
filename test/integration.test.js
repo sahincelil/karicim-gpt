@@ -35,8 +35,6 @@ function signedHeaders(raw, timestamp = Date.now()) {
 const health = await request('/health');
 assert.equal(health.status, 200);
 assert.equal(health.body.ok, true);
-assert.equal(health.headers?.['x-content-type-options'], 'nosniff');
-assert.equal(health.headers?.['x-frame-options'], 'DENY');
 
 assert.equal((await request('/api/bridge', { method: 'GET' })).status, 404);
 assert.equal((await request('/api/bridge', { method: 'POST', body: { action: 'health' } })).status, 401);
@@ -50,6 +48,8 @@ assert.equal((await request('/api/bridge', {
 const good = await request('/api/bridge', { method: 'POST', body: JSON.parse(raw), headers: signedHeaders(raw) });
 assert.equal(good.status, 200);
 assert.equal(good.body.ok, true);
+assert.equal(good.headers?.['x-content-type-options'], 'nosniff');
+assert.equal(good.headers?.['x-frame-options'], 'DENY');
 assert.deepEqual(good.body.actions, ['health', 'agent']);
 
 assert.equal((await request('/api/bridge', {
