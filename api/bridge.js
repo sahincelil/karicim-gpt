@@ -29,33 +29,51 @@ function verify(req, raw) {
   return timingSafeEqual(signature, expected);
 }
 
+function parseBody(req) {
+  if (req.body && typeof req.body === 'object') return req.body;
+  if (typeof req.rawBody !== 'string') return null;
+  try { return JSON.parse(req.rawBody); } catch { return null; }
+}
+
+function cleanMessages(messages) {
+  return messages.map((m) => ({
+    role: m?.role === 'assistant' ? 'assistant' : 'user',
+    content: typeof m?.content === 'string' ? m.content.slice(0, 12000) : ''
+  })).filter((m) => m.content).slice(-20);
+}
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') return send(res, 405, { ok: false, error: 'Yalnızca POST destekleniyor.' });
   const limit = rateLimit(req);
   if (!limit.allowed) return send(res, 429, { ok: false, error: 'Rate limit.' });
+
   const raw = typeof req.rawBody === 'string' ? req.rawBody : JSON.stringify(req.body || {});
   if (Buffer.byteLength(raw, 'utf8') > MAX_BODY) return send(res, 413, { ok: false, error: 'İstek çok büyük.' });
   if (!verify(req, raw)) return send(res, 401, { ok: false, error: 'Bridge kimlik doğrulaması başarısız.' });
 
-  const input = req.body || {};
-  const action = input.action;
-  if (action === 'health') {
+  const input = parseBody(req);
+  if (!input || typeof input !== 'object' || Array.isArray(input)) return send(res, 400, { ok: false, error: 'Geçerli JSON gövdesi gerekli.' });
+
+  if (input.action === 'health') {
     return send(res, 200, { ok: true, bridge: 'karicimgpt-bridge', actions: ['health', 'agent'], timestamp: new Date().toISOString() });
   }
-  if (action === 'agent') {
+
+  if (input.action === 'agent') {
     const messages = Array.isArray(input.messages) ? input.messages : [];
     if (!messages.length || messages.length > 20) return send(res, 400, { ok: false, error: 'messages gerekli.' });
-    const cleanMessages = messages.map((m) => ({ role: m?.role === 'assistant' ? 'assistant' : 'user', content: typeof m?.content === 'string' ? m.content.slice(0, 12000) : '' })).filter((m) => m.content).slice(-20);
-    if (!cleanMessages.length || cleanMessages[cleanMessages.length - 1].role !== 'user') return send(res, 400, { ok: false, error: 'Geçerli bir son kullanıcı mesajı gerekli.' });
+    const clean = cleanMessages(messages);
+    if (!clean.length || clean[clean.length - 1].role !== 'user') return send(res, 400, { ok: false, error: 'Geçerli bir son kullanıcı mesajı gerekli.' });
+
     const context = {
       ...res,
-      req: { ...req, body: { messages: cleanMessages } },
-      body: { messages: cleanMessages },
+      req: { ...req, body: { messages: clean } },
+      body: { messages: clean },
       status(code) { res.statusCode = code; return this; },
       setHeader(name, value) { res.setHeader(name, value); return this; },
       end(data) { res.end(data); }
     };
     return agentHandler(context, res);
   }
+
   return send(res, 400, { ok: false, error: 'İzin verilen action: health, agent.' });
 }
