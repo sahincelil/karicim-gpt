@@ -51,6 +51,7 @@ jobs:
         env:
           PORT: 3000
           NODE_ENV: test
+          BRIDGE_SHARED_SECRET: integration-test-secret
         run: |
           node server.js > /tmp/karicimgpt.log 2>&1 &
           echo $! > /tmp/karicimgpt.pid
@@ -71,7 +72,6 @@ jobs:
         env:
           PORT: 3000
           BRIDGE_SHARED_SECRET: integration-test-secret
-          NODE_ENV: test
         run: node test/integration.test.js
 
       - name: Stop runtime
