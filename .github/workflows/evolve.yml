@@ -42,6 +42,12 @@ jobs:
           node server.js > /tmp/karicimgpt-evolve.log 2>&1 &
           echo $! > /tmp/karicimgpt-evolve.pid
 
+      - name: Generate audit report
+        if: success()
+        run: |
+          curl --fail --silent --show-error http://127.0.0.1:3000/api/audit | tee /tmp/audit.json
+          node -e "const x=require('fs').readFileSync('/tmp/audit.json','utf8'); const j=JSON.parse(x); if(!j.ok) process.exit(1); console.log('Audit status:',j.status,'fingerprint:',j.fingerprint)"
+
       - name: Verify evolve endpoint
         if: success()
         run: |
@@ -54,6 +60,14 @@ jobs:
           done
           cat /tmp/karicimgpt-evolve.log
           exit 1
+
+      - name: Upload audit report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: evolve-audit-report
+          path: /tmp/audit.json
+          if-no-files-found: ignore
 
       - name: Stop runtime
         if: always()
