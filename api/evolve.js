@@ -13,7 +13,7 @@ export default async function handler(req, res) {
     ok: true,
     component: 'evolve',
     mode: 'controlled',
-    pipeline: ['observe', 'analyze', 'propose', 'test', 'review', 'deploy', 'verify', 'rollback'],
+    pipeline: ['observe', 'analyze', 'propose', 'test', 'review', 'coordinate', 'deploy', 'verify', 'rollback'],
     automatic: {
       observe: true,
       analyze: true,
