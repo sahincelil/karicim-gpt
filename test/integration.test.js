@@ -32,6 +32,11 @@ function signedHeaders(raw, timestamp = Date.now()) {
   };
 }
 
+const body = await request('/api/body');
+assert.equal(body.status, 200);
+assert.equal(body.body.capabilities.includes('self-test'), true);
+assert.equal(body.body.capabilities.includes('audit'), true);
+
 const health = await request('/health');
 assert.equal(health.status, 200);
 assert.equal(health.body.ok, true);
