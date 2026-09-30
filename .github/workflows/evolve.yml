@@ -19,12 +19,12 @@ jobs:
     timeout-minutes: 10
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
-          node-version: 20
+          node-version: 24
 
       - name: Install dependencies
         run: npm install --ignore-scripts
@@ -41,6 +41,19 @@ jobs:
         run: |
           node server.js > /tmp/karicimgpt-evolve.log 2>&1 &
           echo $! > /tmp/karicimgpt-evolve.pid
+
+      - name: Wait for runtime
+        if: success()
+        run: |
+          for i in {1..30}; do
+            if curl --fail --silent --show-error http://127.0.0.1:3000/health > /tmp/evolve-health.json; then
+              cat /tmp/evolve-health.json
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/karicimgpt-evolve.log
+          exit 1
 
       - name: Generate audit report
         if: success()
