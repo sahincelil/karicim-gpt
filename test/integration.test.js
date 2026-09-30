@@ -79,6 +79,7 @@ assert.equal(councilMethod.headers?.['x-content-type-options'], 'nosniff');
 const council = await request('/api/council', { method: 'POST', body: { messages: [{ role: 'user', content: 'ping' }] } });
 assert.equal(council.status, 503);
 assert.equal(council.body.ok, false);
+assert.equal(council.body.error.includes('en az bir model'), true);
 
 const grokMethod = await request('/api/grok', { method: 'GET' });
 assert.equal(grokMethod.status, 404);
