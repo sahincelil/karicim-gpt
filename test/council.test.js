@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { normalizeEvidence, normalizeSynthesis } from '../lib/council.js';
+import { normalizeEvidence, normalizeSynthesis, parseSynthesis } from '../lib/council.js';
 
 const evidence = normalizeEvidence({
   claims: ['  claim one  ', '', 42, null, 'claim two'],
@@ -38,3 +38,9 @@ assert.deepEqual(normalizeSynthesis(null), {
 });
 
 console.log('Council schema tests passed.');
+
+assert.equal(parseSynthesis('{"agreements":["ok"]}').ok, true);
+assert.deepEqual(parseSynthesis('{bad-json').structured, { agreements: [], disagreements: [], unknowns: [], nextChecks: [] });
+assert.equal(parseSynthesis('{"agreements":[null]}').ok, true);
+
+console.log('Council parse regression tests passed.');
