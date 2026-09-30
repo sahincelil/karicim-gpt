@@ -27,6 +27,13 @@ jobs:
         with:
           node-version: 24
 
+      - name: Toolchain preflight
+        run: |
+          node --version
+          npm --version
+          test "$(node -p "process.versions.node.split('.')[0]")" -ge 24
+          if test -f package-lock.json || test -f npm-shrinkwrap.json || test -f yarn.lock; then echo "Lockfile detected"; else echo "No lockfile: npm install is intentionally used without cache"; fi
+
       - name: Install dependencies
         run: npm install --ignore-scripts
 
