@@ -44,3 +44,8 @@ Otomasyon sınırları bilerek korunur: keyfi shell çalıştırma, gizli bilgi 
 ## Otonom bakım döngüsü
 
 `/api/evolve` yalnızca statik bir politika döndürmez; canlı audit, self-test ve proposal durumunu birleştirerek mevcut bakım durumunu raporlar. `health=ready` tüm otomatik kontrollerin geçtiğini, `health=attention` ise incelenmesi gereken blocker bulunduğunu gösterir. Bu raporlama katmanı kaynak kodunu kendi başına değiştirmez, deploy etmez ve geri alma işlemi yapmaz.
+
+
+## Bakım merkezi
+
+`GET /api/maintenance` tek bir raporda self-test, runtime audit ve bakım tekliflerini birleştirir. `docs/ARCHITECTURE.md` sistemin katmanlarını ve kontrollü otonomi modelini açıklar.
