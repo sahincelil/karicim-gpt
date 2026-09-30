@@ -11,6 +11,22 @@ const MAX_SERVER_TOOL_CALLS = 2;
 const MAX_CUSTOM_TOOL_RESULT = 30000;
 const DEFAULT_MODEL = 'openrouter/free';
 
+const SECRET_PATTERNS = [
+  /sk-[A-Za-z0-9_-]{20,}/g,
+  /sk-proj-[A-Za-z0-9_-]{20,}/g,
+  /xai-[A-Za-z0-9_-]{20,}/g,
+  /gh[pousr]_[A-Za-z0-9_]{20,}/g,
+  /github_pat_[A-Za-z0-9_]{20,}/g,
+  /AIza[0-9A-Za-z_-]{20,}/g,
+  /(?:api[_-]?key|token|secret|password)\\s*[:=]\\s*['"]?[A-Za-z0-9_./+=-]{16,}['"]?/gi
+];
+
+export function redactSensitiveText(value) {
+  let output = String(value ?? '');
+  for (const pattern of SECRET_PATTERNS) output = output.replace(pattern, '[REDACTED]');
+  return output;
+}
+
 function send(res, status, body, extra = {}) {
   securityHeaders(res);
   Object.entries(extra).forEach(([key, value]) => res.setHeader(key, String(value)));
@@ -122,7 +138,7 @@ async function runModelLoop(model, userMessages, apiKey, signal) {
 
     const toolCalls = Array.isArray(message.tool_calls) ? message.tool_calls : [];
     if (!toolCalls.length) {
-      const output = typeof message.content === 'string' ? message.content.trim() : '';
+      const output = typeof message.content === 'string' ? redactSensitiveText(message.content.trim()) : '';
       if (!output) throw new Error('provider:empty-output');
       return { output, model: data?.model || model, toolCalls: totalToolCalls };
     }
@@ -146,7 +162,7 @@ async function runModelLoop(model, userMessages, apiKey, signal) {
       messages.push({
         role: 'tool',
         tool_call_id: call.id,
-        content: String(result).slice(0, MAX_CUSTOM_TOOL_RESULT)
+        content: redactSensitiveText(String(result)).slice(0, MAX_CUSTOM_TOOL_RESULT)
       });
     }
 
