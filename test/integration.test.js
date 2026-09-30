@@ -72,6 +72,10 @@ assert.equal(agentMethod.status, 404);
 assert.equal(agentMethod.headers?.['x-content-type-options'], 'nosniff');
 assert.equal(agentMethod.headers?.['x-frame-options'], 'DENY');
 
+const grok = await request('/api/grok', { method: 'POST', body: { messages: [{ role: 'user', content: 'ping' }] } });
+assert.equal(grok.status, 503);
+assert.equal(grok.body.ok, false);
+
 const proposals = await request('/api/proposals');
 assert.equal(proposals.status, 200);
 assert.equal(proposals.body.ok, true);
