@@ -80,6 +80,7 @@ const council = await request('/api/council', { method: 'POST', body: { messages
 assert.equal(council.status, 503);
 assert.equal(council.body.ok, false);
 assert.equal(council.body.error.includes('en az bir model'), true);
+assert.equal(council.body.guardrails, undefined);
 
 const grokMethod = await request('/api/grok', { method: 'GET' });
 assert.equal(grokMethod.status, 404);
