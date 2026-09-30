@@ -1,6 +1,18 @@
 import assert from 'node:assert/strict';
 import crypto from 'node:crypto';
 import http from 'node:http';
+import { redactSensitiveText } from '../api/agent.js';
+
+const redactionCases = [
+  ['sk-test-abcdefghijklmnopqrstuvwxyz123456', '[REDACTED]'],
+  ['ghp_abcdefghijklmnopqrstuvwxyz1234567890', '[REDACTED]'],
+  ['api_key=abcdefghijklmnopqrstuvwxyz123456', '[REDACTED]'],
+  ['safe public text', 'safe public text']
+];
+for (const [input, expected] of redactionCases) {
+  assert.equal(redactSensitiveText(input), expected);
+}
+assert.equal(redactSensitiveText('prefix sk-test-abcdefghijklmnopqrstuvwxyz123456 suffix').includes('sk-test-'), false);
 
 const port = Number(process.env.PORT || 3000);
 const secret = process.env.BRIDGE_SHARED_SECRET;
