@@ -72,6 +72,10 @@ assert.equal(agentMethod.status, 404);
 assert.equal(agentMethod.headers?.['x-content-type-options'], 'nosniff');
 assert.equal(agentMethod.headers?.['x-frame-options'], 'DENY');
 
+const grokMethod = await request('/api/grok', { method: 'GET' });
+assert.equal(grokMethod.status, 404);
+assert.equal(grokMethod.headers?.['x-content-type-options'], 'nosniff');
+
 const grok = await request('/api/grok', { method: 'POST', body: { messages: [{ role: 'user', content: 'ping' }] } });
 assert.equal(grok.status, 503);
 assert.equal(grok.body.ok, false);
@@ -94,6 +98,7 @@ const evolve = await request('/api/evolve');
 assert.equal(evolve.status, 200);
 assert.equal(evolve.body.component, 'evolve');
 assert.equal(evolve.body.automatic.deploy, false);
+assert.equal(evolve.body.pipeline.includes('coordinate'), true);
 assert.equal(evolve.body.guardrails.arbitraryShell, false);
 assert.equal(evolve.body.guardrails.unrestrictedWrites, false);
 assert.equal(evolve.body.guardrails.destructiveActions, false);
