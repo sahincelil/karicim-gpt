@@ -36,6 +36,7 @@ const body = await request('/api/body');
 assert.equal(body.status, 200);
 assert.equal(body.body.capabilities.includes('self-test'), true);
 assert.equal(body.body.capabilities.includes('audit'), true);
+assert.equal(body.body.capabilities.includes('maintenance'), true);
 
 const health = await request('/health');
 assert.equal(health.status, 200);
@@ -107,6 +108,12 @@ assert.equal(selfTest.status, 200);
 assert.equal(selfTest.body.ok, true);
 assert.equal(selfTest.body.status, 'passed');
 assert.equal(selfTest.body.policy.automaticDecision, false);
+
+const maintenance = await request('/api/maintenance');
+assert.equal(maintenance.status, 200);
+assert.equal(typeof maintenance.body.status, 'string');
+assert.equal(maintenance.body.policy.autonomousSourceWrite, false);
+assert.equal(maintenance.body.policy.autonomousDeploy, false);
 
 const audit = await request('/api/audit');
 assert.equal(audit.status, 200);
