@@ -72,6 +72,14 @@ assert.equal(agentMethod.status, 404);
 assert.equal(agentMethod.headers?.['x-content-type-options'], 'nosniff');
 assert.equal(agentMethod.headers?.['x-frame-options'], 'DENY');
 
+const councilMethod = await request('/api/council', { method: 'GET' });
+assert.equal(councilMethod.status, 404);
+assert.equal(councilMethod.headers?.['x-content-type-options'], 'nosniff');
+
+const council = await request('/api/council', { method: 'POST', body: { messages: [{ role: 'user', content: 'ping' }] } });
+assert.equal(council.status, 503);
+assert.equal(council.body.ok, false);
+
 const grokMethod = await request('/api/grok', { method: 'GET' });
 assert.equal(grokMethod.status, 404);
 assert.equal(grokMethod.headers?.['x-content-type-options'], 'nosniff');
