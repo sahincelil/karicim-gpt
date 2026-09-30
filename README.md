@@ -33,3 +33,10 @@ Tamamen kendi bilgisayarında çalıştırmak istersen OpenRouter yerine yerel O
 - 45 saniye timeout vardır.
 - GitHub Actions doğrulaması ayrı tutulur.
 - Production'da public self-hosted runner kullanılmamalıdır.
+
+
+## Kontrollü Evolution
+
+Sistem, `/api/audit`, `/api/proposals` ve `/api/evolve` üzerinden kendini gözlemleyen bir bakım döngüsü sunar. Council bağımsız model çıktılarından kanıt/iddia sinyalleri çıkarabilir ve yapılandırılmış bir sentez oluşturabilir.
+
+Otomasyon sınırları bilerek korunur: keyfi shell çalıştırma, gizli bilgi ifşası, yıkıcı işlemler, sınırsız kaynak yazımı, otomatik deploy ve otomatik rollback kapalıdır. GitHub Actions ise test, health-check ve raporlama görevlerini otomatik çalıştırır.
