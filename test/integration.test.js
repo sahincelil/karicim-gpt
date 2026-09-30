@@ -97,6 +97,12 @@ assert.equal(Array.isArray(proposals.body.proposals), true);
 assert.equal(proposals.body.policy.autonomousSourceWrite, false);
 assert.equal(proposals.body.policy.autonomousDeploy, false);
 
+const selfTest = await request('/api/self-test');
+assert.equal(selfTest.status, 200);
+assert.equal(selfTest.body.ok, true);
+assert.equal(selfTest.body.status, 'passed');
+assert.equal(selfTest.body.policy.automaticDecision, false);
+
 const audit = await request('/api/audit');
 assert.equal(audit.status, 200);
 assert.equal(audit.body.ok, true);
