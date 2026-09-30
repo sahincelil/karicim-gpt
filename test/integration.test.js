@@ -102,18 +102,24 @@ assert.equal(proposals.body.ok, true);
 assert.equal(Array.isArray(proposals.body.proposals), true);
 assert.equal(proposals.body.policy.autonomousSourceWrite, false);
 assert.equal(proposals.body.policy.autonomousDeploy, false);
+assert.equal(proposals.body.policy.autonomousRollback, false);
+assert.equal(proposals.body.proposals.every((proposal) => proposal.autoApply === false), true);
 
 const selfTest = await request('/api/self-test');
 assert.equal(selfTest.status, 200);
 assert.equal(selfTest.body.ok, true);
 assert.equal(selfTest.body.status, 'passed');
 assert.equal(selfTest.body.policy.automaticDecision, false);
+assert.equal(selfTest.body.policy.autonomousRollback, false);
+assert.equal(selfTest.body.policy.destructiveActions, false);
 
 const maintenance = await request('/api/maintenance');
 assert.equal(maintenance.status, 200);
 assert.equal(typeof maintenance.body.status, 'string');
 assert.equal(maintenance.body.policy.autonomousSourceWrite, false);
 assert.equal(maintenance.body.policy.autonomousDeploy, false);
+assert.equal(maintenance.body.policy.autonomousRollback, false);
+assert.equal(maintenance.body.policy.destructiveActions, false);
 
 const audit = await request('/api/audit');
 assert.equal(audit.status, 200);
@@ -121,6 +127,8 @@ assert.equal(audit.body.ok, true);
 assert.equal(typeof audit.body.fingerprint, 'string');
 assert.equal(audit.body.policy.autoSourceModification, false);
 assert.equal(audit.body.policy.autoDeploy, false);
+assert.equal(audit.body.policy.autoRollback, false);
+assert.equal(audit.body.policy.destructiveActions, false);
 
 const evolve = await request('/api/evolve');
 assert.equal(evolve.status, 200);
