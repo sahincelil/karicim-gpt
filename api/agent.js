@@ -18,7 +18,7 @@ const SECRET_PATTERNS = [
   /gh[pousr]_[A-Za-z0-9_]{20,}/g,
   /github_pat_[A-Za-z0-9_]{20,}/g,
   /AIza[0-9A-Za-z_-]{20,}/g,
-  /(?:api[_-]?key|token|secret|password)\\s*[:=]\\s*['"]?[A-Za-z0-9_./+=-]{16,}['"]?/gi
+  /(?:api[_-]?key|token|secret|password)\s*[:=]\s*['"]?[A-Za-z0-9_./+=-]{16,}['"]?/gi
 ];
 
 export function redactSensitiveText(value) {
