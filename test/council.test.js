@@ -5,7 +5,7 @@ const evidence = normalizeEvidence({
   claims: ['  claim one  ', '', 42, null, 'claim two'],
   uncertainty: [' unclear ', '', 7]
 });
-assert.deepEqual(evidence.claims, ['claim one', '42', 'null', 'claim two']);
+assert.deepEqual(evidence.claims, ['claim one', '42', 'claim two']);
 assert.deepEqual(evidence.uncertainty, ['unclear', '7']);
 
 const oversized = normalizeEvidence({
