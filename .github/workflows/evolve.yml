@@ -1,6 +1,8 @@
 name: Evolve
 
 on:
+  push:
+    branches: [main]
   schedule:
     - cron: '47 * * * *'
   workflow_dispatch:
