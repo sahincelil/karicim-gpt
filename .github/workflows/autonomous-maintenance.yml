@@ -35,7 +35,7 @@ jobs:
           if test -f package-lock.json || test -f npm-shrinkwrap.json || test -f yarn.lock; then echo "Lockfile detected"; else echo "No lockfile: npm install is intentionally used without cache"; fi
 
       - name: Install dependencies
-        run: npm install --ignore-scripts
+        run: npm ci
 
       - name: Static checks and regression tests
         run: npm test
@@ -58,6 +58,11 @@ jobs:
         env:
           PORT: 3000
           NODE_ENV: test
+          BRIDGE_REQUIRED: true
+          MEMORY_ADMIN_REQUIRED: true
+          PERSISTENT_MEMORY_REQUIRED: true
+          DATA_DIR: /tmp/karicimgpt-data
+          BODY_ADMIN_TOKEN: integration-admin-token
           BRIDGE_SHARED_SECRET: integration-test-secret
         run: |
           node server.js > /tmp/karicimgpt.log 2>&1 &
