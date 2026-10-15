@@ -20,7 +20,7 @@ API service:
 Database service:
 - Provision PostgreSQL in the same Railway project/environment as the API.
 - Reference its private connection URL as `DATABASE_URL` where possible.
-- Use `PGSSLMODE=require` only when connecting through an endpoint that requires TLS; do not disable certificate verification casually.
+- Use `PGSSLMODE=require` only when connecting through an endpoint that requires TLS. Certificate verification remains enabled; do not add a setting that disables it.
 - Backups/restore policy must be configured and tested before real user data is stored.
 
 ## Durable-memory behavior
