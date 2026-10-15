@@ -41,6 +41,10 @@ When `NODE_ENV=production` and `DATABASE_URL` is absent, the application refuses
 - [ ] Test database backup restoration in staging and record the recovery procedure.
 - [ ] Only after all checks pass, separately review and authorize any production deployment.
 
+## Public API launch blocker
+
+Before exposing the API publicly, complete [Issue #18](https://github.com/sahincelil/karicim-gpt/issues/18): abuse/rate controls for model-backed routes, budget controls, production CORS validation, and automated authorization tests. CORS is not authentication. The browser must never contain provider keys or the shared admin token. This runbook and a passing CI run are not evidence that these controls or live PostgreSQL restart persistence have been tested.
+
 ## Important security note
 
 The current `/api/memory` route is guarded by `BODY_ADMIN_TOKEN`; this change does not implement end-user identity or per-user memory isolation. Do not treat the shared admin-protected memory endpoint as multi-user personal memory. Before exposing personal memories to multiple users, implement authentication, per-user authorization, and isolation tests in a separate reviewed change.
