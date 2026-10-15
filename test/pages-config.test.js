@@ -17,6 +17,6 @@ assert.match(worker, /karicimgpt-shell-v3/);
 assert.match(worker, /new URL\('\.\/index\.html',self\.registration\.scope\)/);
 assert.match(manifest, /"start_url": "\.\//);
 assert.match(manifest, /"scope": "\.\//);
-assert.match(server, /config\\\.js/);
+assert.ok(server.includes('config\\.js'));
 
 console.log('GitHub Pages frontend configuration checks passed.');
