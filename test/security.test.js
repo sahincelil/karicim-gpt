@@ -3,6 +3,7 @@ import { clientKey, rateLimit, securityHeaders } from '../lib/security.js';
 
 const req = { headers: {}, socket: { remoteAddress: '127.0.0.1' } };
 assert.equal(clientKey(req), '127.0.0.1');
+assert.equal(clientKey({ headers: { 'x-forwarded-for': '203.0.113.9' }, socket: { remoteAddress: '127.0.0.2' } }), '127.0.0.2', 'must not trust spoofable X-Forwarded-For by default');
 
 const first = rateLimit(req);
 assert.equal(first.allowed, true);
