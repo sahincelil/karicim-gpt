@@ -1,8 +1,13 @@
 import assert from 'node:assert/strict';
-import { clientKey, rateLimit, securityHeaders } from '../lib/security.js';
+import { clientKey, isOriginAllowed, rateLimit, securityHeaders } from '../lib/security.js';
 
 const req = { headers: {}, socket: { remoteAddress: '127.0.0.1' } };
 assert.equal(clientKey(req), '127.0.0.1');
+assert.equal(isOriginAllowed(undefined, undefined), true, 'non-browser requests are not classified by CORS');
+assert.equal(isOriginAllowed('https://app.example', 'https://app.example'), true);
+assert.equal(isOriginAllowed('https://evil.example', 'https://app.example'), false);
+assert.equal(isOriginAllowed('https://app.example', undefined), false, 'browser origins fail closed when no allowlist is configured');
+assert.equal(isOriginAllowed('https://app.example', '*'), false, 'wildcard origins are not accepted for API access');
 assert.equal(clientKey({ headers: { 'x-forwarded-for': '203.0.113.9' }, socket: { remoteAddress: '127.0.0.2' } }), '127.0.0.2', 'must not trust spoofable X-Forwarded-For by default');
 
 const first = rateLimit(req);
