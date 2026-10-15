@@ -41,6 +41,10 @@ When `NODE_ENV=production` and `DATABASE_URL` is absent, the application refuses
 - [ ] Test database backup restoration in staging and record the recovery procedure.
 - [ ] Only after all checks pass, separately review and authorize any production deployment.
 
+## Rate-limit deployment note
+
+The in-process limiter is only a best-effort local guard: its counters are not shared across replicas and must not be treated as production abuse or budget control. It deliberately uses the socket peer address rather than trusting caller-supplied `X-Forwarded-For`. Before public exposure, configure and validate a trusted gateway/proxy that overwrites forwarding headers and enforce distributed rate limits and spend quotas there or in shared storage. Do not enable proxy-header trust based only on the presence of a header.
+
 ## Public API launch blocker
 
 Before exposing the API publicly, complete [Issue #18](https://github.com/sahincelil/karicim-gpt/issues/18): abuse/rate controls for model-backed routes, budget controls, production CORS validation, and automated authorization tests. CORS is not authentication. The browser must never contain provider keys or the shared admin token. This runbook and a passing CI run are not evidence that these controls or live PostgreSQL restart persistence have been tested.
