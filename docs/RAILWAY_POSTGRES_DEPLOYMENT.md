@@ -12,10 +12,11 @@ API service:
 - Source: this GitHub repository, branch `main` only after the relevant PRs have been reviewed and merged.
 - Start command: `npm start` (Node.js 24 or newer).
 - Health check path: `/health`.
-- Required secret environment variables: existing model-provider keys required by the enabled API routes, plus a strong random `BODY_ADMIN_TOKEN`.
+- Required secret environment variables: existing model-provider keys required by enabled API routes, a strong random `BODY_ADMIN_TOKEN`, and a separate random `TRUSTED_GATEWAY_SECRET` of at least 32 characters.
 - `DATABASE_URL`: Railway PostgreSQL connection URL, provided as a Railway variable reference rather than committed text.
 - `CORS_ORIGIN`: one exact published frontend origin, for example `https://sahincelil.github.io` (confirm the repository's actual Pages URL before setting it). Do not use `*`. Browser-origin requests are rejected when this variable is unset or the request Origin does not exactly match it; requests without an Origin are not authenticated by this check and still need route-level authorization.
 - `NODE_ENV=production`.
+- Every `/api/*` request in production now requires `x-karicimgpt-gateway-secret` to match `TRUSTED_GATEWAY_SECRET`; absent configuration fails closed with HTTP 503, and a missing/incorrect header gets HTTP 401. A trusted gateway must strip any client-supplied copy of this header and inject the secret only on the server-to-server hop. Never put this secret in GitHub Pages or browser JavaScript. This is a shared gateway boundary, **not** end-user identity or per-user quota enforcement.
 
 Database service:
 - Provision PostgreSQL in the same Railway project/environment as the API.
@@ -33,7 +34,8 @@ When `NODE_ENV=production` and `DATABASE_URL` is absent, the application refuses
 
 - [ ] Deploy to a non-production Railway environment only after a human review of the implementation PR.
 - [ ] Set all API provider credentials and `BODY_ADMIN_TOKEN` through Railway's secret-variable UI; never put them in GitHub Pages files.
-- [ ] Set one exact `CORS_ORIGIN`; verify a matching Origin succeeds, a mismatched Origin gets HTTP 403, and browser-origin requests fail closed if the variable is unset. Never treat this check as authentication.
+- [ ] Set one exact `CORS_ORIGIN`; verify a matching Origin succeeds and a mismatched Origin gets HTTP 403. Never treat this check as authentication.
+- [ ] Put a trusted gateway in front of the API, configure `TRUSTED_GATEWAY_SECRET` only on the API and gateway, and verify direct requests without the injected header get HTTP 401 (or HTTP 503 when the secret is not configured). Confirm the gateway overwrites/removes caller-supplied copies of the header.
 - [ ] Confirm `/health` reports `memory.backend = postgres`.
 - [ ] Add a harmless test memory through the authorized API, restart/redeploy the staging API, and confirm the record remains.
 - [ ] Confirm invalid/missing admin token cannot read or write `/api/memory`.

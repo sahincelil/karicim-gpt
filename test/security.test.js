@@ -1,8 +1,14 @@
 import assert from 'node:assert/strict';
-import { clientKey, isOriginAllowed, rateLimit, securityHeaders } from '../lib/security.js';
+import { clientKey, isOriginAllowed, isTrustedGatewayRequest, rateLimit, securityHeaders } from '../lib/security.js';
 
 const req = { headers: {}, socket: { remoteAddress: '127.0.0.1' } };
 assert.equal(clientKey(req), '127.0.0.1');
+const gatewaySecret = 'test-only-secret-that-is-at-least-32-characters';
+assert.equal(isTrustedGatewayRequest({ headers: { 'x-karicimgpt-gateway-secret': gatewaySecret } }, gatewaySecret), true);
+assert.equal(isTrustedGatewayRequest({ headers: { 'x-karicimgpt-gateway-secret': 'wrong-secret' } }, gatewaySecret), false);
+assert.equal(isTrustedGatewayRequest({ headers: {} }, gatewaySecret), false);
+assert.equal(isTrustedGatewayRequest({ headers: { 'x-karicimgpt-gateway-secret': gatewaySecret } }, undefined), false);
+assert.equal(isTrustedGatewayRequest({ headers: { 'x-karicimgpt-gateway-secret': gatewaySecret } }, 'short'), false);
 assert.equal(isOriginAllowed(undefined, undefined), true, 'non-browser requests are not classified by CORS');
 assert.equal(isOriginAllowed('https://app.example', 'https://app.example'), true);
 assert.equal(isOriginAllowed('https://evil.example', 'https://app.example'), false);
