@@ -135,13 +135,13 @@ assert.equal(selfTest.body.policy.automaticDecision, false);
 assert.equal(selfTest.body.policy.autonomousRollback, false);
 assert.equal(selfTest.body.policy.destructiveActions, false);
 
-const maintenance = await request('/api/maintenance');
-assert.equal(maintenance.status, 200);
-assert.equal(typeof maintenance.body.status, 'string');
-assert.equal(maintenance.body.policy.autonomousSourceWrite, false);
-assert.equal(maintenance.body.policy.autonomousDeploy, false);
-assert.equal(maintenance.body.policy.autonomousRollback, false);
-assert.equal(maintenance.body.policy.destructiveActions, false);
+const maintenancePolicy = await request('/api/maintenance');
+assert.equal(maintenancePolicy.status, 200);
+assert.equal(typeof maintenancePolicy.body.status, 'string');
+assert.equal(maintenancePolicy.body.policy.autonomousSourceWrite, false);
+assert.equal(maintenancePolicy.body.policy.autonomousDeploy, false);
+assert.equal(maintenancePolicy.body.policy.autonomousRollback, false);
+assert.equal(maintenancePolicy.body.policy.destructiveActions, false);
 
 const audit = await request('/api/audit');
 assert.equal(audit.status, 200);
