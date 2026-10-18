@@ -38,34 +38,33 @@ jobs:
                 event: 'schedule',
                 per_page: 10,
               });
-              const runs = response.data.workflow_runs;
-              const latest = runs[0];
+              const latest = response.data.workflow_runs[0];
 
               if (!latest) {
-                problems.push(\`\${target.label}: no scheduled run is visible on main.\`);
+                problems.push(target.label + ': no scheduled run is visible on main.');
                 continue;
               }
 
-              const latestAgeHours = (now - Date.parse(latest.created_at)) / 3600000;
-              if (latest.status !== 'completed' && latestAgeHours <= 2.5) {
-                core.info(\`\${target.label}: a recent scheduled run is still \${latest.status}; allowing it time to finish.\`);
+              const ageHours = (now - Date.parse(latest.created_at)) / 3600000;
+              if (latest.status !== 'completed' && ageHours <= 2.5) {
+                core.info(target.label + ': a recent scheduled run is still ' + latest.status + '; allowing it time to finish.');
                 continue;
               }
 
               if (latest.status !== 'completed') {
-                problems.push(\`\${target.label}: latest scheduled run has remained \${latest.status} for \${latestAgeHours.toFixed(1)} hours (\${latest.html_url}).\`);
+                problems.push(target.label + ': latest scheduled run has remained ' + latest.status + ' for ' + ageHours.toFixed(1) + ' hours (' + latest.html_url + ').');
                 continue;
               }
 
               if (latest.conclusion !== 'success') {
-                problems.push(\`\${target.label}: latest scheduled run concluded "\${latest.conclusion}" (\${latest.html_url}).\`);
+                problems.push(target.label + ': latest scheduled run concluded "' + latest.conclusion + '" (' + latest.html_url + ').');
                 continue;
               }
 
-              if (latestAgeHours > 3) {
-                problems.push(\`\${target.label}: latest successful scheduled run is \${latestAgeHours.toFixed(1)} hours old (\${latest.html_url}).\`);
+              if (ageHours > 3) {
+                problems.push(target.label + ': latest successful scheduled run is ' + ageHours.toFixed(1) + ' hours old (' + latest.html_url + ').');
               } else {
-                core.info(\`\${target.label}: latest scheduled run succeeded \${latestAgeHours.toFixed(1)} hours ago.\`);
+                core.info(target.label + ': latest scheduled run succeeded ' + ageHours.toFixed(1) + ' hours ago.');
               }
             }
 
@@ -88,13 +87,13 @@ jobs:
               'The scheduled automation watchdog detected a stale or unsuccessful scheduled workflow.',
               '',
               'Findings:',
-              ...problems.map(problem => \`- \${problem}\`),
+              ...problems.map(problem => '- ' + problem),
               '',
-              \`Watchdog run: \${context.serverUrl}/\${context.repo.owner}/\${context.repo.repo}/actions/runs/\${context.runId}\`,
+              'Watchdog run: ' + context.serverUrl + '/' + context.repo.owner + '/' + context.repo.repo + '/actions/runs/' + context.runId,
               '',
               'This workflow only reports the condition. It does not modify source code, re-run other workflows, close issues, or deploy anything.',
               'After investigating and confirming recovery, a maintainer may close this issue manually.',
-            ].join('\\n');
+            ].join('\n');
 
             if (existing) {
               await github.rest.issues.update({
@@ -103,23 +102,14 @@ jobs:
                 issue_number: existing.number,
                 body,
               });
-              core.warning(\`Updated existing watchdog issue #\${existing.number}.\`);
+              core.warning('Updated existing watchdog issue #' + existing.number + '.');
             } else {
               const created = await github.rest.issues.create({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 title,
                 body,
-                labels: ['automation', 'monitoring'],
-              }).catch(async error => {
-                if (error.status !== 422) throw error;
-                return github.rest.issues.create({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  title,
-                  body,
-                });
               });
-              core.warning(\`Created watchdog issue #\${created.data.number}.\`);
+              core.warning('Created watchdog issue #' + created.data.number + '.');
             }
             core.setOutput('status', 'problem');
