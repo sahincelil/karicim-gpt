@@ -1,0 +1,125 @@
+name: Automation Freshness Watchdog
+
+on:
+  schedule:
+    - cron: '13 */2 * * *'
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  issues: write
+
+concurrency:
+  group: automation-freshness-watchdog
+  cancel-in-progress: true
+
+jobs:
+  check-scheduled-automation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check scheduled maintenance and evolve runs
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const targets = [
+              { workflow: 'autonomous-maintenance.yml', label: 'Autonomous Maintenance' },
+              { workflow: 'evolve.yml', label: 'Evolve' },
+            ];
+            const problems = [];
+            const now = Date.now();
+
+            for (const target of targets) {
+              const response = await github.rest.actions.listWorkflowRuns({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                workflow_id: target.workflow,
+                branch: 'main',
+                event: 'schedule',
+                per_page: 10,
+              });
+              const runs = response.data.workflow_runs;
+              const latest = runs[0];
+
+              if (!latest) {
+                problems.push(\`\${target.label}: no scheduled run is visible on main.\`);
+                continue;
+              }
+
+              const latestAgeHours = (now - Date.parse(latest.created_at)) / 3600000;
+              if (latest.status !== 'completed' && latestAgeHours <= 2.5) {
+                core.info(\`\${target.label}: a recent scheduled run is still \${latest.status}; allowing it time to finish.\`);
+                continue;
+              }
+
+              if (latest.status !== 'completed') {
+                problems.push(\`\${target.label}: latest scheduled run has remained \${latest.status} for \${latestAgeHours.toFixed(1)} hours (\${latest.html_url}).\`);
+                continue;
+              }
+
+              if (latest.conclusion !== 'success') {
+                problems.push(\`\${target.label}: latest scheduled run concluded "\${latest.conclusion}" (\${latest.html_url}).\`);
+                continue;
+              }
+
+              if (latestAgeHours > 3) {
+                problems.push(\`\${target.label}: latest successful scheduled run is \${latestAgeHours.toFixed(1)} hours old (\${latest.html_url}).\`);
+              } else {
+                core.info(\`\${target.label}: latest scheduled run succeeded \${latestAgeHours.toFixed(1)} hours ago.\`);
+              }
+            }
+
+            const title = 'Automation freshness watchdog: scheduled workflow stale or failing';
+            const listed = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              per_page: 100,
+            });
+            const existing = listed.data.find(issue => issue.title === title && !issue.pull_request);
+
+            if (problems.length === 0) {
+              core.notice('Scheduled maintenance and Evolve runs are fresh and successful.');
+              core.setOutput('status', 'healthy');
+              return;
+            }
+
+            const body = [
+              'The scheduled automation watchdog detected a stale or unsuccessful scheduled workflow.',
+              '',
+              'Findings:',
+              ...problems.map(problem => \`- \${problem}\`),
+              '',
+              \`Watchdog run: \${context.serverUrl}/\${context.repo.owner}/\${context.repo.repo}/actions/runs/\${context.runId}\`,
+              '',
+              'This workflow only reports the condition. It does not modify source code, re-run other workflows, close issues, or deploy anything.',
+              'After investigating and confirming recovery, a maintainer may close this issue manually.',
+            ].join('\\n');
+
+            if (existing) {
+              await github.rest.issues.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: existing.number,
+                body,
+              });
+              core.warning(\`Updated existing watchdog issue #\${existing.number}.\`);
+            } else {
+              const created = await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title,
+                body,
+                labels: ['automation', 'monitoring'],
+              }).catch(async error => {
+                if (error.status !== 422) throw error;
+                return github.rest.issues.create({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  title,
+                  body,
+                });
+              });
+              core.warning(\`Created watchdog issue #\${created.data.number}.\`);
+            }
+            core.setOutput('status', 'problem');
