@@ -17,12 +17,14 @@ Last checked: 2026-10-19
 
 ## Latest verified CI and maintenance checks
 
-- Latest code checks completed successfully after the Pages workflow and dashboard updates. The Pages deployment itself is still blocked by repository integration permissions; see below.
+- Latest application change: OpenAI Responses API requests now use `store: false` by default to avoid API-side response storage. This does not guarantee zero retention across all providers; review each provider's data policies.
+- Latest verified application commit: [74645e6](https://github.com/sahincelil/karicim-gpt/commit/74645e64ddb31add222aeaf401de1ba49481fa68).
+- [CI / push — success](https://github.com/sahincelil/karicim-gpt/actions/runs/39277183632)
+- [Check / syntax — success](https://github.com/sahincelil/karicim-gpt/actions/runs/39277183805)
+- [Autonomous Maintenance — success](https://github.com/sahincelil/karicim-gpt/actions/runs/39277183998)
+- [Evolve — success](https://github.com/sahincelil/karicim-gpt/actions/runs/39277183633)
 
-- [CI — success for latest dashboard commit](https://github.com/sahincelil/karicim-gpt/actions/runs/39276343420)
-- [Autonomous Maintenance — previous verified success](https://github.com/sahincelil/karicim-gpt/actions/runs/39275548552)
-- [Evolve — previous verified success](https://github.com/sahincelil/karicim-gpt/actions/runs/39275556146)
-- [Check workflow — success for latest dashboard commit](https://github.com/sahincelil/karicim-gpt/actions/runs/39276343594)
+The Pages deployment itself is still blocked by repository integration permissions; see below.
 - Vercel project creation and a separate static-preview deployment both returned **403 Forbidden**. GitHub Pages workflow also failed because its token cannot create/enable the Pages site. No deployment was created. A repository admin must enable Pages under Settings → Pages and choose GitHub Actions. See [deployment blocker diagnosis](./DEPLOYMENT_BLOCKER.md).
 
 ## Status — do not overstate
