@@ -69,13 +69,18 @@ jobs:
             }
 
             const title = 'Automation freshness watchdog: scheduled workflow stale or failing';
-            const listed = await github.rest.issues.listForRepo({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              state: 'open',
-              per_page: 100,
-            });
-            const existing = listed.data.find(issue => issue.title === title && !issue.pull_request);
+            let existing;
+            for (let page = 1; page <= 10; page += 1) {
+              const listed = await github.rest.issues.listForRepo({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                state: 'open',
+                per_page: 100,
+                page,
+              });
+              existing = listed.data.find(issue => issue.title === title && !issue.pull_request);
+              if (existing || listed.data.length < 100) break;
+            }
 
             if (problems.length === 0) {
               core.notice('Scheduled maintenance and Evolve runs are fresh and successful.');
