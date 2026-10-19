@@ -10,6 +10,7 @@ Last checked: 2026-10-19
 - [Demo examples](./DEMO_EXAMPLES.md) — sample outputs, not proof of production functionality.
 - [90-day product growth plan](./PRODUCT_GROWTH_PLAN.md) — staged plan and decision rules.
 - [Architecture notes](./ARCHITECTURE.md) — security and controlled-autonomy boundaries.
+- [Deployment blocker diagnosis](./DEPLOYMENT_BLOCKER.md) — tested Vercel paths, exact failure, and safe recovery options.
 - [Canva editable design](https://www.canva.com/d/5cQoYrVz2r4mFg7) — existing editable design found in the connected Canva account.
 - [Repository README / project cockpit](../README.md) — quick links and current hosting status.
 
@@ -19,7 +20,7 @@ Last checked: 2026-10-19
 - [Autonomous Maintenance — success](https://github.com/sahincelil/karicim-gpt/actions/runs/39275548552)
 - [Evolve — success](https://github.com/sahincelil/karicim-gpt/actions/runs/39275556146)
 - [Check workflow — success](https://github.com/sahincelil/karicim-gpt/actions/runs/39275548572)
-- Vercel project creation returned **403 Forbidden** for the connected Hobby team. No deployment was created by that attempt. Do not retry unchanged; deployment needs the correct team/account permission or an existing authorized project.
+- Vercel project creation and a separate static-preview deployment both returned **403 Forbidden**. A fresh inventory found **0 projects and 0 deployments** in the connected Hobby team. No deployment was created. See [deployment blocker diagnosis](./DEPLOYMENT_BLOCKER.md); do not repeat unchanged requests.
 
 ## Status — do not overstate
 
@@ -32,7 +33,7 @@ Last checked: 2026-10-19
 | Customer validation | Not yet evidenced | Conduct interviews; record real responses |
 | Outreach | Scripts prepared | No messages confirmed sent |
 | Revenue | None evidenced yet | Do not report revenue as achieved |
-| Deployment | Blocked by Vercel permission error | Resolve account/team permission; keep API keys server-side |
+| Deployment | Blocked: project and deployment creation both 403; inventory shows 0 projects/deployments | Use an authorized Vercel team/project or validate GitHub Pages as a static-only fallback; keep API keys server-side |
 | Legal readiness | Not cleared | As a 657 public employee, check applicable rules with personnel/legal adviser before paid business activity |
 
 ## Next execution sequence
