@@ -19,7 +19,7 @@ Last checked: 2026-10-19
 
 - Latest code checks completed successfully after the Pages workflow and dashboard updates. The Pages deployment itself is still blocked by repository integration permissions; see below.
 
-- [CI — success for latest dashboard commit](https://github.com/sahincelil/karicim-gpt/actions/runs/39276343594)
+- [CI — success for latest dashboard commit](https://github.com/sahincelil/karicim-gpt/actions/runs/39276343420)
 - [Autonomous Maintenance — previous verified success](https://github.com/sahincelil/karicim-gpt/actions/runs/39275548552)
 - [Evolve — previous verified success](https://github.com/sahincelil/karicim-gpt/actions/runs/39275556146)
 - [Check workflow — success for latest dashboard commit](https://github.com/sahincelil/karicim-gpt/actions/runs/39276343594)
