@@ -17,10 +17,12 @@ Last checked: 2026-10-19
 
 ## Latest verified CI and maintenance checks
 
-- [CI — success for README cockpit update](https://github.com/sahincelil/karicim-gpt/actions/runs/39275548670)
-- [Autonomous Maintenance — success](https://github.com/sahincelil/karicim-gpt/actions/runs/39275548552)
-- [Evolve — success](https://github.com/sahincelil/karicim-gpt/actions/runs/39275556146)
-- [Check workflow — success](https://github.com/sahincelil/karicim-gpt/actions/runs/39275548572)
+- Latest code checks completed successfully after the Pages workflow and dashboard updates. The Pages deployment itself is still blocked by repository integration permissions; see below.
+
+- [CI — success for latest dashboard commit](https://github.com/sahincelil/karicim-gpt/actions/runs/39276343594)
+- [Autonomous Maintenance — previous verified success](https://github.com/sahincelil/karicim-gpt/actions/runs/39275548552)
+- [Evolve — previous verified success](https://github.com/sahincelil/karicim-gpt/actions/runs/39275556146)
+- [Check workflow — success for latest dashboard commit](https://github.com/sahincelil/karicim-gpt/actions/runs/39276343594)
 - Vercel project creation and a separate static-preview deployment both returned **403 Forbidden**. GitHub Pages workflow also failed because its token cannot create/enable the Pages site. No deployment was created. A repository admin must enable Pages under Settings → Pages and choose GitHub Actions. See [deployment blocker diagnosis](./DEPLOYMENT_BLOCKER.md).
 
 ## Status — do not overstate
