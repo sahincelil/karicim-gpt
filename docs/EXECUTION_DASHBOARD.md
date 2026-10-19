@@ -18,11 +18,14 @@ Last checked: 2026-10-19
 ## Latest verified CI and maintenance checks
 
 - Latest application change: OpenAI Responses API requests now use `store: false` by default to avoid API-side response storage. This does not guarantee zero retention across all providers; review each provider's data policies.
-- Latest verified application commit: [74645e6](https://github.com/sahincelil/karicim-gpt/commit/74645e64ddb31add222aeaf401de1ba49481fa68).
-- [CI / push — success](https://github.com/sahincelil/karicim-gpt/actions/runs/39277183632)
-- [Check / syntax — success](https://github.com/sahincelil/karicim-gpt/actions/runs/39277183805)
-- [Autonomous Maintenance — success](https://github.com/sahincelil/karicim-gpt/actions/runs/39277183998)
-- [Evolve — success](https://github.com/sahincelil/karicim-gpt/actions/runs/39277183633)
+- Latest application commit: [74645e6](https://github.com/sahincelil/karicim-gpt/commit/74645e64ddb31add222aeaf401de1ba49481fa68) (privacy default: `store: false`).
+- Latest dashboard commit: [f0a8909](https://github.com/sahincelil/karicim-gpt/commit/f0a89099203e77dbd4efadbcd725d69efb4b9df3).
+- [CI / push — success](https://github.com/sahincelil/karicim-gpt/actions/runs/39277387370)
+- [Check / syntax — success](https://github.com/sahincelil/karicim-gpt/actions/runs/39277386986)
+- [Autonomous Maintenance — success](https://github.com/sahincelil/karicim-gpt/actions/runs/39277387002)
+- [Evolve — success](https://github.com/sahincelil/karicim-gpt/actions/runs/39277387100)
+
+All four workflows for the latest dashboard commit completed successfully. These checks validate repository automation, not a live production deployment.
 
 The Pages deployment itself is still blocked by repository integration permissions; see below.
 - Vercel project creation and a separate static-preview deployment both returned **403 Forbidden**. GitHub Pages workflow also failed because its token cannot create/enable the Pages site. No deployment was created. A repository admin must enable Pages under Settings → Pages and choose GitHub Actions. See [deployment blocker diagnosis](./DEPLOYMENT_BLOCKER.md).
