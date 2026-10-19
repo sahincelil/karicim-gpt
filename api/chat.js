@@ -44,14 +44,14 @@ async function callOpenAI(messages, apiKey, controller) {
       tools: [{ type: 'web_search_preview' }],
       tool_choice: 'auto',
       parallel_tool_calls: false,
-      store: true
+      store: false
     }),
     signal: controller.signal
   });
   const data = await response.json().catch(() => ({}));
   if (!response.ok) throw Object.assign(new Error('OpenAI request failed'), { status: response.status, data });
   const output = typeof data.output_text === 'string' ? data.output_text.trim() : Array.isArray(data.output)
-    ? data.output.flatMap((item) => Array.isArray(item.content) ? item.content : []).map((item) => item?.text || '').filter(Boolean).join('\n').trim()
+    ? data.output.flatMap((item) => Array.isArray(item.content) ? item.content : []).map((item) => item?.text || '').filter(Boolean).join('\\n').trim()
     : '';
   if (!output) throw Object.assign(new Error('Model returned no text output'), { status: 502 });
   return { output, model: data?.model || model, provider: 'openai', usedTools: true };
@@ -104,7 +104,7 @@ async function callXai(messages, apiKey, controller) {
   const data = await response.json().catch(() => ({}));
   if (!response.ok) throw Object.assign(new Error('xAI request failed'), { status: response.status, data });
   const output = typeof data.output_text === 'string' ? data.output_text : Array.isArray(data.output)
-    ? data.output.flatMap((item) => Array.isArray(item.content) ? item.content : []).map((item) => item?.text || '').filter(Boolean).join('\n') : '';
+    ? data.output.flatMap((item) => Array.isArray(item.content) ? item.content : []).map((item) => item?.text || '').filter(Boolean).join('\\n') : '';
   if (!output.trim()) throw Object.assign(new Error('Model returned no text output'), { status: 502 });
   return { output: output.trim(), model: 'grok-4.6', provider: 'xai', usedTools: true };
 }
