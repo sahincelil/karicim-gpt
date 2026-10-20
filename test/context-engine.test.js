@@ -25,7 +25,7 @@ try {
     Array.from({ length: 30 }, (_, index) => createContext({ text: `Concurrent unique record number ${index}.` }))
   );
   assert.equal(parallel.length, 30);
-  const concurrentSearch = await searchContexts('Concurrent unique record');
+  const concurrentSearch = await searchContexts('Concurrent unique record', 50);
   assert.equal(concurrentSearch.length, 30, 'parallel writes must not overwrite one another within the process');
 
   for (const secret of [
