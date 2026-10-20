@@ -2,6 +2,7 @@ import { securityHeaders } from '../lib/security.js';
 import { buildAudit } from '../lib/audit.js';
 import { buildProposals } from '../lib/proposals.js';
 import { buildSelfTest } from '../lib/selftest.js';
+import { buildImprovementPlan } from '../lib/improvement-loop.js';
 
 function send(res, status, body) {
   securityHeaders(res);
@@ -13,6 +14,7 @@ function send(res, status, body) {
 export default async function handler(req, res) {
   if (req.method !== 'GET') return send(res, 405, { ok: false, error: 'Yalnızca GET destekleniyor.' });
   const [audit, proposals, selfTest] = await Promise.all([buildAudit(), buildProposals(), buildSelfTest()]);
+  const improvementPlan = buildImprovementPlan({ audit, proposals, selfTest });
   const blockers = [...new Set([...audit.warnings, ...selfTest.checks.filter((check) => !check.ok).map((check) => check.name)])];
   return send(res, 200, {
     ok: true,
@@ -21,12 +23,14 @@ export default async function handler(req, res) {
     auditFingerprint: audit.fingerprint,
     selfTest: { ok: selfTest.ok, status: selfTest.status },
     proposalCount: proposals.proposals.length,
+    improvementPlan,
     component: 'evolve',
     mode: 'controlled',
-    pipeline: ['observe', 'analyze', 'propose', 'test', 'review', 'coordinate', 'deploy', 'verify', 'rollback'],
+    pipeline: ['observe', 'analyze', 'plan', 'propose', 'test', 'review', 'coordinate', 'deploy', 'verify', 'rollback'],
     automatic: {
       observe: true,
       analyze: true,
+      plan: true,
       test: true,
       verify: true,
       deploy: false,
@@ -36,7 +40,8 @@ export default async function handler(req, res) {
       arbitraryShell: false,
       secretDisclosure: false,
       unrestrictedWrites: false,
-      destructiveActions: false
+      destructiveActions: false,
+      autonomousSourceWrite: false
     },
     timestamp: new Date().toISOString()
   });
