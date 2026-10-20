@@ -64,8 +64,9 @@ Otomasyon sınırları bilerek korunur: keyfi shell çalıştırma, gizli bilgi 
 
 ## MCP Context Creation
 
-Authenticated endpoint for manually creating, automatically deriving, and searching persistent context records:
+Authenticated REST endpoint and MCP-compatible tool endpoint for manually creating, automatically deriving, and searching persistent context records:
 
+- MCP clients can connect to `POST /mcp` using bearer-token authorization. It supports `initialize`, `tools/list`, and `tools/call` for `context_create`, `context_auto_derive`, and `context_search` (JSON-RPC 2.0; protocol version `2025-06-18`).
 - `GET /api/context?q=project&limit=10` — search saved context.
 - `POST /api/context` with `{"action":"create","text":"...","tags":["project"]}` — save a context explicitly.
 - `POST /api/context` with `{"action":"auto","text":"...","source":"chat-summary"}` — derive candidate preferences, decisions, tasks, and remember-notes from supplied text.
