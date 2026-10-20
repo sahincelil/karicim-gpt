@@ -18,7 +18,7 @@ function reply(res, status, payload) {
   securityHeaders(res);
   res.setHeader('Cache-Control', 'no-store');
   res.setHeader('Content-Type', 'application/json; charset=utf-8');
-  res.statusCode = status;
+  if (typeof res.status === 'function') res.status(status); else res.statusCode = status;
   return res.end(JSON.stringify(payload));
 }
 function error(id, code, message) {
@@ -30,7 +30,7 @@ export default async function handler(req, res) {
   const input = req.body;
   if (!input || input.jsonrpc !== '2.0' || typeof input.method !== 'string') return reply(res, 400, error(input?.id, -32600, 'Invalid JSON-RPC request.'));
   if (input.method === 'notifications/initialized' || input.method === 'notifications/cancelled') {
-    res.statusCode = 202;
+    if (typeof res.status === 'function') res.status(202); else res.statusCode = 202;
     return res.end();
   }
   if (input.method === 'initialize') {
