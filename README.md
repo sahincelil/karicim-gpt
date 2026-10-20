@@ -60,3 +60,17 @@ Otomasyon sınırları bilerek korunur: keyfi shell çalıştırma, gizli bilgi 
 ## Bakım merkezi
 
 `GET /api/maintenance` tek bir raporda self-test, runtime audit ve bakım tekliflerini birleştirir. `docs/ARCHITECTURE.md` sistemin katmanlarını ve kontrollü otonomi modelini açıklar.
+
+
+## MCP Context Creation
+
+Authenticated endpoint for manually creating, automatically deriving, and searching persistent context records:
+
+- `GET /api/context?q=project&limit=10` — search saved context.
+- `POST /api/context` with `{"action":"create","text":"...","tags":["project"]}` — save a context explicitly.
+- `POST /api/context` with `{"action":"auto","text":"...","source":"chat-summary"}` — derive candidate preferences, decisions, tasks, and remember-notes from supplied text.
+- `POST /api/context` with `{"action":"search","query":"project","limit":10}` — search via POST.
+
+All requests require `Authorization: Bearer $BODY_ADMIN_TOKEN`. Set `CONTEXT_FILE` to choose the context JSON file, or use `DATA_DIR` (default: `./data/context.json`). The store is capped at 500 entries, deduplicates exact text, and rejects text matching common credential patterns. Automatic extraction is intentionally heuristic and only processes text explicitly sent to this endpoint; it does not silently read connected MCP tools or conversation history. A client/agent can call this endpoint with context from a permitted MCP result after applying its own access controls.
+
+Run `npm test` to include the context-engine tests.
