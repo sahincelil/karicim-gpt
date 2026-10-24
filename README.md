@@ -11,6 +11,7 @@ Repo: https://github.com/sahincelil/karicim-gpt
 - [Demo examples](docs/DEMO_EXAMPLES.md)
 - [90-day product growth plan](docs/PRODUCT_GROWTH_PLAN.md)
 - [Architecture notes](docs/ARCHITECTURE.md)
+- [Persistent digital twin core](docs/DIGITAL_TWIN.md)
 - [Canva editable design](https://www.canva.com/d/5cQoYrVz2r4mFg7)
 
 > Status discipline: CI checks have passed recently, but this alone does not mean a production site is live. Vercel project creation returned 403 Forbidden for the currently connected team; hosting is not yet verified. No customer outreach or revenue is confirmed.
