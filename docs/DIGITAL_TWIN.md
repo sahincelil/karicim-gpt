@@ -12,7 +12,7 @@ KaricimGPT's digital twin is a versioned, user-owned profile plus explicit decis
 - `examples`: user-provided decision cases with situation, decision, reasoning, outcome, tags, and confidence.
 - `revisions`: bounded profile change log.
 
-The engine stores up to 200 decision examples and 100 profile revisions. Text fields are length-limited. Profile updates accept only known fields.
+The engine stores up to 200 decision examples and 100 profile revisions. Text fields are length-limited. Profile updates accept only known fields. Both `/api/chat` and `/api/agent` include a bounded profile context when one exists; the context distinguishes confirmed facts from hypotheses and does not override system or safety rules.
 
 ## API
 
