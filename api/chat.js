@@ -102,7 +102,7 @@ async function callOpenRouter(messages, apiKey, controller) {
 }
 
 async function callXai(messages, apiKey, controller) {
-  const working = [{ role: 'system', content: systemPrompt() }, ...messages];
+  const working = [{ role: 'system', content: await systemPrompt() }, ...messages];
   const response = await fetch('https://api.x.ai/v1/responses', {
     method: 'POST',
     headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json', Accept: 'application/json' },
