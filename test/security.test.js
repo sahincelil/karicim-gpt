@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import { clientKey, rateLimit, securityHeaders } from '../lib/security.js';
+import { buildProposals } from '../lib/proposals.js';
 
 const req = { headers: {}, socket: { remoteAddress: '127.0.0.1' } };
 assert.equal(clientKey(req), '127.0.0.1');
@@ -23,4 +24,21 @@ assert.equal(blocked.allowed, false);
 assert.equal(blocked.remaining, 0);
 assert.equal(typeof blocked.retryAfter, 'number');
 
-console.log('Security unit tests passed.');
+const proposalResult = await buildProposals();
+assert.equal(proposalResult.ok, true);
+const requiredProposalIds = [
+  'authenticated-user-identity',
+  'provider-spend-budget',
+  'staging-security-evidence'
+];
+for (const id of requiredProposalIds) {
+  const proposal = proposalResult.proposals.find((item) => item.id === id);
+  assert.ok(proposal, `missing required proposal: ${id}`);
+  assert.equal(proposal.autoApply, false);
+  assert.ok(Array.isArray(proposal.evidenceRequired) && proposal.evidenceRequired.length > 0);
+  assert.ok(typeof proposal.risk === 'string' && proposal.risk.length > 0);
+  assert.ok(typeof proposal.rollbackPlan === 'string' && proposal.rollbackPlan.length > 0);
+}
+assert.ok(proposalResult.proposals.every((item) => item.autoApply === false));
+
+console.log('Security and evolution-evidence tests passed.');
