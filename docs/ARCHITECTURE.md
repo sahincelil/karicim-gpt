@@ -6,7 +6,7 @@
 - **HTTP body:** `server.js`
 - **AI routes:** `/api/chat`, `/api/agent`, `/api/grok`, `/api/council`
 - **Maintenance:** `/api/self-test`, `/api/audit`, `/api/proposals`, `/api/evolve`, `/api/maintenance`
-- **Persistence:** file-backed memory with configurable `MEMORY_FILE` / `DATA_DIR`
+- **Persistence:** file-backed memory with configurable `MEMORY_FILE` / `DATA_DIR`; versioned digital twin profile with configurable `DIGITAL_TWIN_FILE`
 - **Automation:** GitHub Actions runs tests and runtime health checks
 
 ## Autonomous maintenance model
@@ -23,6 +23,7 @@ Council asks independent providers in parallel, extracts bounded evidence/uncert
 
 - `GET /health` — runtime health and heartbeat
 - `GET /api/body` — capabilities and safety contract
+- `GET/POST /api/digital-twin` — authenticated, versioned digital twin profile and decision examples (requires `BODY_ADMIN_TOKEN`)
 - `GET /api/self-test` — deterministic internal regression checks
 - `GET /api/audit` — runtime audit and fingerprint
 - `GET /api/proposals` — bounded maintenance proposals
@@ -32,3 +33,7 @@ Council asks independent providers in parallel, extracts bounded evidence/uncert
 ## Design principle
 
 KaricimGPT is designed for **controlled autonomy**: maximize automated observation, reasoning, testing, and proposal generation while keeping irreversible infrastructure actions behind explicit human control.
+
+## Digital twin core
+
+The digital twin stores explicit profile fields, hypotheses, open questions, version history, and user-provided decision examples separately. Personal profile data is not seeded into the public repository; runtime data lives under the ignored `data/` directory by default. See [Digital Twin Core](./DIGITAL_TWIN.md) for the schema, API, and deployment persistence requirements.
