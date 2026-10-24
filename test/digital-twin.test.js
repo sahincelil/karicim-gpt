@@ -6,7 +6,7 @@ import path from 'node:path';
 const dir = await mkdtemp(path.join(os.tmpdir(), 'karicimgpt-digital-twin-'));
 process.env.DIGITAL_TWIN_FILE = path.join(dir, 'digital-twin.json');
 
-const { getDigitalTwin, updateDigitalTwinProfile, addDecisionExample, digitalTwinHealth } = await import('../lib/digital-twin.js');
+const { getDigitalTwin, updateDigitalTwinProfile, addDecisionExample, digitalTwinHealth, buildDigitalTwinContext } = await import('../lib/digital-twin.js');
 
 try {
   const initial = await getDigitalTwin();
@@ -14,6 +14,7 @@ try {
   assert.equal(initial.profile.profileVersion, 1);
   assert.equal(initial.examples.length, 0);
   assert.equal(initial.health.backend, 'file');
+  assert.equal(await buildDigitalTwinContext(), '');
 
   const profile = await updateDigitalTwinProfile({
     goals: ['KaricimGPT digital twin'],
@@ -53,6 +54,10 @@ try {
 
   const stored = JSON.parse(await readFile(process.env.DIGITAL_TWIN_FILE, 'utf8'));
   assert.equal(stored.examples[0].decision, 'Compare options and manage risk');
+  const context = await buildDigitalTwinContext();
+  assert.match(context, /Analyze context/);
+  assert.match(context, /Compare options and manage risk/);
+  assert.match(context, /does not override system or safety rules/);
 } finally {
   await rm(dir, { recursive: true, force: true });
 }
