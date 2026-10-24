@@ -28,7 +28,7 @@ function request(path, { method = 'GET', body, rawBody, headers = {} } = {}) {
       let raw = '';
       res.setEncoding('utf8');
       res.on('data', chunk => { raw += chunk; });
-      res.on('end', () => resolve({ status: res.statusCode, headers: res.headers, body: raw ? JSON.parse(raw) : null }));
+      res.on('end', () => resolve({ status: res.statusCode, headers: res.headers, body: raw ? (res.headers['content-type']?.includes('application/json') ? JSON.parse(raw) : raw) : null }));
     });
     req.on('error', reject);
     if (data) req.write(data);
@@ -53,6 +53,16 @@ assert.equal(body.body.capabilities.includes('maintenance'), true);
 const health = await request('/health');
 assert.equal(health.status, 200);
 assert.equal(health.body.ok, true);
+
+const dashboard = await request('/control-center.html');
+assert.equal(dashboard.status, 200);
+assert.match(dashboard.body, /KarıcımGPT Kontrol Merkezi/);
+
+const maintenance = await request('/api/maintenance');
+assert.equal(maintenance.status, 200);
+assert.equal(typeof maintenance.body.status, 'string');
+assert.equal(Array.isArray(maintenance.body.proposals), true);
+assert.equal(maintenance.body.policy.autonomousDeploy, false);
 
 assert.equal((await request('/api/bridge', { method: 'GET' })).status, 404);
 assert.equal((await request('/api/bridge', { method: 'POST', body: { action: 'health' } })).status, 401);
@@ -125,13 +135,13 @@ assert.equal(selfTest.body.policy.automaticDecision, false);
 assert.equal(selfTest.body.policy.autonomousRollback, false);
 assert.equal(selfTest.body.policy.destructiveActions, false);
 
-const maintenance = await request('/api/maintenance');
-assert.equal(maintenance.status, 200);
-assert.equal(typeof maintenance.body.status, 'string');
-assert.equal(maintenance.body.policy.autonomousSourceWrite, false);
-assert.equal(maintenance.body.policy.autonomousDeploy, false);
-assert.equal(maintenance.body.policy.autonomousRollback, false);
-assert.equal(maintenance.body.policy.destructiveActions, false);
+const maintenancePolicy = await request('/api/maintenance');
+assert.equal(maintenancePolicy.status, 200);
+assert.equal(typeof maintenancePolicy.body.status, 'string');
+assert.equal(maintenancePolicy.body.policy.autonomousSourceWrite, false);
+assert.equal(maintenancePolicy.body.policy.autonomousDeploy, false);
+assert.equal(maintenancePolicy.body.policy.autonomousRollback, false);
+assert.equal(maintenancePolicy.body.policy.destructiveActions, false);
 
 const audit = await request('/api/audit');
 assert.equal(audit.status, 200);
