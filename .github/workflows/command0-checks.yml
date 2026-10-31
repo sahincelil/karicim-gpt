@@ -1,0 +1,41 @@
+name: command-0-checks
+
+on:
+  push:
+    branches: [command-0/bootstrap]
+  pull_request:
+    branches: [main]
+    paths:
+      - "api/**"
+      - "lib/**"
+      - "test/**"
+      - "server.js"
+      - "package.json"
+      - ".github/workflows/command0-checks.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: command-0-checks-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Syntax and regression tests
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Set up Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Run syntax and regression tests
+        run: npm test
