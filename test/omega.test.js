@@ -37,4 +37,36 @@ assert.deepEqual(critical.steps, []);
 assert.throws(() => planOmegaGoal('  '), /goal boş olamaz/);
 assert.throws(() => planOmegaGoal(null), /goal metin olmalı/);
 
+
+process.env.BODY_ADMIN_TOKEN = 'omega-test-token';
+const { default: omegaHandler } = await import('../api/omega.js');
+function responseMock() {
+  return {
+    statusCode: 200,
+    headers: new Map(),
+    payload: '',
+    status(code) { this.statusCode = code; return this; },
+    setHeader(name, value) { this.headers.set(name, value); return this; },
+    end(value) { this.payload = value; return this; }
+  };
+}
+const denied = responseMock();
+await omegaHandler({ method: 'GET', headers: {} }, denied);
+assert.equal(denied.statusCode, 401);
+
+const allowed = responseMock();
+await omegaHandler({ method: 'GET', headers: { authorization: 'Bearer omega-test-token' } }, allowed);
+assert.equal(allowed.statusCode, 200);
+assert.equal(JSON.parse(allowed.payload).name, 'PROJECT Ω');
+
+const planned = responseMock();
+await omegaHandler({
+  method: 'POST',
+  headers: { authorization: 'Bearer omega-test-token' },
+  body: { action: 'plan', goal: 'Bir araştırma planı hazırla' }
+}, planned);
+assert.equal(planned.statusCode, 200);
+assert.equal(JSON.parse(planned.payload).execution.performed, false);
+delete process.env.BODY_ADMIN_TOKEN;
+
 console.log('PROJECT Ω core tests passed.');
