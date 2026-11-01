@@ -1,6 +1,6 @@
 import { timingSafeEqual } from 'node:crypto';
 import { buildOmegaStatus, planOmegaGoal } from '../lib/omega.js';
-import { securityHeaders } from '../lib/security.js';
+import { rateLimit, securityHeaders } from '../lib/security.js';
 import { simulateRobotCommands } from '../lib/robotics-sim.js';
 
 function json(res, status, body) {
@@ -11,7 +11,7 @@ function json(res, status, body) {
 }
 
 function authorized(req) {
-  const expected = process.env.BODY_ADMIN_TOKEN;
+  const expected = process.env.OMEGA_API_TOKEN;
   if (!expected) return false;
   const provided = String(req.headers.authorization || '').replace(/^Bearer\s+/i, '');
   const left = Buffer.from(provided);
@@ -20,6 +20,11 @@ function authorized(req) {
 }
 
 export default async function handler(req, res) {
+  const limit = rateLimit(req);
+  if (!limit.allowed) {
+    res.setHeader('Retry-After', String(limit.retryAfter));
+    return json(res, 429, { ok: false, error: 'Rate limit exceeded' });
+  }
   if (!authorized(req)) return json(res, 401, { ok: false, error: 'Unauthorized' });
   if (req.method === 'GET') return json(res, 200, buildOmegaStatus());
   if (req.method !== 'POST') return json(res, 405, { ok: false, error: 'Yalnızca GET ve POST destekleniyor.' });
