@@ -1,6 +1,7 @@
 import { timingSafeEqual } from 'node:crypto';
 import { buildOmegaStatus, planOmegaGoal } from '../lib/omega.js';
 import { securityHeaders } from '../lib/security.js';
+import { simulateRobotCommands } from '../lib/robotics-sim.js';
 
 function json(res, status, body) {
   securityHeaders(res);
@@ -24,8 +25,11 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') return json(res, 405, { ok: false, error: 'Yalnızca GET ve POST destekleniyor.' });
   try {
     const body = req.body || {};
-    if (body.action !== 'plan') return json(res, 400, { ok: false, error: 'action=plan olmalı.' });
-    return json(res, 200, planOmegaGoal(body.goal));
+    if (body.action === 'plan') return json(res, 200, planOmegaGoal(body.goal));
+    if (body.action === 'simulate_robot') {
+      return json(res, 200, { ok: true, project: 'PROJECT Ω', simulation: simulateRobotCommands(body.commands) });
+    }
+    return json(res, 400, { ok: false, error: 'action=plan veya simulate_robot olmalı.' });
   } catch (error) {
     return json(res, error?.status || 500, { ok: false, error: error?.status ? error.message : 'Omega planning error' });
   }
