@@ -11,10 +11,12 @@ assert.equal(clientKey({
   socket: { remoteAddress: '10.0.0.1' }
 }), '203.0.113.9', 'one explicitly trusted proxy hop should expose the client address');
 
+process.env.TRUST_PROXY_HOPS = '2';
 assert.equal(clientKey({
   headers: { 'x-forwarded-for': '198.51.100.4, 203.0.113.9' },
   socket: { remoteAddress: '10.0.0.1' }
-}), '198.51.100.4', 'select the address before the configured trusted proxy chain');
+}), '198.51.100.4', 'select the client address before two trusted proxy hops');
+process.env.TRUST_PROXY_HOPS = '1';
 
 assert.equal(clientKey({
   headers: { 'x-forwarded-for': 'attacker.invalid' },
