@@ -53,6 +53,7 @@ Risk is classified from the requested goal, but keyword classification is only a
 
 - `GET /api/omega`: authenticated status and capability manifest.
 - `POST /api/omega`: authenticated `{ "action": "plan", "goal": "..." }`; returns a bounded plan and risk tier.
+- `POST /api/omega`: authenticated `{ "action": "simulate_robot", "commands": [...] }`; runs a deterministic 2D simulation only. Supports bounded move, turn, stop and emergency_stop commands.
 - Both routes require `Authorization: Bearer BODY_ADMIN_TOKEN`.
 - No external tool calls, source writes, financial actions, deployment or physical actuation are performed.
 - Robotics is simulation-only until hardware, emergency stop, geofence/workspace limits, force/speed caps and independent operator controls are tested.
@@ -70,7 +71,7 @@ Risk is classified from the requested goal, but keyword classification is only a
 
 ## First milestones
 
-- M0: plan-only API and deterministic tests.
+- M0: plan-only API and deterministic tests.\n- M0.1: deterministic 2D robotics simulator with bounded movement, emergency stop and no hardware connection.
 - M1: provider-neutral model gateway and structured plan/evidence objects.
 - M2: read-only adapters (GitHub metadata, research and market data).
 - M3: durable per-user state and audited approvals.
