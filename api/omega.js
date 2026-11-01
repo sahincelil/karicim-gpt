@@ -12,7 +12,7 @@ function json(res, status, body) {
 function authorized(req) {
   const expected = process.env.BODY_ADMIN_TOKEN;
   if (!expected) return false;
-  const provided = String(req.headers.authorization || '').replace(/^Bearer\\s+/i, '');
+  const provided = String(req.headers.authorization || '').replace(/^Bearer\s+/i, '');
   const left = Buffer.from(provided);
   const right = Buffer.from(expected);
   return left.length === right.length && timingSafeEqual(left, right);
