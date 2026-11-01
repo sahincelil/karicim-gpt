@@ -31,7 +31,7 @@ assert.equal(low.execution.performed, false);
 const robotics = planOmegaGoal('Robot kolunu hareket ettir');
 assert.equal(robotics.domain, 'robotics');
 assert.equal(robotics.execution.performed, false);
-assert.match(robotics.steps.join(' '), /simülasyon/i);
+assert.match(robotics.steps.map((step) => step.description).join(' '), /simülasyon/i);
 
 const high = planOmegaGoal('Üretime deploy et');
 assert.equal(high.risk, 'high');
