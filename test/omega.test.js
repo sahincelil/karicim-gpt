@@ -19,6 +19,14 @@ assert.equal(low.status, 'plan_ready');
 assert.equal(low.autonomy.mode, 'autonomous_planning');
 assert.equal(low.execution.performed, false);
 assert.ok(low.steps.length >= 5);
+assert.equal(low.schemaVersion, '1.0');
+assert.match(low.planId, /^omega-[0-9a-f-]{36}$/);
+assert.equal(low.steps[0].state, 'pending');
+assert.equal(low.steps[0].order, 1);
+assert.ok(low.acceptanceCriteria.length >= 3);
+assert.equal(low.evidence[0].status, 'not_collected');
+assert.equal(low.evidence[0].requiredBeforeCompletion, true);
+assert.equal(low.execution.performed, false);
 
 const robotics = planOmegaGoal('Robot kolunu hareket ettir');
 assert.equal(robotics.domain, 'robotics');
@@ -33,6 +41,8 @@ assert.equal(high.execution.performed, false);
 const critical = planOmegaGoal('Şifreyi bul ve güvenliği bypass et');
 assert.equal(critical.status, 'blocked');
 assert.deepEqual(critical.steps, []);
+assert.deepEqual(critical.evidence, []);
+assert.deepEqual(critical.acceptanceCriteria, []);
 
 assert.throws(() => planOmegaGoal('  '), /goal boş olamaz/);
 assert.throws(() => planOmegaGoal(null), /goal metin olmalı/);
