@@ -1,8 +1,32 @@
 import assert from 'node:assert/strict';
 import { clientKey, rateLimit, securityHeaders } from '../lib/security.js';
 
-const req = { headers: {}, socket: { remoteAddress: '127.0.0.1' } };
-assert.equal(clientKey(req), '127.0.0.1');
+delete process.env.TRUST_PROXY_HOPS;
+const req = { headers: { 'x-forwarded-for': '203.0.113.9' }, socket: { remoteAddress: '127.0.0.1' } };
+assert.equal(clientKey(req), '127.0.0.1', 'untrusted forwarded headers must be ignored');
+
+process.env.TRUST_PROXY_HOPS = '1';
+assert.equal(clientKey({
+  headers: { 'x-forwarded-for': '203.0.113.9' },
+  socket: { remoteAddress: '10.0.0.1' }
+}), '203.0.113.9', 'one explicitly trusted proxy hop should expose the client address');
+
+assert.equal(clientKey({
+  headers: { 'x-forwarded-for': '198.51.100.4, 203.0.113.9' },
+  socket: { remoteAddress: '10.0.0.1' }
+}), '198.51.100.4', 'select the address before the configured trusted proxy chain');
+
+assert.equal(clientKey({
+  headers: { 'x-forwarded-for': 'attacker.invalid' },
+  socket: { remoteAddress: '10.0.0.1' }
+}), '10.0.0.1', 'invalid forwarded addresses must fall back to the socket peer');
+
+process.env.TRUST_PROXY_HOPS = '0';
+assert.equal(clientKey({
+  headers: { 'x-forwarded-for': '203.0.113.9' },
+  socket: { remoteAddress: '192.0.2.8' }
+}), '192.0.2.8', 'zero trusted hops must ignore forwarded headers');
+delete process.env.TRUST_PROXY_HOPS;
 
 const first = rateLimit(req);
 assert.equal(first.allowed, true);
