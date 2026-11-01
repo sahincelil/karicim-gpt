@@ -28,6 +28,11 @@ assert.equal(clientKey({
   headers: { 'x-forwarded-for': '203.0.113.9' },
   socket: { remoteAddress: '192.0.2.8' }
 }), '192.0.2.8', 'zero trusted hops must ignore forwarded headers');
+process.env.TRUST_PROXY_HOPS = '1garbage';
+assert.equal(clientKey({
+  headers: { 'x-forwarded-for': '203.0.113.9' },
+  socket: { remoteAddress: '192.0.2.9' }
+}), '192.0.2.9', 'malformed proxy hop configuration must not enable trust');
 delete process.env.TRUST_PROXY_HOPS;
 
 const first = rateLimit(req);
