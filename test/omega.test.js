@@ -67,6 +67,32 @@ await omegaHandler({
 }, planned);
 assert.equal(planned.statusCode, 200);
 assert.equal(JSON.parse(planned.payload).execution.performed, false);
+
+const invalidToken = responseMock();
+await omegaHandler({ method: 'GET', headers: { authorization: 'Bearer wrong-token', 'x-forwarded-for': 'omega-invalid-token-test' } }, invalidToken);
+assert.equal(invalidToken.statusCode, 401);
+
+const simulationResponse = responseMock();
+await omegaHandler({
+  method: 'POST',
+  headers: { authorization: 'Bearer omega-test-token', 'x-forwarded-for': 'omega-simulation-test' },
+  body: { action: 'simulate_robot', commands: [{ type: 'move', distance: 0.2 }, { type: 'emergency_stop' }] }
+}, simulationResponse);
+assert.equal(simulationResponse.statusCode, 200);
+assert.equal(JSON.parse(simulationResponse.payload).simulation.physicalActuation, false);
+
+let rateLimited;
+for (let i = 0; i < 21; i += 1) {
+  const response = responseMock();
+  await omegaHandler({
+    method: 'GET',
+    headers: { authorization: 'Bearer omega-test-token', 'x-forwarded-for': 'omega-rate-limit-test' }
+  }, response);
+  if (response.statusCode === 429) rateLimited = response;
+}
+assert.ok(rateLimited, '21st request from one client should be rate limited');
+assert.equal(rateLimited.statusCode, 429);
+
 delete process.env.OMEGA_API_TOKEN;
 
 console.log('PROJECT Ω core tests passed.');
