@@ -71,7 +71,8 @@ Risk is classified from the requested goal, but keyword classification is only a
 
 ## First milestones
 
-- M0: plan-only API and deterministic tests.\n- M0.1: deterministic 2D robotics simulator with bounded movement, emergency stop and no hardware connection.
+- M0: plan-only API and deterministic tests.
+- M0.1: deterministic 2D robotics simulator with bounded movement, emergency stop and no hardware connection.
 - M1: provider-neutral model gateway and structured plan/evidence objects.
 - M2: read-only adapters (GitHub metadata, research and market data).
 - M3: durable per-user state and audited approvals.
