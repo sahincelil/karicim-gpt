@@ -55,8 +55,16 @@ Risk is classified from the requested goal, but keyword classification is only a
 - `POST /api/omega`: authenticated `{ "action": "plan", "goal": "..." }`; returns a bounded plan and risk tier.
 - `POST /api/omega`: authenticated `{ "action": "simulate_robot", "commands": [...] }`; runs a deterministic 2D simulation only. Supports bounded move, turn, stop and emergency_stop commands.
 - Both routes require a dedicated `Authorization: Bearer OMEGA_API_TOKEN`; it must not be reused from the broader memory-admin token.
+- The API token must contain at least 32 bytes; shorter configured secrets are rejected.
 - No external tool calls, source writes, financial actions, deployment or physical actuation are performed.
 - Robotics is simulation-only until hardware, emergency stop, geofence/workspace limits, force/speed caps and independent operator controls are tested.
+
+## Rate-limit and proxy configuration
+
+- Rate limiting currently uses an in-process memory map. It is a per-process development guard, not a distributed production limiter.
+- By default, client identity comes only from the TCP socket peer. `X-Forwarded-For` is ignored unless `TRUST_PROXY_HOPS` is explicitly configured.
+- Configure `TRUST_PROXY_HOPS` only after verifying the exact reverse-proxy topology and that each trusted proxy safely appends/normalizes the forwarded chain. Values 1–10 are accepted. Incorrect configuration can enable spoofing or misidentify clients.
+- Production must replace the in-memory limiter with a shared store (e.g. Redis) and verify proxy topology before enabling forwarded headers.
 
 ## Production gates
 
