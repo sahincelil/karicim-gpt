@@ -12,11 +12,14 @@ function json(res, status, body) {
 
 function authorized(req) {
   const expected = process.env.OMEGA_API_TOKEN;
-  if (!expected) return false;
-  const provided = String(req.headers.authorization || '').replace(/^Bearer\s+/i, '');
-  const left = Buffer.from(provided);
-  const right = Buffer.from(expected);
-  return left.length === right.length && timingSafeEqual(left, right);
+  if (typeof expected !== 'string' || Buffer.byteLength(expected, 'utf8') < 32) return false;
+
+  const match = /^Bearer ([^\s]+)$/i.exec(String(req.headers?.authorization || ''));
+  if (!match) return false;
+
+  const provided = Buffer.from(match[1], 'utf8');
+  const expectedBytes = Buffer.from(expected, 'utf8');
+  return provided.length === expectedBytes.length && timingSafeEqual(provided, expectedBytes);
 }
 
 export default async function handler(req, res) {
