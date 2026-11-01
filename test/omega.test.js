@@ -38,7 +38,7 @@ assert.throws(() => planOmegaGoal('  '), /goal boş olamaz/);
 assert.throws(() => planOmegaGoal(null), /goal metin olmalı/);
 
 
-process.env.BODY_ADMIN_TOKEN = 'omega-test-token';
+process.env.OMEGA_API_TOKEN = 'omega-test-token';
 const { default: omegaHandler } = await import('../api/omega.js');
 function responseMock() {
   return {
@@ -67,6 +67,6 @@ await omegaHandler({
 }, planned);
 assert.equal(planned.statusCode, 200);
 assert.equal(JSON.parse(planned.payload).execution.performed, false);
-delete process.env.BODY_ADMIN_TOKEN;
+delete process.env.OMEGA_API_TOKEN;
 
 console.log('PROJECT Ω core tests passed.');
