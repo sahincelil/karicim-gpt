@@ -37,8 +37,7 @@ assert.deepEqual(critical.steps, []);
 assert.throws(() => planOmegaGoal('  '), /goal boş olamaz/);
 assert.throws(() => planOmegaGoal(null), /goal metin olmalı/);
 
-
-process.env.OMEGA_API_TOKEN = 'omega-test-token';
+process.env.OMEGA_API_TOKEN = 'omega-test-token-0123456789abcdef';
 const { default: omegaHandler } = await import('../api/omega.js');
 function responseMock() {
   return {
@@ -54,15 +53,23 @@ const denied = responseMock();
 await omegaHandler({ method: 'GET', headers: {} }, denied);
 assert.equal(denied.statusCode, 401);
 
+const bareToken = responseMock();
+await omegaHandler({ method: 'GET', headers: { authorization: process.env.OMEGA_API_TOKEN, 'x-forwarded-for': 'omega-bare-token-test' } }, bareToken);
+assert.equal(bareToken.statusCode, 401);
+
+const malformedBearer = responseMock();
+await omegaHandler({ method: 'GET', headers: { authorization: 'Bearer  omega-test-token-0123456789abcdef', 'x-forwarded-for': 'omega-malformed-bearer-test' } }, malformedBearer);
+assert.equal(malformedBearer.statusCode, 401);
+
 const allowed = responseMock();
-await omegaHandler({ method: 'GET', headers: { authorization: 'Bearer omega-test-token' } }, allowed);
+await omegaHandler({ method: 'GET', headers: { authorization: 'Bearer omega-test-token-0123456789abcdef' } }, allowed);
 assert.equal(allowed.statusCode, 200);
 assert.equal(JSON.parse(allowed.payload).name, 'PROJECT Ω');
 
 const planned = responseMock();
 await omegaHandler({
   method: 'POST',
-  headers: { authorization: 'Bearer omega-test-token' },
+  headers: { authorization: 'Bearer omega-test-token-0123456789abcdef' },
   body: { action: 'plan', goal: 'Bir araştırma planı hazırla' }
 }, planned);
 assert.equal(planned.statusCode, 200);
@@ -75,7 +82,7 @@ assert.equal(invalidToken.statusCode, 401);
 const simulationResponse = responseMock();
 await omegaHandler({
   method: 'POST',
-  headers: { authorization: 'Bearer omega-test-token', 'x-forwarded-for': 'omega-simulation-test' },
+  headers: { authorization: 'Bearer omega-test-token-0123456789abcdef', 'x-forwarded-for': 'omega-simulation-test' },
   body: { action: 'simulate_robot', commands: [{ type: 'move', distance: 0.2 }, { type: 'emergency_stop' }] }
 }, simulationResponse);
 assert.equal(simulationResponse.statusCode, 200);
@@ -86,7 +93,7 @@ for (let i = 0; i < 21; i += 1) {
   const response = responseMock();
   await omegaHandler({
     method: 'GET',
-    headers: { authorization: 'Bearer omega-test-token', 'x-forwarded-for': 'omega-rate-limit-test' }
+    headers: { authorization: 'Bearer omega-test-token-0123456789abcdef', 'x-forwarded-for': 'omega-rate-limit-test' }
   }, response);
   if (response.statusCode === 429) rateLimited = response;
 }
