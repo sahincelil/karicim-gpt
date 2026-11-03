@@ -51,9 +51,10 @@ Risk is classified from the requested goal, but keyword classification is only a
 
 ## Prototype 0.1
 
-- `GET /api/omega`: authenticated status and capability manifest.
+- `GET /api/omega`: authenticated status and capability manifest, enriched with the live maintenance report (self-test status, audit status/fingerprint, and bounded proposal count). Secrets and raw configuration values are not included.
 - `POST /api/omega`: authenticated `{ "action": "plan", "goal": "..." }`; returns a bounded plan and risk tier.
 - `POST /api/omega`: authenticated `{ "action": "simulate_robot", "commands": [...] }`; runs a deterministic 2D simulation only. Supports bounded move, turn, stop and emergency_stop commands.
+- The status endpoint reads the existing maintenance layer at request time; it does not execute proposals or mutate system state.
 - Both routes require a dedicated `Authorization: Bearer OMEGA_API_TOKEN`; it must not be reused from the broader memory-admin token.
 - The API token must contain at least 32 bytes; shorter configured secrets are rejected.
 - Plans now use a versioned structured contract with ordered pending steps, acceptance criteria and evidence records. Evidence remains `not_collected` until an independently verifiable source is attached.
