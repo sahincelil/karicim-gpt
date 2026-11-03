@@ -147,7 +147,7 @@ async function callAnthropic(messages, apiKey, controller) {
   const data = await response.json().catch(() => ({}));
   if (!response.ok) throw Object.assign(new Error('Anthropic request failed'), { status: response.status, data });
   const output = Array.isArray(data?.content)
-    ? data.content.filter((item) => item?.type === 'text').map((item) => item.text || '').join('\\n').trim()
+    ? data.content.filter((item) => item?.type === 'text').map((item) => item.text || '').join('\n').trim()
     : '';
   if (!output) throw Object.assign(new Error('Model returned no text output'), { status: 502 });
   return { output, model: data?.model || model, provider: 'anthropic', usedTools: false };
