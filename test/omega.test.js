@@ -1,12 +1,18 @@
 import assert from 'node:assert/strict';
 import { buildOmegaStatus, classifyOmegaRisk, planOmegaGoal } from '../lib/omega.js';
 
-const status = buildOmegaStatus();
+const status = await buildOmegaStatus();
 assert.equal(status.name, 'PROJECT Ω');
 assert.equal(status.vision, 'hybrid');
 assert.equal(status.autonomy, 'adaptive');
 assert.equal(status.capabilities.boundedPlanning, true);
 assert.equal(status.capabilities.physicalActuation, false);
+assert.equal(status.capabilities.roboticsSimulation, 'simulation_only');
+assert.ok(['healthy', 'attention'].includes(status.runtime.status));
+assert.equal(typeof status.runtime.ok, 'boolean');
+assert.equal(typeof status.runtime.selfTest.ok, 'boolean');
+assert.equal(typeof status.runtime.audit.fingerprint, 'string');
+assert.equal(Number.isInteger(status.runtime.proposalCount), true);
 assert.equal(status.safety.externalWrites, false);
 
 assert.equal(classifyOmegaRisk('Osmaniye hakkında araştırma yap'), 'low');
@@ -75,6 +81,8 @@ const allowed = responseMock();
 await omegaHandler({ method: 'GET', headers: { authorization: 'Bearer omega-test-token-0123456789abcdef' } }, allowed);
 assert.equal(allowed.statusCode, 200);
 assert.equal(JSON.parse(allowed.payload).name, 'PROJECT Ω');
+assert.ok(['healthy', 'attention'].includes(JSON.parse(allowed.payload).runtime.status));
+assert.equal(typeof JSON.parse(allowed.payload).runtime.audit.fingerprint, 'string');
 
 const planned = responseMock();
 await omegaHandler({
