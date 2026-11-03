@@ -8,6 +8,7 @@ const MAX_REQUEST_BYTES = 180000;
 const MAX_SERVER_TOOL_CALLS = 2;
 const DEFAULT_FREE_MODEL = 'openrouter/free';
 const DEFAULT_OPENAI_MODEL = 'gpt-6-astra';
+const DEFAULT_ANTHROPIC_MODEL = 'claude-sonnet-4-5-20250929';
 
 function json(res, status, body, extra = {}) {
   securityHeaders(res);
@@ -35,7 +36,7 @@ async function systemPrompt() {
 }
 
 function providerKey(provider) {
-  return provider === 'openai' ? process.env.OPENAI_API_KEY : provider === 'xai' ? process.env.XAI_API_KEY : process.env.OPENROUTER_API_KEY;
+  return provider === 'openai' ? process.env.OPENAI_API_KEY : provider === 'xai' ? process.env.XAI_API_KEY : provider === 'anthropic' ? process.env.ANTHROPIC_API_KEY : process.env.OPENROUTER_API_KEY;
 }
 
 async function callOpenAI(messages, apiKey, controller) {
@@ -117,6 +118,39 @@ async function callXai(messages, apiKey, controller) {
   return { output: output.trim(), model: 'grok-4.6', provider: 'xai', usedTools: true };
 }
 
+async function callAnthropic(messages, apiKey, controller) {
+  const model = process.env.ANTHROPIC_MODEL || DEFAULT_ANTHROPIC_MODEL;
+  const system = await systemPrompt();
+  const anthropicMessages = messages.map((message) => ({
+    role: message.role === 'assistant' ? 'assistant' : 'user',
+    content: message.content
+  }));
+  const response = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'x-api-key': apiKey,
+      'anthropic-version': '2023-06-01',
+      'Content-Type': 'application/json',
+      Accept: 'application/json'
+    },
+    body: JSON.stringify({
+      model,
+      system,
+      messages: anthropicMessages,
+      max_tokens: MAX_OUTPUT_TOKENS,
+      temperature: 0.7
+    }),
+    signal: controller.signal
+  });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) throw Object.assign(new Error('Anthropic request failed'), { status: response.status, data });
+  const output = Array.isArray(data?.content)
+    ? data.content.filter((item) => item?.type === 'text').map((item) => item.text || '').join('\\n').trim()
+    : '';
+  if (!output) throw Object.assign(new Error('Model returned no text output'), { status: 502 });
+  return { output, model: data?.model || model, provider: 'anthropic', usedTools: false };
+}
+
 async function callWithAutoFallback(messages, controller) {
   if (process.env.OPENAI_API_KEY) {
     try {
@@ -128,6 +162,7 @@ async function callWithAutoFallback(messages, controller) {
   }
   if (process.env.OPENROUTER_API_KEY) return callOpenRouter(messages, process.env.OPENROUTER_API_KEY, controller);
   if (process.env.XAI_API_KEY) return callXai(messages, process.env.XAI_API_KEY, controller);
+  if (process.env.ANTHROPIC_API_KEY) return callAnthropic(messages, process.env.ANTHROPIC_API_KEY, controller);
   throw Object.assign(new Error('No AI provider configured'), { status: 503 });
 }
 
@@ -141,9 +176,9 @@ export default async function handler(req, res) {
   if (!messages.length || messages[messages.length - 1].role !== 'user') return json(res, 400, { error: 'Son mesaj kullanıcı mesajı olmalı.' });
 
   const requestedProvider = (process.env.AI_PROVIDER || 'auto').toLowerCase();
-  const provider = ['openai', 'xai', 'openrouter', 'auto'].includes(requestedProvider) ? requestedProvider : 'auto';
+  const provider = ['openai', 'xai', 'openrouter', 'anthropic', 'auto'].includes(requestedProvider) ? requestedProvider : 'auto';
   if (provider !== 'auto' && !providerKey(provider)) {
-    const keyName = provider === 'openai' ? 'OPENAI_API_KEY' : provider === 'xai' ? 'XAI_API_KEY' : 'OPENROUTER_API_KEY';
+    const keyName = provider === 'openai' ? 'OPENAI_API_KEY' : provider === 'xai' ? 'XAI_API_KEY' : provider === 'anthropic' ? 'ANTHROPIC_API_KEY' : 'OPENROUTER_API_KEY';
     return json(res, 503, { error: `${keyName} sunucuda yapılandırılmamış.` });
   }
 
@@ -156,6 +191,8 @@ export default async function handler(req, res) {
         ? await callOpenAI(messages, process.env.OPENAI_API_KEY, controller)
         : provider === 'xai'
           ? await callXai(messages, process.env.XAI_API_KEY, controller)
+          : provider === 'anthropic'
+          ? await callAnthropic(messages, process.env.ANTHROPIC_API_KEY, controller)
           : await callOpenRouter(messages, process.env.OPENROUTER_API_KEY, controller);
     return json(res, 200, result, { 'X-RateLimit-Remaining': limit.remaining });
   } catch (error) {
