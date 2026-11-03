@@ -29,7 +29,7 @@ export default async function handler(req, res) {
     return json(res, 429, { ok: false, error: 'Rate limit exceeded' });
   }
   if (!authorized(req)) return json(res, 401, { ok: false, error: 'Unauthorized' });
-  if (req.method === 'GET') return json(res, 200, buildOmegaStatus());
+  if (req.method === 'GET') return json(res, 200, await buildOmegaStatus());
   if (req.method !== 'POST') return json(res, 405, { ok: false, error: 'Yalnızca GET ve POST destekleniyor.' });
   try {
     const body = req.body || {};
