@@ -38,7 +38,7 @@ Vercel Project Settings → Environment Variables bölümünde Preview ortamı i
 ```text
 AI_PROVIDER=anthropic
 ANTHROPIC_API_KEY=...
-ANTHROPIC_MODEL=claude-sonnet-4-5-20250929
+ANTHROPIC_MODEL=claude-sonnet-5-5
 ```
 
 `ANTHROPIC_API_KEY` değerini yalnızca Vercel'in server-side Environment Variables alanına gir. GitHub'a, istemci koduna veya sohbet mesajlarına koyma. Değişken eklendikten sonra Preview deployment'ı yeniden oluştur. `POST /api/chat` endpoint'i Claude yanıtını `provider: anthropic` bilgisiyle döndürür. Anthropic sağlayıcısı bu endpoint'te yerleşik web araması kullanmaz.
