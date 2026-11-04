@@ -161,6 +161,12 @@ try {
   assert.equal(failedResult.body.providers.find((member) => member.provider === 'anthropic').error, 'provider:400');
   assert.equal(failedResult.raw.includes('sk-ant'), false);
 
+  anthropicStatus = 200;
+  anthropicBody = {
+    model: 'claude-sonnet-5',
+    content: [{ type: 'text', text: 'alpha' }, { type: 'text', text: 'beta' }]
+  };
+
   // Histories truncated to 20 entries must still start with a user turn for Anthropic.
   const longHistory = Array.from({ length: 21 }, (_, index) => ({
     role: index % 2 === 0 ? 'user' : 'assistant',
