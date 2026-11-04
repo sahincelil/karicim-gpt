@@ -161,6 +161,49 @@ try {
   assert.equal(failedResult.body.providers.find((member) => member.provider === 'anthropic').error, 'provider:400');
   assert.equal(failedResult.raw.includes('sk-ant'), false);
 
+  // Histories truncated to 20 entries must still start with a user turn for Anthropic.
+  const longHistory = Array.from({ length: 21 }, (_, index) => ({
+    role: index % 2 === 0 ? 'user' : 'assistant',
+    content: `turn-${index + 1}`
+  }));
+  calls.length = 0;
+  const longChat = mockRes();
+  await chatHandler(request('203.0.113.14', { messages: longHistory }), longChat);
+  assert.equal(longChat.result().status, 200);
+  const longChatMessages = JSON.parse(calls[0].init.body).messages;
+  assert.equal(longChatMessages[0].role, 'user');
+  assert.equal(longChatMessages[0].content, 'turn-3');
+  assert.equal(longChatMessages.length, 19);
+  assert.ok(longChatMessages.every((message, index) => index === 0 || message.role !== longChatMessages[index - 1].role));
+
+  calls.length = 0;
+  const longCouncil = mockRes();
+  await runCouncil(request('203.0.113.15', { messages: longHistory }), longCouncil);
+  assert.equal(longCouncil.result().status, 200);
+  const longCouncilMessages = JSON.parse(calls[0].init.body).messages;
+  assert.equal(longCouncilMessages[0].role, 'user');
+  assert.equal(longCouncilMessages[0].content, 'turn-3');
+  assert.equal(longCouncilMessages.length, 19);
+  assert.ok(longCouncilMessages.every((message, index) => index === 0 || message.role !== longCouncilMessages[index - 1].role));
+
+  // Keep all default-model surfaces aligned with the active model.
+  delete process.env.ANTHROPIC_MODEL;
+  const defaultHealth = mockRes();
+  await healthHandler({ method: 'GET' }, defaultHealth);
+  assert.equal(defaultHealth.result().body.model, 'claude-sonnet-5-5');
+
+  calls.length = 0;
+  const defaultChat = mockRes();
+  await chatHandler(request('203.0.113.16', { messages: [{ role: 'user', content: 'default model' }] }), defaultChat);
+  assert.equal(defaultChat.result().status, 200);
+  assert.equal(JSON.parse(calls[0].init.body).model, 'claude-sonnet-5-5');
+
+  calls.length = 0;
+  const defaultCouncil = mockRes();
+  await runCouncil(request('203.0.113.17', { messages: [{ role: 'user', content: 'default model' }] }), defaultCouncil);
+  assert.equal(defaultCouncil.result().status, 200);
+  assert.equal(JSON.parse(calls[0].init.body).model, 'claude-sonnet-5-5');
+
   console.log('Anthropic provider tests passed.');
 } finally {
   globalThis.fetch = originalFetch;
