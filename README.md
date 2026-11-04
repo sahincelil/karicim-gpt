@@ -31,6 +31,18 @@ APP_URL=https://site-adresin
 
 Anahtar kesinlikle `index.html`, `app.js` veya GitHub dosyalarına yazılmamalıdır.
 
+### Claude (Anthropic) entegrasyonu
+
+Vercel Project Settings → Environment Variables bölümünde Preview ortamı için şu değişkenleri ekle:
+
+```text
+AI_PROVIDER=anthropic
+ANTHROPIC_API_KEY=...
+ANTHROPIC_MODEL=claude-sonnet-5-5
+```
+
+`ANTHROPIC_API_KEY` değerini yalnızca Vercel'in server-side Environment Variables alanına gir. GitHub'a, istemci koduna veya sohbet mesajlarına koyma. Değişken eklendikten sonra Preview deployment'ı yeniden oluştur. `POST /api/chat` endpoint'i Claude yanıtını `provider: anthropic` bilgisiyle döndürür. Anthropic sağlayıcısı bu endpoint'te yerleşik web araması kullanmaz.
+
 ### Alternatif
 
 `AI_PROVIDER=xai` ve `XAI_API_KEY` ile xAI backend yolu da kullanılabilir.
