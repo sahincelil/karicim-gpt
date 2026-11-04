@@ -8,7 +8,7 @@ const MAX_REQUEST_BYTES = 180000;
 const MAX_SERVER_TOOL_CALLS = 2;
 const DEFAULT_FREE_MODEL = 'openrouter/free';
 const DEFAULT_OPENAI_MODEL = 'gpt-6-astra';
-const DEFAULT_ANTHROPIC_MODEL = 'claude-sonnet-4-5-20250929';
+const DEFAULT_ANTHROPIC_MODEL = 'claude-sonnet-5-5';
 
 function json(res, status, body, extra = {}) {
   securityHeaders(res);
@@ -124,10 +124,17 @@ async function callXai(messages, apiKey, controller) {
 async function callAnthropic(messages, apiKey, controller) {
   const model = process.env.ANTHROPIC_MODEL || DEFAULT_ANTHROPIC_MODEL;
   const system = await systemPrompt({ webSearchAvailable: false });
-  const anthropicMessages = messages.map((message) => ({
-    role: message.role === 'assistant' ? 'assistant' : 'user',
-    content: message.content
-  }));
+  const anthropicMessages = [];
+  for (const message of messages) {
+    const next = {
+      role: message.role === 'assistant' ? 'assistant' : 'user',
+      content: message.content
+    };
+    const previous = anthropicMessages[anthropicMessages.length - 1];
+    if (!previous && next.role !== 'user') continue;
+    if (previous?.role === next.role) previous.content += `\n\n${next.content}`;
+    else anthropicMessages.push(next);
+  }
   const response = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
     headers: {
