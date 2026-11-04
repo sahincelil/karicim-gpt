@@ -12,7 +12,7 @@ export default async function handler(req, res) {
 
   const provider = (process.env.AI_PROVIDER || 'openrouter').toLowerCase();
   const configuredModel = provider === 'anthropic'
-    ? (process.env.ANTHROPIC_MODEL || 'claude-sonnet-4-5-20250929')
+    ? (process.env.ANTHROPIC_MODEL || 'claude-sonnet-5-5')
     : provider === 'xai'
       ? (process.env.XAI_MODEL || 'grok-4.6')
       : process.env.OPENROUTER_AGENT_MODEL || process.env.OPENROUTER_MODEL || 'openrouter/free';
