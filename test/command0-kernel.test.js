@@ -33,7 +33,7 @@ test('agents cannot authorize tasks and capabilities are checked', async (t) => 
   });
   await kernel.transitionTask(task.id, 'INSPECTING');
   await kernel.transitionTask(task.id, 'PLANNING');
-  await assert.rejects(kernel.transitionTask(task.id, 'AUTHORIZED', { actor: 'agent-1' }), /Only the owner/);
+  await assert.rejects(kernel.transitionTask(task.id, 'AUTHORIZED', { actor: 'agent-1' }), /Authenticated owner approval is required/);
   await assert.rejects(kernel.transitionTask(task.id, 'AUTHORIZED', { actor: 'owner' }), /Capabilities not granted/);
 });
 
