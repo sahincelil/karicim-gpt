@@ -67,3 +67,16 @@ test('audit events are HMAC verifiable', async (t) => {
   assert.equal(verifyAuditEvent(event, 'test-only-key'), true);
   assert.equal(verifyAuditEvent(event, 'wrong-key'), false);
 });
+
+test('emergency halt survives kernel restart', async (t) => {
+  const directory = await mkdtemp(path.join(os.tmpdir(), 'command0-restart-'));
+  t.after(() => rm(directory, { recursive: true, force: true }));
+  const filePath = path.join(directory, 'kernel.json');
+  const first = createCommand0Kernel({ filePath, signingKey: 'restart-test-key' });
+  await first.emergencyHalt();
+  const restarted = createCommand0Kernel({ filePath, signingKey: 'restart-test-key' });
+  await assert.rejects(
+    restarted.createTask({ objective: 'must remain halted', idempotencyKey: 'restart-halt' }),
+    /Kernel is halted/
+  );
+});
