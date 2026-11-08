@@ -8,7 +8,12 @@ import { createCommand0Kernel, verifyAuditEvent } from '../lib/command0-kernel.j
 async function fixture(t, options = {}) {
   const directory = await mkdtemp(path.join(os.tmpdir(), 'command0-'));
   t.after(() => rm(directory, { recursive: true, force: true }));
-  return createCommand0Kernel({ filePath: path.join(directory, 'kernel.json'), signingKey: 'test-only-key', ...options });
+  return createCommand0Kernel({
+    filePath: path.join(directory, 'kernel.json'),
+    signingKey: 'test-only-key',
+    authorizeOwner: async () => true,
+    ...options
+  });
 }
 
 test('idempotency key returns the original task', async (t) => {
@@ -72,11 +77,23 @@ test('emergency halt survives kernel restart', async (t) => {
   const directory = await mkdtemp(path.join(os.tmpdir(), 'command0-restart-'));
   t.after(() => rm(directory, { recursive: true, force: true }));
   const filePath = path.join(directory, 'kernel.json');
-  const first = createCommand0Kernel({ filePath, signingKey: 'restart-test-key' });
+  const first = createCommand0Kernel({ filePath, signingKey: 'restart-test-key', authorizeOwner: async () => true });
   await first.emergencyHalt();
-  const restarted = createCommand0Kernel({ filePath, signingKey: 'restart-test-key' });
+  const restarted = createCommand0Kernel({ filePath, signingKey: 'restart-test-key', authorizeOwner: async () => true });
   await assert.rejects(
     restarted.createTask({ objective: 'must remain halted', idempotencyKey: 'restart-halt' }),
     /Kernel is halted/
   );
+});
+
+test('owner label alone cannot authorize privileged operations', async (t) => {
+  const kernel = await fixture(t, { authorizeOwner: async () => false });
+  const task = await kernel.createTask({ objective: 'sensitive action', idempotencyKey: 'owner-auth-test' });
+  await kernel.transitionTask(task.id, 'INSPECTING');
+  await kernel.transitionTask(task.id, 'PLANNING');
+  await assert.rejects(
+    kernel.transitionTask(task.id, 'AUTHORIZED', { actor: 'owner' }),
+    /Authenticated owner approval/
+  );
+  await assert.rejects(kernel.emergencyHalt('owner'), /Authenticated owner approval/);
 });
