@@ -12,7 +12,11 @@ This module is the first executable foundation for the COMMAND-0 architecture. I
 - Explicit approval references for high/critical risk tasks.
 - Evidence-required verification.
 - Owner emergency halt and resume.
-- Append-only HMAC-signed audit events when `COMMAND0_AUDIT_KEY` is configured.
+- Append-only HMAC-signed, hash-chained audit events when `COMMAND0_AUDIT_KEY` is configured.
+
+## Agent security
+
+The agent registry requires injected `authorizeOwner` and `authorizeAgent` verifiers for privileged registration, revocation, and agent health reports. The default verifiers reject all requests. The literal actor labels `owner` and an agent ID are identifiers only, not authentication proofs. The integration must verify authenticated server-side sessions or signed agent credentials.
 
 ## Integration
 
@@ -22,18 +26,18 @@ The kernel does not execute arbitrary code, grant OS privileges, access credenti
 
 ## Verification
 
-Run `node --test test/command0-kernel.test.js`. Tests use temporary directories and a test-only signing key.
+Run `npm test` with Node.js 24 or later. Tests use temporary directories and test-only signing/authentication fixtures. CI has not yet been observed for the current branch, so passing CI must not be assumed.
 
 ## Agent, policy, and recovery modules
 
-- `lib/command0-agent-registry.js` registers unique agent identities and immutable-at-registration capability lists. Revocation clears capabilities.
-- `lib/command0-policy.js` applies a default-deny capability allow-list, per-capability risk ceilings, and approval-reference requirements.
-- `lib/command0-recovery.js` classifies failures and recommends at most three retries for an allow-listed set of transient errors, always from a supplied checkpoint reference. It does not execute retries itself.
+- `lib/command0-agent-registry.js` registers unique agent identities, enforces owner-granted capabilities, bounds concurrency, verifies health-report proof, and supports owner-authenticated revocation. It remains in-memory.
+- `lib/command0-policy.js` applies a default-deny capability allow-list, per-capability risk ceilings, and approval-reference verification.
+- `lib/command0-recovery.js` stores in-memory checkpoints and enforces a bounded retry budget. Recovery is not distributed or durable yet.
 
 ## Owner authentication integration
 
-The kernel's privileged actions require an injected asynchronous `authorizeOwner` verifier. The default rejects all owner actions. The hosting/API integration must connect this callback to a real authenticated owner session and validate approval references server-side. The string `actor: 'owner'` alone is not authentication. Do not use a client-supplied role label as proof of identity.
+The kernel's privileged actions require an injected asynchronous `authorizeOwner` verifier. The default rejects all owner actions. The hosting/API integration must connect this callback to a real authenticated owner session and validate approval references server-side. Do not use a client-supplied role label as proof of identity.
 
 ## Current implementation boundary
 
-The agent registry and recovery records are in-memory MVP components. They are not yet durable across process restarts and are not a distributed consensus or remote execution layer. Production use requires durable storage, authenticated API integration, key management, concurrency controls across multiple processes, and independent security review.
+The task kernel persists local JSON state atomically. Agent registry and recovery records are in-memory MVP components and are not durable across process restarts. This is not a distributed consensus or remote execution layer. Production use requires durable storage, authenticated API integration, key management, concurrency controls across multiple processes, and independent security review.
