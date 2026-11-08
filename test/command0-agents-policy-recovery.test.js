@@ -4,17 +4,35 @@ import { createAgentRegistry } from '../lib/command0-agent-registry.js';
 import { createPolicyEngine } from '../lib/command0-policy.js';
 import { createRecoveryEngine } from '../lib/command0-recovery.js';
 
-test('only owner registers agents and grants pre-approved capabilities', () => {
-  const registry = createAgentRegistry({ grantedCapabilities: ['read:docs'] });
-  assert.throws(() => registry.register({ id: 'worker' }), /Only the owner/);
-  assert.throws(() => registry.register({ id: 'worker', capabilities: ['admin'] }, { actor: 'owner' }), /not granted/);
-  const agent = registry.register({ id: 'worker', capabilities: ['read:docs'] }, { actor: 'owner' });
+const ownerAuth = async ({ action }) => action === 'register-agent' || action === 'revoke-agent';
+const agentAuth = async ({ action, agentId, proof }) => action === 'report-agent-health' && proof === `signed:${agentId}`;
+
+test('agent registry requires authenticated owner proof for registration and revocation', async () => {
+  const registry = createAgentRegistry({ grantedCapabilities: ['read:docs'], authorizeOwner: ownerAuth });
+  await assert.rejects(registry.register({ id: 'worker' }, { actor: 'owner' }), /Authenticated owner/);
+  await assert.rejects(registry.register({ id: 'worker', capabilities: ['admin'] }, { actor: 'owner' }), /Capabilities not granted/);
+  const agent = await registry.register({ id: 'worker', capabilities: ['read:docs'] }, { actor: 'owner' });
   assert.equal(agent.status, 'healthy');
+  await assert.rejects(registry.revoke('worker'), /Authenticated owner/);
+  assert.equal(await registry.revoke('worker', { actor: 'owner' }), true);
+  assert.throws(() => registry.acquire('worker'), /not healthy/);
 });
 
-test('agent leases enforce capability and concurrency limits', () => {
-  const registry = createAgentRegistry({ grantedCapabilities: ['read:docs'] });
-  registry.register({ id: 'reader', capabilities: ['read:docs'], maxConcurrency: 1 }, { actor: 'owner' });
+test('agent health reports require a verifiable agent proof', async () => {
+  const registry = createAgentRegistry({
+    grantedCapabilities: ['read:docs'],
+    authorizeOwner: ownerAuth,
+    authorizeAgent: agentAuth
+  });
+  await registry.register({ id: 'reader', capabilities: ['read:docs'] }, { actor: 'owner' });
+  await assert.rejects(registry.setHealth('reader', 'offline', { actor: 'reader' }), /proof/);
+  const updated = await registry.setHealth('reader', 'degraded', { actor: 'reader', proof: 'signed:reader' });
+  assert.equal(updated.status, 'degraded');
+});
+
+test('agent leases enforce capability and concurrency limits', async () => {
+  const registry = createAgentRegistry({ grantedCapabilities: ['read:docs'], authorizeOwner: ownerAuth });
+  await registry.register({ id: 'reader', capabilities: ['read:docs'], maxConcurrency: 1 }, { actor: 'owner' });
   const lease = registry.acquire('reader', ['read:docs']);
   assert.throws(() => registry.acquire('reader'), /concurrency limit/);
   assert.equal(lease.release(), true);
