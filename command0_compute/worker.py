@@ -59,6 +59,16 @@ def validate_result(item):
         raise ValueError("checksum mismatch")
     return item
 
+def sieve_flags(stop):
+    """Independent bounded prime oracle, different from the worker's trial division."""
+    flags = bytearray(b"\x01") * stop
+    flags[:min(stop, 2)] = b"\x00" * min(stop, 2)
+    for candidate in range(2, math.isqrt(stop - 1) + 1):
+        if flags[candidate]:
+            begin = candidate * candidate
+            flags[begin:stop:candidate] = b"\x00" * ((stop - 1 - begin) // candidate + 1)
+    return flags
+
 def verify(paths, start, stop):
     if len(paths) < 1 or len(paths) > 16 or not 0 <= start < stop <= MAX_END:
         raise ValueError("invalid verify request")
@@ -75,6 +85,13 @@ def verify(paths, start, stop):
         cursor = row["stop"]
     if cursor != stop:
         raise ValueError("incomplete coverage")
+    if len({row["node"] for row in rows}) != len(rows):
+        raise ValueError("duplicate node identifiers")
+    flags = sieve_flags(stop)
+    for row in rows:
+        actual = sum(flags[row["start"]:row["stop"]])
+        if actual != row["count"]:
+            raise ValueError(f"incorrect prime count from node {row['node']}")
     return {"schema": VERSION, "task": "prime_count", "start": start,
             "stop": stop, "count": sum(row["count"] for row in rows),
             "shards": len(rows), "nodes": [row["node"] for row in rows],
