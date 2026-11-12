@@ -41,6 +41,8 @@ jobs:
           pattern: command0-shard-*
           path: results
           merge-multiple: true
+      - name: Run adversarial verification regression tests
+        run: python3 -m unittest discover -s command0_compute -p 'test_*.py' -v
       - name: Verify complete distributed result
         run: |
           python3 command0_compute/worker.py self-test

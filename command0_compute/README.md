@@ -7,6 +7,7 @@
 - Validates result checksums and checks for missing/overlapping ranges before aggregating.
 - GitHub Actions runs only for this folder's pull requests or manual triggers; it does not publish the application.
 - Checksum protects against accidental corruption, **not** malicious modification or node impersonation.
+- The separate verifier independently recomputes each shard's prime count with a sieve and rejects false counts even when a new valid checksum was attached; duplicate node IDs, gaps, overlaps and malformed data are rejected. This checks bounded *results* but does not authenticate worker identity.
 
 ## Local smoke test (Windows, Python 3.10+)
 ```powershell
