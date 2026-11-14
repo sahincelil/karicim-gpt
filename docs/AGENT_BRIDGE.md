@@ -2,7 +2,7 @@
 
 ## Goal
 
-Provide one provider-neutral integration contract so authorized AI agents, bots, and external services can exchange bounded tasks with KaricimGPT through GitHub. GitHub Issues remain the durable inbox and pull requests remain the code-review boundary. This bridge is an integration contract, not a claim that every provider is already connected or continuously running.
+Provide one provider-neutral integration contract so authorized AI agents, bots, and external services can exchange bounded tasks with KaricimGPT through GitHub. GitHub Issues remain the durable inbox and pull requests remain the code-review boundary. The repository already exposes an authenticated `POST /api/bridge` endpoint for `health` and `agent` actions. That is a working single-agent gateway when deployed with `BRIDGE_SHARED_SECRET` and an AI provider configured. The multi-agent task queue and provider-specific worker adapters described below are the next layer, not yet live.
 
 ## Topology
 
@@ -89,3 +89,28 @@ No agent receives production credentials by default. No provider may elevate its
 ## Current status
 
 This document defines the bridge contract and rollout plan. It does not establish live connections to external providers, deploy a service, or grant agents access to the user's other accounts or devices.
+
+
+## Existing live gateway contract
+
+The current application already routes `POST /api/bridge` to `api/bridge.js`.
+
+- Actions: `health` and `agent`.
+- Authentication: HMAC-SHA256 over the exact string `<timestamp>.<raw JSON body>`.
+- Headers: `X-Bridge-Timestamp` (Unix milliseconds) and `X-Bridge-Signature` (hex HMAC).
+- Replay window: five minutes.
+- Request body limit: 180 KB in the bridge handler (the server's outer parser applies its own limit).
+- Rate limiting: uses the shared application rate limiter.
+- Agent input: up to 20 messages, each content string bounded to 12,000 characters; the bridge forwards sanitized user/assistant messages to the configured agent handler.
+
+Configure `BRIDGE_SHARED_SECRET` only in the server environment. The calling bot must receive the same secret through its own secret manager. Configure model-provider API keys separately on the server; do not distribute provider keys to calling bots. Use `examples/bridge-client.mjs` as a minimal Node.js 24 reference client.
+
+Example caller setup (values are placeholders; do not commit them):
+
+```sh
+export BRIDGE_URL="https://YOUR_DEPLOYED_HOST"
+export BRIDGE_SHARED_SECRET="YOUR_LONG_RANDOM_SECRET"
+node examples/bridge-client.mjs "Summarize the approved project status"
+```
+
+The current gateway is not yet a durable multi-agent queue: it forwards one bounded conversation to the configured agent and returns its response. GitHub Issues, the task schema, and reviewed PRs provide the governance foundation for the later dispatcher/worker layer.
