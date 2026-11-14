@@ -1,0 +1,46 @@
+name: Production task
+description: Track one SYSTEM ARCHIVE production task from idea to review.
+title: "[SA] "
+labels: ["status: idea"]
+body:
+  - type: dropdown
+    id: format
+    attributes:
+      label: Format
+      options:
+        - Short
+        - Long-form
+        - Community post
+        - Research / operations
+    validations:
+      required: true
+  - type: textarea
+    id: viewer_question
+    attributes:
+      label: Viewer question / task outcome
+      description: What should the viewer learn, or what should this task deliver?
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence and source links
+      description: Add primary research or reputable institutional sources. Note limitations.
+    validations:
+      required: false
+  - type: textarea
+    id: visual_proof
+    attributes:
+      label: Visual proof / acceptance criteria
+      description: What must be visible or verifiably complete?
+    validations:
+      required: true
+  - type: checkboxes
+    id: safety
+    attributes:
+      label: Safety and release checks
+      options:
+        - label: No credentials, recovery codes, or private personal data included
+          required: true
+        - label: No external publishing action is requested by this issue
+          required: true
