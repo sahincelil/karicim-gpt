@@ -1,0 +1,96 @@
+name: LEGION Task Intake
+
+on:
+  issues:
+    types: [opened, reopened]
+
+permissions:
+  contents: none
+  issues: read
+
+concurrency:
+  group: legion-intake-${{ github.event.issue.number }}
+  cancel-in-progress: true
+
+jobs:
+  validate-task:
+    if: ${{ !github.event.issue.pull_request }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 3
+    permissions:
+      issues: read
+    steps:
+      - name: Validate structured task packet
+        env:
+          EVENT_PATH: ${{ github.event_path }}
+        run: |
+          node <<'NODE'
+          const fs = require('node:fs');
+
+          const event = JSON.parse(fs.readFileSync(process.env.EVENT_PATH, 'utf8'));
+          const issue = event.issue;
+          if (!issue || issue.pull_request) {
+            console.error('LEGION intake accepts issues only.');
+            process.exit(1);
+          }
+
+          // Issue content is untrusted data. It is parsed as text and never executed.
+          const body = String(issue.body || '');
+          const fields = [
+            'Görev türü',
+            'Görev tanımı',
+            'Beklenen çıktı',
+            'Dış etki / risk',
+            'Onay durumu'
+          ];
+
+          function readField(label) {
+            const escaped = label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            const match = body.match(new RegExp('^###\\s+' + escaped + '\\s*\\n([\\s\\S]*?)(?=\\n###\\s+|$)', 'm'));
+            return match ? match[1].trim() : '';
+          }
+
+          const values = Object.fromEntries(fields.map((field) => [field, readField(field)]));
+          const allowedTypes = new Set([
+            'Araştırma',
+            'Analiz',
+            'Mimari tasarım',
+            'Kod değişikliği önerisi',
+            'Test / QA',
+            'Dokümantasyon',
+            'Operasyon planı'
+          ]);
+          const allowedImpacts = new Set([
+            'Yalnızca okuma / analiz',
+            'Kod önerisi, PR üzerinden inceleme',
+            'Deploy, silme, hesap, finans, dış iletişim veya hassas veri'
+          ]);
+          const allowedApprovals = new Set([
+            'Planlama için onaylı',
+            'Henüz onay yok'
+          ]);
+
+          const errors = [];
+          if (!allowedTypes.has(values['Görev türü'])) errors.push('Görev türü eksik veya izin verilen listede değil.');
+          if (!values['Görev tanımı'] || values['Görev tanımı'].length > 4000) errors.push('Görev tanımı boş veya 4000 karakter sınırını aşıyor.');
+          if (!values['Beklenen çıktı'] || values['Beklenen çıktı'].length > 2000) errors.push('Beklenen çıktı boş veya 2000 karakter sınırını aşıyor.');
+          if (!allowedImpacts.has(values['Dış etki / risk'])) errors.push('Dış etki / risk alanı geçersiz.');
+          if (!allowedApprovals.has(values['Onay durumu'])) errors.push('Onay durumu alanı geçersiz.');
+
+          console.log('LEGION task intake');
+          console.log('Issue:', issue.number);
+          console.log('Title:', String(issue.title || '').slice(0, 160));
+          console.log('Task type:', values['Görev türü'] || '(missing)');
+          console.log('Impact:', values['Dış etki / risk'] || '(missing)');
+
+          if (errors.length) {
+            for (const error of errors) console.error('VALIDATION:', error);
+            process.exit(1);
+          }
+
+          const humanGate = values['Dış etki / risk'] !== 'Yalnızca okuma / analiz'
+            || values['Onay durumu'] !== 'Planlama için onaylı';
+
+          console.log('Intake result:', humanGate ? 'VALIDATED / HUMAN REVIEW REQUIRED' : 'VALIDATED / READ-ONLY TRIAGE');
+          console.log('Execution:', 'DISABLED in this release; no agent, shell command, deployment, or external action was started.');
+          NODE
