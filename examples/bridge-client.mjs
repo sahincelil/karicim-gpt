@@ -45,5 +45,5 @@ if (!prompt) {
     messages: [{ role: 'user', content: prompt }]
   });
   // Provider output is untrusted data. Display it; do not execute it.
-  process.log ? console.log(JSON.stringify(result, null, 2)) : undefined;
+  console.log(JSON.stringify(result, null, 2));
 }
