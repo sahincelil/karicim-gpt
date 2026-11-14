@@ -42,10 +42,44 @@ Every adapter MUST:
 
 - GitHub Issues: durable task intake and status.
 - GitHub Actions: schema validation, policy checks, tests, and bounded reporting.
-- Native provider routes: `/api/claude` (Anthropic Messages API) and `/api/gemini` (Google Gemini `generateContent` API) are now implemented on this branch. They require `ANTHROPIC_API_KEY` and `GEMINI_API_KEY` server-side.
-- Existing routes: `/api/chat` supports OpenAI, xAI, and OpenRouter; `/api/grok` uses xAI; `/api/council` now fans out in parallel to xAI, OpenRouter, Anthropic Claude, and Google Gemini when each key is configured. OpenRouter performs the optional synthesis.
-- Additional adapters: OpenRouter, local Ollama gateways, and custom HTTPS bots can be added under the same provider-neutral contract. A code route is not a live connection until credentials and deployment are configured.
+- Native provider routes: `/api/claude` (Anthropic Messages API) and `/api/gemini` (Google Gemini `generateContent` API). Each requires its provider API key and a separate `PROVIDER_SHARED_SECRET` configured server-side.
+- Existing routes: `/api/chat` supports OpenAI, xAI, and OpenRouter; `/api/grok` uses xAI; `/api/council` can call xAI, OpenRouter, Anthropic Claude, and Google Gemini when configured. OpenRouter provides optional synthesis.
+- Additional adapters: local Ollama gateways and custom HTTPS bots can use the same provider-neutral contract. A code route is not a live connection until credentials and deployment are configured.
 - Results: issue comments or artifacts for reports; feature branches and pull requests for code proposals.
+
+## Provider endpoint authentication
+
+Both native provider endpoints reject unauthenticated requests before calling a paid provider API.
+
+- Required server secret: `PROVIDER_SHARED_SECRET`, a long random value distinct from every provider API key and from `BRIDGE_SHARED_SECRET`.
+- Headers: `X-Provider-Timestamp` (Unix milliseconds) and `X-Provider-Signature` (hex HMAC-SHA256).
+- Signature input: `<timestamp>.<JSON.stringify(requestBody)>` using the exact JSON serialization sent in the HTTP body.
+- Timestamp freshness window: five minutes. This limits the useful replay window; it is not a durable nonce store.
+- Body limit: 180 KB after JSON parsing. A per-IP rate limit is also applied.
+- Provider API keys remain server-side and are never sent to the caller.
+
+Example Node.js signing snippet:
+
+```js
+import crypto from 'node:crypto';
+
+const timestamp = String(Date.now());
+const body = { messages: [{ role: 'user', content: 'Hello' }] };
+const serialized = JSON.stringify(body);
+const signature = crypto.createHmac('sha256', process.env.PROVIDER_SHARED_SECRET)
+  .update(`${timestamp}.${serialized}`)
+  .digest('hex');
+
+await fetch(`${process.env.APP_URL}/api/claude`, {
+  method: 'POST',
+  headers: {
+    'content-type': 'application/json',
+    'x-provider-timestamp': timestamp,
+    'x-provider-signature': signature
+  },
+  body: serialized
+});
+```
 
 ## Permission tiers
 
@@ -90,12 +124,11 @@ No agent receives production credentials by default. No provider may elevate its
 
 ## Current status
 
-This branch contains native provider routes and a four-provider Council implementation, but this PR is not merged or deployed. No live connection is confirmed until provider credentials are configured in the hosting environment and authenticated smoke tests pass.
-
+This change adds native provider routes and four-provider Council wiring, but code presence and a Vercel preview build do not prove live provider connectivity. Provider credentials must be configured in the hosting environment and authenticated smoke tests must pass.
 
 ## Existing live gateway contract
 
-The current application already routes `POST /api/bridge` to `api/bridge.js`.
+The current application routes `POST /api/bridge` to `api/bridge.js`.
 
 - Actions: `health` and `agent`.
 - Authentication: HMAC-SHA256 over the exact string `<timestamp>.<raw JSON body>`.
