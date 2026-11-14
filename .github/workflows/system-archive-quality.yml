@@ -1,0 +1,66 @@
+name: SYSTEM ARCHIVE quality gate
+
+on:
+  pull_request:
+    paths:
+      - "system-archive/**"
+      - ".github/workflows/**"
+  push:
+    branches:
+      - github-control-plane
+      - system-archive-foundation
+    paths:
+      - "system-archive/**"
+      - ".github/workflows/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: system-archive-quality-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    name: Validate project documents
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Check required project files
+        shell: bash
+        run: |
+          set -euo pipefail
+          required=(
+            "system-archive/README.md"
+            "system-archive/PRODUCTION_PIPELINE.md"
+            "system-archive/RESEARCH_STANDARDS.md"
+            "system-archive/EVOLUTION_STANDARD.md"
+            "system-archive/GITHUB_CONTROL_PLANE.md"
+          )
+          for file in "${required[@]}"; do
+            test -s "$file" || { echo "::error::Missing or empty: $file"; exit 1; }
+          done
+
+      - name: Check for accidental credential patterns
+        shell: bash
+        run: |
+          set -euo pipefail
+          if grep -RInE --exclude-dir=.git --exclude='*.lock'             '(gh[pousr]_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{20,}|AKIA[0-9A-Z]{16}|-----BEGIN (RSA|OPENSSH|EC) PRIVATE KEY-----)'             system-archive; then
+            echo "::error::Potential credential material found. Remove it and rotate any exposed secret."
+            exit 1
+          fi
+
+      - name: Check required editorial guardrails
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q "primary" system-archive/RESEARCH_STANDARDS.md
+          grep -q "owner" system-archive/PRODUCTION_PIPELINE.md
+          grep -q "APPROVED" system-archive/PRODUCTION_PIPELINE.md
+          echo "SYSTEM ARCHIVE document checks passed."
