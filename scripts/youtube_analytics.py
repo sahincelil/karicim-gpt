@@ -14,7 +14,10 @@ from datetime import date, timedelta
 from pathlib import Path
 from typing import Any
 
-SCOPE = "https://www.googleapis.com/auth/yt-analytics.readonly"
+SCOPES = (
+    "https://www.googleapis.com/auth/yt-analytics.readonly",
+    "https://www.googleapis.com/auth/youtube.readonly",
+)
 DEFAULT_PRIVATE_DIR = Path.home() / ".system-archive"
 DEFAULT_CLIENT_FILE = DEFAULT_PRIVATE_DIR / "oauth-client.json"
 DEFAULT_TOKEN_FILE = DEFAULT_PRIVATE_DIR / "youtube-token.json"
@@ -40,6 +43,25 @@ def previous_complete_28_days(today: date | None = None) -> tuple[date, date]:
     anchor = today or date.today()
     end_date = anchor - timedelta(days=1)
     return end_date - timedelta(days=27), end_date
+
+
+def api_query_window(today: date | None = None) -> tuple[date, date]:
+    """Fetch an extra four weeks so delayed daily rows still leave a full 28-day report."""
+    anchor = today or date.today()
+    end_date = anchor - timedelta(days=1)
+    return end_date - timedelta(days=55), end_date
+
+
+def latest_returned_day(daily_response: dict[str, Any]) -> date:
+    returned = []
+    for row in response_rows(daily_response):
+        try:
+            returned.append(date.fromisoformat(str(row["day"])))
+        except (KeyError, TypeError, ValueError):
+            continue
+    if not returned:
+        raise RuntimeError("YouTube returned no daily rows for the requested range.")
+    return max(returned)
 
 
 def week_ranges(end_date: date) -> dict[str, tuple[date, date]]:
@@ -89,20 +111,28 @@ def _period_metrics(rows: list[dict[str, Any]], start: date, end: date) -> dict[
 
     for metric in ADDITIVE_METRICS:
         values = [_number(row.get(metric)) for row in in_period]
-        result["metrics"][metric] = round(sum(v for v in values if v is not None), 3)
+        result["metrics"][metric] = (
+            round(sum(values), 3)
+            if values and all(value is not None for value in values)
+            else None
+        )
 
-    weights = [_number(row.get("engagedViews")) or 0.0 for row in in_period]
-    total_weight = sum(weights)
+    weights = [_number(row.get("engagedViews")) for row in in_period]
     for metric in WEIGHTED_METRICS:
-        numerator = 0.0
-        denominator = 0.0
-        for row, weight in zip(in_period, weights):
-            value = _number(row.get(metric))
-            if value is not None and weight > 0:
-                numerator += value * weight
-                denominator += weight
-        result["metrics"][metric] = round(numerator / denominator, 3) if denominator else None
-        result["metrics"][metric + "Weight"] = round(total_weight, 3)
+        metric_values = [_number(row.get(metric)) for row in in_period]
+        valid = [
+            (value, weight)
+            for value, weight in zip(metric_values, weights)
+            if value is not None and weight is not None and weight > 0
+        ]
+        denominator = sum(weight for _, weight in valid)
+        all_values_present = bool(metric_values) and all(value is not None for value in metric_values)
+        result["metrics"][metric] = (
+            round(sum(value * weight for value, weight in valid) / denominator, 3)
+            if all_values_present and denominator > 0
+            else None
+        )
+        result["metrics"][metric + "Weight"] = round(denominator, 3) if denominator else None
     return result
 
 
@@ -153,7 +183,11 @@ def build_report(
             "comparison_status": "comparable" if can_compare else "incomplete_data_coverage",
         }
 
-    all_days = sorted({str(row.get("day")) for row in daily_rows if row.get("day")})
+    all_days = sorted({
+        str(row.get("day"))
+        for row in daily_rows
+        if row.get("day") and start_date.isoformat() <= str(row.get("day")) <= end_date.isoformat()
+    })
     return {
         "channel": "SYSTEM ARCHIVE",
         "generated_on": date.today().isoformat(),
@@ -197,7 +231,7 @@ def load_credentials(client_file: Path, token_file: Path):
 
     credentials = None
     if token_file.is_file():
-        credentials = Credentials.from_authorized_user_file(str(token_file), [SCOPE])
+        credentials = Credentials.from_authorized_user_file(str(token_file), list(SCOPES))
 
     if credentials and credentials.expired and credentials.refresh_token:
         credentials.refresh(Request())
@@ -207,7 +241,7 @@ def load_credentials(client_file: Path, token_file: Path):
                 f"OAuth client file not found: {client_file}. "
                 "Download a Desktop OAuth client from Google Cloud and keep it outside Git."
             )
-        flow = InstalledAppFlow.from_client_secrets_file(str(client_file), [SCOPE])
+        flow = InstalledAppFlow.from_client_secrets_file(str(client_file), list(SCOPES))
         credentials = flow.run_local_server(
             host="localhost", port=0, access_type="offline", prompt="consent"
         )
@@ -221,7 +255,7 @@ def load_credentials(client_file: Path, token_file: Path):
     return credentials
 
 
-def fetch_report(credentials, start_date: date, end_date: date) -> dict[str, Any]:
+def fetch_report(credentials) -> dict[str, Any]:
     try:
         from googleapiclient.discovery import build
     except ImportError as exc:
@@ -232,22 +266,28 @@ def fetch_report(credentials, start_date: date, end_date: date) -> dict[str, Any
     service = build(
         "youtubeAnalytics", "v2", credentials=credentials, cache_discovery=False
     )
-    common = {
-        "ids": "channel==MINE",
-        "startDate": start_date.isoformat(),
-        "endDate": end_date.isoformat(),
-    }
-    summary = service.reports().query(
-        **common, metrics=",".join(SUMMARY_METRICS)
-    ).execute()
+    query_start, query_end = api_query_window()
     daily = service.reports().query(
-        **common,
+        ids="channel==MINE",
+        startDate=query_start.isoformat(),
+        endDate=query_end.isoformat(),
         dimensions="day,creatorContentType",
         metrics=",".join(DAILY_METRICS),
         sort="day,creatorContentType",
         maxResults=1000,
     ).execute()
-    return build_report(summary, daily, start_date, end_date)
+
+    # Query daily data over 56 days, then anchor the report to the latest date
+    # actually returned by YouTube. The endpoint omits the most recent days.
+    report_end = latest_returned_day(daily)
+    report_start = report_end - timedelta(days=27)
+    summary = service.reports().query(
+        ids="channel==MINE",
+        startDate=report_start.isoformat(),
+        endDate=report_end.isoformat(),
+        metrics=",".join(SUMMARY_METRICS),
+    ).execute()
+    return build_report(summary, daily, report_start, report_end)
 
 
 def main() -> int:
@@ -265,23 +305,23 @@ def main() -> int:
         parser.error("--output is required unless --check-only is used.")
 
     credentials = load_credentials(args.client_secrets, args.credentials)
-    start_date, end_date = previous_complete_28_days()
-
     if args.check_only:
         from googleapiclient.discovery import build
         service = build(
             "youtubeAnalytics", "v2", credentials=credentials, cache_discovery=False
         )
+        check_end = date.today() - timedelta(days=1)
+        check_start = check_end - timedelta(days=7)
         service.reports().query(
             ids="channel==MINE",
-            startDate=end_date.isoformat(),
-            endDate=end_date.isoformat(),
+            startDate=check_start.isoformat(),
+            endDate=check_end.isoformat(),
             metrics="views",
         ).execute()
         print("Read-only YouTube OAuth check succeeded; channel metrics were suppressed.")
         return 0
 
-    report = fetch_report(credentials, start_date, end_date)
+    report = fetch_report(credentials)
     output_path = args.output.expanduser().resolve()
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text(
