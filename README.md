@@ -12,6 +12,8 @@ Repo: https://github.com/sahincelil/karicim-gpt
 - [90-day product growth plan](docs/PRODUCT_GROWTH_PLAN.md)
 - [Architecture notes](docs/ARCHITECTURE.md)
 - [LEGION AI command center](docs/LEGION_AI.md)
+- [LEGION AI Agent Bridge](docs/AGENT_BRIDGE.md)
+- [Signed Node.js bridge client](examples/bridge-client.mjs)
 - [Persistent digital twin core](docs/DIGITAL_TWIN.md)
 - [Canva editable design](https://www.canva.com/d/5cQoYrVz2r4mFg7)
 
