@@ -21,7 +21,7 @@ Repo: https://github.com/sahincelil/karicim-gpt
 - [Persistent digital twin core](docs/DIGITAL_TWIN.md)
 - [Canva editable design](https://www.canva.com/d/5cQoYrVz2r4mFg7)
 
-> Status discipline: CI checks have passed recently, but this alone does not mean a production site is live. Vercel project creation returned 403 Forbidden for the currently connected team; hosting is not yet verified. No customer outreach or revenue is confirmed.
+> Status discipline: GitHub's Vercel integration has reported Ready preview deployments for recent LEGION changes. A production deployment and live provider connectivity are not yet verified; server-side provider credentials and authenticated smoke tests are still required. No customer outreach or revenue is confirmed.
 
 ## AI motoru
 
