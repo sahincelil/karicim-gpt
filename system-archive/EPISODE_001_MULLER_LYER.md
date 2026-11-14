@@ -1,6 +1,6 @@
 # Episode 001 — Müller-Lyer Illusion
 
-Status: Draft visual master v2 created; narration and final editorial QC remain open.
+Status: Visual master v2.1 created; voiceover and final release gates remain open.
 Working title: Beynin Gözlerine Söylediği Yalan
 Format: YouTube Shorts, vertical 9:16
 Target duration: 30 seconds
@@ -39,15 +39,30 @@ Two line shafts can be physically equal while their surrounding arrowheads chang
 - Music-only; narration remains a separate next production step.
 - Export filename: `system_archive_muller_lyer_v2.mp4`.
 
+### v2.1
+- Re-exported with normalized background music for improved audibility.
+- Preserved 1080×1920, 30 fps, H.264 visual stream; AAC mono audio.
+- Created a Turkish SRT timing guide as a separate sidecar.
+- SRT timings are provisional and must be synchronized against the final narration; the current v2.1 audio is still music-only.
+- Spot-checked visual frames at 2s, 12s, and 26s.
+- Export filename: `system_archive_muller_lyer_v2_1.mp4`.
+- QC record: `SYSTEM_ARCHIVE_EP001_QC_v2_1.md`.
+
 ## Remaining release checklist
 
-- [ ] Verify the line geometry and final playback frame-by-frame.
+- [ ] Generate Turkish narration after explicit approval of the estimated 493-credit / $4.93 spend.
+- [ ] Re-time and verify subtitles against the actual narration.
 - [ ] Add sourced scientific reference to description.
-- [ ] Generate and mix Turkish narration, then re-check caption timing.
-- [ ] Check spelling, safe areas, loudness, audio peaks, and playback on a phone.
+- [x] Verify export dimensions, frame rate, codecs, duration, and file size.
+- [x] Spot-check opening, reveal, and closing frames.
+- [ ] Complete full playback review on a phone.
 - [ ] Prepare title, description, hashtags, and thumbnail.
 - [ ] Obtain owner approval before publishing.
 
 ## Learning plan
 
 After publication, compare the first 24 hours, 72 hours, and 7 days with Shorts of similar age and topic. Review viewed-vs-swiped, engaged views, average view duration, average percentage viewed, and subscribers gained where available. Record missing metrics as unavailable, not zero.
+
+## Release decision
+
+NOT READY FOR PUBLICATION. No YouTube upload or publication has been performed.
