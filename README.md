@@ -14,6 +14,8 @@ Repo: https://github.com/sahincelil/karicim-gpt
 - [LEGION AI command center](docs/LEGION_AI.md)
 - [LEGION AI Agent Bridge](docs/AGENT_BRIDGE.md)
 - [Signed Node.js bridge client](examples/bridge-client.mjs)
+- [Claude API route](api/claude.js)
+- [Gemini API route](api/gemini.js)
 - [Persistent digital twin core](docs/DIGITAL_TWIN.md)
 - [Canva editable design](https://www.canva.com/d/5cQoYrVz2r4mFg7)
 
