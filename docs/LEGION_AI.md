@@ -87,12 +87,12 @@ Suggested labels for maintainers to create in GitHub:
 
 See `docs/LEGION_RUNTIME_V2.md` for setup and operation.
 
-### Stage 3: Worker delegation
+### Stage 3: Sandboxed worker delegation
 
 - Each future worker receives only its assigned task and minimum required context.
 - Worker output is an artifact or pull-request proposal, never an instruction to execute arbitrary commands.
 
-### Stage 3: Sandboxed workers
+### Worker runtime requirements
 
 - Use isolated, ephemeral runners or containers with no production credentials.
 - Default network access off; allowlist destinations only when justified.
