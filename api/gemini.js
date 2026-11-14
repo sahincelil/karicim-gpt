@@ -1,4 +1,5 @@
 import { rateLimit, securityHeaders } from '../lib/security.js';
+import { verifyProviderRequest, providerRequestBytes } from '../lib/provider-auth.js';
 
 const MAX_MESSAGES = 20;
 const MAX_MESSAGE_CHARS = 12000;
@@ -23,9 +24,10 @@ function clean(messages) {
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') return send(res, 405, { ok: false, error: 'Yalnızca POST destekleniyor.' }, { Allow: 'POST' });
+  if (providerRequestBytes(req) > MAX_REQUEST_BYTES) return send(res, 413, { ok: false, error: 'İstek çok büyük.' });
+  if (!verifyProviderRequest(req)) return send(res, 401, { ok: false, error: 'Provider kimlik doğrulaması başarısız.' });
   const limit = rateLimit(req);
   if (!limit.allowed) return send(res, 429, { ok: false, error: 'Çok fazla istek.' }, { 'Retry-After': limit.retryAfter });
-  if (Number(req.headers['content-length'] || 0) > MAX_REQUEST_BYTES) return send(res, 413, { ok: false, error: 'İstek çok büyük.' });
 
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) return send(res, 503, { ok: false, error: 'GEMINI_API_KEY sunucuda yapılandırılmamış.' });
