@@ -44,6 +44,30 @@ class AnalyticsReportTests(unittest.TestCase):
         self.assertFalse(summary["complete_coverage"])
         self.assertEqual(summary["metrics"]["views"], 12)
 
+    def test_api_query_window_has_56_day_lookback(self):
+        start, end = analytics.api_query_window(date(2026, 11, 14))
+        self.assertEqual(end, date(2026, 11, 13))
+        self.assertEqual((end - start).days + 1, 56)
+
+    def test_latest_returned_day_anchors_report(self):
+        response = {
+            "columnHeaders": [{"name": "day"}, {"name": "views"}],
+            "rows": [
+                ["2026-11-10", 10],
+                ["2026-11-12", 12],
+            ],
+        }
+        self.assertEqual(analytics.latest_returned_day(response), date(2026, 11, 12))
+
+    def test_null_metric_is_not_converted_to_zero(self):
+        rows = [
+            {"day": "2026-11-13", "views": None, "engagedViews": 2},
+        ]
+        summary = analytics._period_metrics(
+            rows, date(2026, 11, 13), date(2026, 11, 13)
+        )
+        self.assertIsNone(summary["metrics"]["views"])
+
     def test_zero_previous_period_has_no_percentage_change(self):
         self.assertIsNone(analytics._change_percent(10, 0))
 
