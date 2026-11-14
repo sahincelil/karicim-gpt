@@ -4,7 +4,7 @@ const MAX_MESSAGES = 20;
 const MAX_MESSAGE_CHARS = 12000;
 const MAX_OUTPUT_TOKENS = 4096;
 const MAX_REQUEST_BYTES = 180000;
-const DEFAULT_MODEL = 'claude-sonnet-4-5';
+const DEFAULT_MODEL = 'claude-sonnet-5-5';
 
 function send(res, status, body, extra = {}) {
   securityHeaders(res);
