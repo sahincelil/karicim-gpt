@@ -43,7 +43,7 @@ Every adapter MUST:
 - GitHub Issues: durable task intake and status.
 - GitHub Actions: schema validation, policy checks, tests, and bounded reporting.
 - Native provider routes: `/api/claude` (Anthropic Messages API) and `/api/gemini` (Google Gemini `generateContent` API) are now implemented on this branch. They require `ANTHROPIC_API_KEY` and `GEMINI_API_KEY` server-side.
-- Existing routes: `/api/chat` supports OpenAI, xAI, and OpenRouter; `/api/grok` uses xAI; `/api/council` currently calls xAI and OpenRouter.
+- Existing routes: `/api/chat` supports OpenAI, xAI, and OpenRouter; `/api/grok` uses xAI; `/api/council` now fans out in parallel to xAI, OpenRouter, Anthropic Claude, and Google Gemini when each key is configured. OpenRouter performs the optional synthesis.
 - Additional adapters: OpenRouter, local Ollama gateways, and custom HTTPS bots can be added under the same provider-neutral contract. A code route is not a live connection until credentials and deployment are configured.
 - Results: issue comments or artifacts for reports; feature branches and pull requests for code proposals.
 
@@ -72,8 +72,8 @@ No agent receives production credentials by default. No provider may elevate its
 
 ## Rollout
 
-1. **Contract only:** validate schema and document adapter requirements. No provider is considered connected yet.
-2. **Read-only pilot:** connect one provider using a restricted server-side secret; permit only research/planning tasks.
+1. **Provider routes:** native Claude and Gemini routes plus existing OpenAI, xAI, and OpenRouter routes are present in source. Live availability depends on server-side keys and deployment.
+2. **Read-only pilot:** configure one provider using a restricted server-side secret; smoke-test research/planning requests.
 3. **Proposal pilot:** enable isolated branch/PR creation after security review.
 4. **Measured expansion:** add providers one at a time; track success rate, latency, cost, rejection rate, and security events.
 
@@ -90,7 +90,7 @@ No agent receives production credentials by default. No provider may elevate its
 
 ## Current status
 
-This document defines the bridge contract and rollout plan. It does not establish live connections to external providers, deploy a service, or grant agents access to the user's other accounts or devices.
+This branch contains native provider routes and a four-provider Council implementation, but this PR is not merged or deployed. No live connection is confirmed until provider credentials are configured in the hosting environment and authenticated smoke tests pass.
 
 
 ## Existing live gateway contract
