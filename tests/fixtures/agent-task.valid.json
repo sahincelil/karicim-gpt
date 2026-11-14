@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "task_id": "demo:research:001",
+  "idempotency_key": "demo-idempotency-key-001",
+  "correlation_id": "demo-correlation-001",
+  "provider": "example-provider",
+  "agent": {
+    "agent_id": "research-agent-01",
+    "model": "example-model",
+    "role": "research"
+  },
+  "task": {
+    "type": "research",
+    "title": "Compare adapter approaches",
+    "objective": "Produce a concise comparison of provider adapter patterns.",
+    "context": "Use public documentation only.",
+    "acceptance_criteria": ["Include trade-offs", "Cite sources"],
+    "repository": "sahincelil/karicim-gpt",
+    "issue_number": 1
+  },
+  "requested_capabilities": ["read_task", "read_approved_context", "write_report"],
+  "risk_tier": "low",
+  "limits": {
+    "timeout_seconds": 300,
+    "max_output_chars": 12000,
+    "max_retries": 1
+  },
+  "created_at": "2026-11-14T10:00:00Z",
+  "expires_at": "2026-11-15T10:00:00Z"
+}

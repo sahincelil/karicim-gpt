@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/sahincelil/karicim-gpt/blob/main/schemas/agent-task.schema.json",
+  "title": "LEGION Agent Task Envelope",
+  "description": "Provider-neutral, bounded task packet for authorized AI agents and bots.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "task_id", "idempotency_key", "provider", "agent", "task", "requested_capabilities", "risk_tier", "created_at"],
+  "properties": {
+    "schema_version": { "const": "1.0" },
+    "task_id": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[A-Za-z0-9._:-]+$" },
+    "idempotency_key": { "type": "string", "minLength": 16, "maxLength": 128 },
+    "correlation_id": { "type": "string", "maxLength": 128 },
+    "provider": { "type": "string", "minLength": 1, "maxLength": 64 },
+    "agent": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["agent_id", "role"],
+      "properties": {
+        "agent_id": { "type": "string", "maxLength": 128 },
+        "model": { "type": "string", "maxLength": 128 },
+        "role": { "enum": ["dispatcher", "research", "architect", "builder", "qa", "security", "operations", "analyst", "documentation", "reviewer", "custom"] }
+      }
+    },
+    "task": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "title", "objective"],
+      "properties": {
+        "type": { "enum": ["research", "planning", "code_proposal", "testing", "documentation", "analysis"] },
+        "title": { "type": "string", "minLength": 1, "maxLength": 200 },
+        "objective": { "type": "string", "minLength": 1, "maxLength": 10000 },
+        "context": { "type": "string", "maxLength": 20000 },
+        "acceptance_criteria": { "type": "array", "maxItems": 30, "items": { "type": "string", "maxLength": 1000 } },
+        "repository": { "type": "string", "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$" },
+        "issue_number": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "requested_capabilities": {
+      "type": "array",
+      "uniqueItems": true,
+      "maxItems": 8,
+      "items": { "enum": ["read_task", "read_approved_context", "web_research", "write_report", "create_proposal_branch", "open_pull_request", "run_tests"] }
+    },
+    "risk_tier": { "enum": ["low", "medium", "high", "critical"] },
+    "limits": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "timeout_seconds": { "type": "integer", "minimum": 1, "maximum": 1800 },
+        "max_output_chars": { "type": "integer", "minimum": 100, "maximum": 50000 },
+        "max_retries": { "type": "integer", "minimum": 0, "maximum": 3 }
+      }
+    },
+    "created_at": { "type": "string", "format": "date-time" },
+    "expires_at": { "type": "string", "format": "date-time" }
+  }
+}
