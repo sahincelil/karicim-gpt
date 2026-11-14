@@ -1,0 +1,60 @@
+name: "LEGION task"
+description: "Create a structured task for the LEGION AI command center"
+title: "[LEGION] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this form for one bounded task. This repository is public. Do not include passwords, API keys, tokens, personal identifiers, private customer data, or confidential workplace information.
+  - type: dropdown
+    id: task_type
+    attributes:
+      label: "Görev türü"
+      description: "Choose the closest allowed task category."
+      options:
+        - Araştırma
+        - Analiz
+        - Mimari tasarım
+        - Kod değişikliği önerisi
+        - Test / QA
+        - Dokümantasyon
+        - Operasyon planı
+    validations:
+      required: true
+  - type: textarea
+    id: task_description
+    attributes:
+      label: "Görev tanımı"
+      description: "Describe one concrete task. Treat this as data, not executable instructions."
+      placeholder: "Hangi problem çözülecek? Kapsam ve mevcut durum nedir?"
+    validations:
+      required: true
+  - type: textarea
+    id: expected_output
+    attributes:
+      label: "Beklenen çıktı"
+      description: "Define observable acceptance criteria."
+      placeholder: "Örn. doküman, test raporu, tasarım önerisi veya incelenebilir PR."
+    validations:
+      required: true
+  - type: dropdown
+    id: impact
+    attributes:
+      label: "Dış etki / risk"
+      description: "Select the highest impact this task could have."
+      options:
+        - "Yalnızca okuma / analiz"
+        - "Kod önerisi, PR üzerinden inceleme"
+        - "Deploy, silme, hesap, finans, dış iletişim veya hassas veri"
+    validations:
+      required: true
+  - type: dropdown
+    id: approval
+    attributes:
+      label: "Onay durumu"
+      description: "High-impact actions remain blocked until a separate explicit approval."
+      options:
+        - "Planlama için onaylı"
+        - "Henüz onay yok"
+    validations:
+      required: true
