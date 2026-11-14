@@ -7,6 +7,15 @@ on:
       - "tests/fixtures/agent-task.valid.json"
       - "scripts/validate_agent_task.py"
       - "requirements-agent-bridge.txt"
+      - "api/claude.js"
+      - "api/gemini.js"
+      - "lib/provider-auth.js"
+      - "docs/AGENT_BRIDGE.md"
+      - ".env.example"
+      - "package.json"
+      - "server.js"
+      - "lib/council.js"
+      - "test/**"
       - ".github/workflows/agent-bridge-contract.yml"
   push:
     branches: ["main"]
@@ -15,6 +24,15 @@ on:
       - "tests/fixtures/agent-task.valid.json"
       - "scripts/validate_agent_task.py"
       - "requirements-agent-bridge.txt"
+      - "api/claude.js"
+      - "api/gemini.js"
+      - "lib/provider-auth.js"
+      - "docs/AGENT_BRIDGE.md"
+      - ".env.example"
+      - "package.json"
+      - "server.js"
+      - "lib/council.js"
+      - "test/**"
       - ".github/workflows/agent-bridge-contract.yml"
   workflow_dispatch:
 
@@ -27,12 +45,18 @@ concurrency:
 
 jobs:
   validate-contract:
-    name: Validate task envelope
+    name: Validate task envelope and runtime
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 10
     steps:
       - name: Checkout source
         uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - name: Run runtime syntax and regression checks
+        run: npm run check
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
