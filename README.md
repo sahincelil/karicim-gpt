@@ -14,6 +14,10 @@ Repo: https://github.com/sahincelil/karicim-gpt
 - [Architecture notes](docs/ARCHITECTURE.md)
 - [LEGION AI command center](docs/LEGION_AI.md)
 - [LEGION Runtime v3 planner and specialist workers](docs/LEGION_RUNTIME_V3.md)
+- [LEGION AI Agent Bridge](docs/AGENT_BRIDGE.md)
+- [Signed Node.js bridge client](examples/bridge-client.mjs)
+- [Claude API route](api/claude.js)
+- [Gemini API route](api/gemini.js)
 - [Persistent digital twin core](docs/DIGITAL_TWIN.md)
 - [Canva editable design](https://www.canva.com/d/5cQoYrVz2r4mFg7)
 
@@ -53,7 +57,7 @@ Tamamen kendi bilgisayarında çalıştırmak istersen OpenRouter yerine yerel O
 
 ## Kontrollü Evolution
 
-Sistem, `/api/audit`, `/api/proposals` ve `/api/evolve` üzerinden kendini gözlemleyen bir bakım döngüsü sunar. Council bağımsız model çıktılarından kanıt/iddia sinyalleri çıkarabilir ve yapılandırılmış bir sentez oluşturabilir.
+Sistem, `/api/audit`, `/api/proposals` ve `/api/evolve` üzerinden kendini gözlemleyen bir bakım döngüsü sunar. Council bağımsız model çıktılarından kanıt/iddia sinyalleri çıkarabilir ve yapılandırılmış bir sentez oluşturur.
 
 Otomasyon sınırları bilerek korunur: keyfi shell çalıştırma, gizli bilgi ifşası, yıkıcı işlemler, sınırsız kaynak yazımı, otomatik deploy ve otomatik rollback kapalıdır. GitHub Actions ise test, health-check ve raporlama görevlerini otomatik çalıştırır.
 
