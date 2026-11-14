@@ -30,7 +30,7 @@ Do not request upload or broad account-management scopes for analytics.
 4. Move the downloaded OAuth client JSON into that folder and rename it to:
    `oauth-client.json`
    Keep it outside the repository, public cloud-sync folders, and shared folders.
-5. Install Python 3.12, then from the repository folder run:
+5. Install Python 3.13 (the owner workstation has been prepared with Python 3.13.17), then from the repository folder run:
    ```powershell
    python -m pip install -r requirements-youtube-analytics.txt
    python scripts/youtube_analytics.py --output "$env:USERPROFILE\.system-archive\analytics-private.json"
