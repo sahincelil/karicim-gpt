@@ -24,10 +24,11 @@ Never paste the key into an Issue, pull request, chat message, workflow file, co
 
 ## Run the system
 
-1. Create a task using the [LEGION issue form](https://github.com/sahincelil/karicim-gpt/issues/new?template=legion-task.yml).
-2. Open **Actions → LEGION Agent Planner → Run workflow**.
-3. Enter the Issue number and start the workflow.
-4. Download the `legion-results-N` artifact from the completed run. It contains `legion-plan.json` and `legion-workers.json`; artifacts expire after seven days.
+**Automatic intake:** create a task using the [LEGION issue form](https://github.com/sahincelil/karicim-gpt/issues/new?template=legion-task.yml). The form creates a `[LEGION]`-prefixed Issue; opening that Issue automatically starts the planner and specialist workers when the provider secret is configured.
+
+**Manual retry:** open **Actions → LEGION Agent Planner → Run workflow**, enter the Issue number, and start the workflow.
+
+Download the `legion-results-N` artifact from the completed run. It contains `legion-plan.json` and `legion-workers.json`; artifacts expire after seven days.
 
 ## Execution and safety boundary
 

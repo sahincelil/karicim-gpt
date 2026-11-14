@@ -1,11 +1,13 @@
 name: LEGION Agent Planner
 
 on:
+  issues:
+    types: [opened]
   workflow_dispatch:
     inputs:
       issue_number:
         description: "GitHub Issue number to plan"
-        required: true
+        required: false
         type: string
 
 permissions:
@@ -18,6 +20,7 @@ concurrency:
 
 jobs:
   plan:
+    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'issues' && startsWith(github.event.issue.title, '[LEGION]'))
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     permissions:
@@ -28,7 +31,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           GITHUB_REPOSITORY: ${{ github.repository }}
-          ISSUE_NUMBER: ${{ inputs.issue_number }}
+          ISSUE_NUMBER: ${{ inputs.issue_number || github.event.issue.number }}
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
           LEGION_MODEL: ${{ vars.OPENROUTER_LEGION_MODEL }}
         run: |
