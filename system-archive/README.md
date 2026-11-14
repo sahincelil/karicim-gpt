@@ -33,6 +33,13 @@ Record date ranges and data coverage. Missing analytics are not zero.
 - Keep scripts, titles, thumbnails, and uploads as drafts until reviewed by the channel owner.
 - Never store passwords, OAuth tokens, recovery codes, API keys, or private analytics exports here.
 
+## GitHub control plane
+- [GitHub-first operating model](GITHUB_CONTROL_PLANE.md)
+- [Production task issue template](../.github/ISSUE_TEMPLATE/production-task.yml)
+- [Automated quality gate](../.github/workflows/system-archive-quality.yml)
+
+GitHub Issues track work, Pull Requests review changes, Actions validate documents, and Releases preserve approved versions. External publishing remains owner-approved.
+
 ## Workspace
 - [Content calendar](CONTENT_CALENDAR.md)
 - [Shorts script template](SHORTS_TEMPLATE.md)
