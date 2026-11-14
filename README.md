@@ -12,7 +12,7 @@ Repo: https://github.com/sahincelil/karicim-gpt
 - [90-day product growth plan](docs/PRODUCT_GROWTH_PLAN.md)
 - [Architecture notes](docs/ARCHITECTURE.md)
 - [LEGION AI command center](docs/LEGION_AI.md)
-- [LEGION Runtime v3 planner and specialist workers](docs/LEGION_RUNTIME_V2.md)
+- [LEGION Runtime v3 planner and specialist workers](docs/LEGION_RUNTIME_V3.md)
 - [Persistent digital twin core](docs/DIGITAL_TWIN.md)
 - [Canva editable design](https://www.canva.com/d/5cQoYrVz2r4mFg7)
 
