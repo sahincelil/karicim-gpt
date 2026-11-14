@@ -1,0 +1,43 @@
+name: LEGION Agent Bridge Contract
+
+on:
+  pull_request:
+    paths:
+      - "schemas/agent-task.schema.json"
+      - "tests/fixtures/agent-task.valid.json"
+      - "scripts/validate_agent_task.py"
+      - "requirements-agent-bridge.txt"
+      - ".github/workflows/agent-bridge-contract.yml"
+  push:
+    branches: ["main"]
+    paths:
+      - "schemas/agent-task.schema.json"
+      - "tests/fixtures/agent-task.valid.json"
+      - "scripts/validate_agent_task.py"
+      - "requirements-agent-bridge.txt"
+      - ".github/workflows/agent-bridge-contract.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: legion-agent-bridge-contract-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate-contract:
+    name: Validate task envelope
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install pinned validator
+        run: python -m pip install --disable-pip-version-check -r requirements-agent-bridge.txt
+      - name: Validate schema and fixture
+        run: python scripts/validate_agent_task.py
