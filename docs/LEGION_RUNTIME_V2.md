@@ -1,47 +1,48 @@
-# LEGION Runtime v2
+# LEGION Runtime v3
 
 ## What is connected
 
-The repository now has a manual, provider-backed planner workflow at
-`.github/workflows/legion-planner.yml`. It reads one existing GitHub Issue,
-sends its bounded title/body to OpenRouter, validates the returned JSON plan,
-and stores the plan as a seven-day workflow artifact.
+The manual GitHub Actions workflow `.github/workflows/legion-planner.yml` reads one selected GitHub Issue and calls OpenRouter using the server-side `OPENROUTER_API_KEY` repository secret.
 
-This is a real model call when the required repository secret is configured.
-It is intentionally **planning-only**: it does not start worker processes,
-write source files, comment on issues, run generated commands, deploy, or
-perform external side effects.
+The workflow now has two model stages:
+
+1. **Planner:** converts the Issue into a bounded JSON plan with up to five logical subtasks.
+2. **Specialist workers:** sends each subtask to a separate model call using its assigned role (Research, Architect, Builder, QA, Security, Operations, Analyst, Documentation, or Reviewer).
+
+At most **three worker model calls run concurrently**. The resulting plan and per-role reports are uploaded together as a seven-day workflow artifact.
 
 ## One-time GitHub configuration
 
-In the repository, open **Settings → Secrets and variables → Actions → New repository secret**:
+Open [Repository Actions secrets](https://github.com/sahincelil/karicim-gpt/settings/secrets/actions/new) and add:
 
-- Name: `OPENROUTER_API_KEY`
-- Value: your OpenRouter API key
+- Secret name: `OPENROUTER_API_KEY`
+- Secret value: your OpenRouter API key
 
-Optionally add a repository variable:
+Optionally add a repository variable named `OPENROUTER_LEGION_MODEL` with a model slug available to your OpenRouter account. If absent, the workflow uses `openrouter/free`.
 
-- Name: `OPENROUTER_LEGION_MODEL`
-- Value: a model slug available to your OpenRouter account; if omitted, the workflow uses `openrouter/free`.
+Never paste the key into an Issue, pull request, chat message, workflow file, commit, or log. The key is injected only into the job steps that call the provider.
 
-Never paste the key into an Issue, chat, workflow file, commit, or log. The workflow does not print the key.
+## Run the system
 
-## Run a plan
+1. Create a task using the [LEGION issue form](https://github.com/sahincelil/karicim-gpt/issues/new?template=legion-task.yml).
+2. Open **Actions → LEGION Agent Planner → Run workflow**.
+3. Enter the Issue number and start the workflow.
+4. Download the `legion-results-N` artifact from the completed run. It contains `legion-plan.json` and `legion-workers.json`; artifacts expire after seven days.
 
-1. Open **Actions → LEGION Agent Planner → Run workflow**.
-2. Enter the existing Issue number.
-3. Start the workflow.
-4. Open the completed run and download the `legion-plan-N` artifact. It expires after seven days.
+## Execution and safety boundary
 
-The workflow is manually dispatched, uses read-only repository permissions, accepts Issues rather than pull requests, serializes planner runs, and validates the model output against fixed role/type/risk allowlists.
+- One planner call plus at most five specialist calls per run.
+- Maximum three simultaneous specialist calls.
+- Workers receive only the task summary, role, objective, expected deliverable, and acceptance criteria.
+- Workers have no tools, browser, shell, GitHub write permission, or production credentials.
+- The workflow has `contents: none` and `issues: read` permissions.
+- No source files are changed; no issue comments, deployments, financial actions, account changes, or external messages are performed.
+- Worker outputs are recommendations, not verified facts or executed work. Research requiring live sources must be checked separately.
+- If worker calls fail, their per-role status is recorded in the artifact. A run with no completed workers fails.
+- High-risk and ambiguous tasks still require human approval before any later privileged stage.
 
-## Current boundary
+Because the repository is public, do not put confidential, personal, customer, or workplace information in its Issues. Provider calls may process the submitted task text.
 
-- One planner model call per manually selected Issue.
-- Maximum five logical subtasks in the plan.
-- No concurrent worker execution yet.
-- No generated code execution or repository write permission.
-- High-risk or unclear tasks require human approval.
-- Because this repository is public, do not put confidential, personal, customer, or workplace information in its Issues.
+## Future stage
 
-The next stage is isolated workers with per-role tool allowlists, bounded concurrency (initially no more than three), short-lived credentials, and branch/PR-only code proposals. That stage must be reviewed separately before enabling write-capable agents.
+The next stage, if enabled, is isolated tool-using workers with per-role allowlists, ephemeral environments, short-lived credentials, branch/PR-only code proposals, and explicit approval gates. This version deliberately does not grant those permissions.
