@@ -42,7 +42,9 @@ Every adapter MUST:
 
 - GitHub Issues: durable task intake and status.
 - GitHub Actions: schema validation, policy checks, tests, and bounded reporting.
-- Provider adapters: separately configured server-side clients for OpenAI-compatible APIs, Anthropic-compatible APIs, Google/Gemini APIs, OpenRouter, local Ollama gateways, and custom HTTPS bots. Listing a provider here means the contract can accommodate it, not that credentials or a live connection exist.
+- Native provider routes: `/api/claude` (Anthropic Messages API) and `/api/gemini` (Google Gemini `generateContent` API) are now implemented on this branch. They require `ANTHROPIC_API_KEY` and `GEMINI_API_KEY` server-side.
+- Existing routes: `/api/chat` supports OpenAI, xAI, and OpenRouter; `/api/grok` uses xAI; `/api/council` currently calls xAI and OpenRouter.
+- Additional adapters: OpenRouter, local Ollama gateways, and custom HTTPS bots can be added under the same provider-neutral contract. A code route is not a live connection until credentials and deployment are configured.
 - Results: issue comments or artifacts for reports; feature branches and pull requests for code proposals.
 
 ## Permission tiers
