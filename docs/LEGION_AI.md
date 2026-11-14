@@ -77,14 +77,22 @@ Suggested labels for maintainers to create in GitHub:
 - Explicit task type and impact declaration.
 - No LLM calls, code execution, or external side effects.
 
-### Stage 2: Planner and role delegation
+### Stage 2: Provider-backed planner (implemented on feature branch)
 
-- Add a provider adapter using a server-side secret stored in GitHub Actions Secrets or a dedicated secret manager.
-- Planner emits a strict JSON plan validated against a schema.
-- Each worker receives only its assigned task and the minimum required context.
+- Manual GitHub Actions dispatch reads one selected Issue with read-only permissions.
+- OpenRouter is called using the `OPENROUTER_API_KEY` repository Actions secret.
+- Planner emits a bounded JSON plan; fixed allowlists validate task types, roles, and risk.
+- Plan is stored as a seven-day workflow artifact.
+- This stage is planning-only: no worker processes, code changes, issue comments, deployments, or external side effects.
+
+See `docs/LEGION_RUNTIME_V2.md` for setup and operation.
+
+### Stage 3: Sandboxed worker delegation
+
+- Each future worker receives only its assigned task and minimum required context.
 - Worker output is an artifact or pull-request proposal, never an instruction to execute arbitrary commands.
 
-### Stage 3: Sandboxed workers
+### Worker runtime requirements
 
 - Use isolated, ephemeral runners or containers with no production credentials.
 - Default network access off; allowlist destinations only when justified.
