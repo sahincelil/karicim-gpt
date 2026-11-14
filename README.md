@@ -5,6 +5,7 @@ Repo: https://github.com/sahincelil/karicim-gpt
 ## Project cockpit
 
 - [Execution dashboard and verified status](docs/EXECUTION_DASHBOARD.md)
+- [LEGION GitHub control plane and private node operations](docs/LEGION-GITHUB-NODE-OPERATIONS.md)
 - [Landing page preview (HTML file; not deployed)](docs/landing-page-preview.html)
 - [Zero-budget validation kit](docs/ZERO_BUDGET_VALIDATION_KIT.md)
 - [First-customer outreach scripts (drafts only)](docs/FIRST_CUSTOMER_OUTREACH.md)
