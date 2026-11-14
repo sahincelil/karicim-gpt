@@ -1,6 +1,6 @@
 # Episode 001 — Müller-Lyer Illusion
 
-Status: Visual master v2.1 created; voiceover and final release gates remain open.
+Status: Zero-cost narrated draft v2.2 created; final listen-through and release gates remain open.
 Working title: Beynin Gözlerine Söylediği Yalan
 Format: YouTube Shorts, vertical 9:16
 Target duration: 30 seconds
@@ -30,32 +30,35 @@ Two line shafts can be physically equal while their surrounding arrowheads chang
 - 25 seconds, 1080×1920, 30 fps.
 - Moving visual comparison and a subtle original electronic bed.
 - Music-only, no spoken narration.
-- Delivered as a first visual draft.
 
 ### v2
 - 30 seconds, 1080×1920, 30 fps.
-- Reworked sequence: hook → perceptual conflict → arrowhead removal → equal-length proof → explanation → channel signature.
-- Added Turkish on-screen captions and stronger mobile-safe framing.
-- Music-only; narration remains a separate next production step.
-- Export filename: `system_archive_muller_lyer_v2.mp4`.
+- Hook → perceptual conflict → arrowhead removal → equal-length proof → explanation → channel signature.
+- Turkish on-screen captions and mobile-safe framing.
+- Music-only.
 
 ### v2.1
-- Re-exported with normalized background music for improved audibility.
-- Preserved 1080×1920, 30 fps, H.264 visual stream; AAC mono audio.
-- Created a Turkish SRT timing guide as a separate sidecar.
-- SRT timings are provisional and must be synchronized against the final narration; the current v2.1 audio is still music-only.
-- Spot-checked visual frames at 2s, 12s, and 26s.
-- Export filename: `system_archive_muller_lyer_v2_1.mp4`.
-- QC record: `SYSTEM_ARCHIVE_EP001_QC_v2_1.md`.
+- Normalized background music; 1080×1920, 30 fps, H.264, AAC mono.
+- Turkish SRT timing guide created.
+- Spot-checked opening, reveal, and closing frames.
+
+### v2.2 zero-cost narration draft
+- Local Turkish speech synthesis generated with eSpeak; no paid credits or services used.
+- Background music lowered under narration.
+- 30.000 seconds, 1080×1920, 30 fps, H.264 video; AAC mono 44.1 kHz audio.
+- File: `system_archive_muller_lyer_v2_2.mp4`.
+- Voice quality is synthetic/robotic and is explicitly a zero-cost draft, not studio human narration.
+- Existing SRT retained as cue timing guide; pronunciation and subtitle synchronization still require a human listen-through.
+- QC record: `SYSTEM_ARCHIVE_EP001_QC_v2_2.md`.
 
 ## Remaining release checklist
 
-- [ ] Generate Turkish narration after explicit approval of the estimated 493-credit / $4.93 spend.
-- [ ] Re-time and verify subtitles against the actual narration.
+- [x] Create no-cost Turkish narration draft.
+- [x] Verify duration, dimensions, frame rate, codecs, sample rate, and audio signal.
+- [x] Preserve v1, v2, and v2.1 exports; create a separate v2.2 file.
+- [ ] Listen on a phone and approve voice quality/mix.
+- [ ] Verify pronunciation and subtitle synchronization by listening.
 - [ ] Add sourced scientific reference to description.
-- [x] Verify export dimensions, frame rate, codecs, duration, and file size.
-- [x] Spot-check opening, reveal, and closing frames.
-- [ ] Complete full playback review on a phone.
 - [ ] Prepare title, description, hashtags, and thumbnail.
 - [ ] Obtain owner approval before publishing.
 
@@ -65,4 +68,4 @@ After publication, compare the first 24 hours, 72 hours, and 7 days with Shorts 
 
 ## Release decision
 
-NOT READY FOR PUBLICATION. No YouTube upload or publication has been performed.
+NOT READY FOR PUBLICATION. This is a zero-cost narrated draft, not a final studio master. No YouTube upload or publication has been performed.
