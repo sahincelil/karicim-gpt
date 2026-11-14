@@ -35,10 +35,12 @@ Record date ranges and data coverage. Missing analytics are not zero.
 
 ## GitHub control plane
 - [GitHub-first operating model](GITHUB_CONTROL_PLANE.md)
+- [YouTube and GitHub integration](YOUTUBE_GITHUB_INTEGRATION.md)
 - [Production task issue template](../.github/ISSUE_TEMPLATE/production-task.yml)
-- [Automated quality gate](../.github/workflows/system-archive-quality.yml)
+- [Document quality gate](../.github/workflows/system-archive-quality.yml)
+- [Read-only YouTube analytics workflow](../.github/workflows/youtube-analytics.yml)
 
-GitHub Issues track work, Pull Requests review changes, Actions validate documents, and Releases preserve approved versions. External publishing remains owner-approved.
+GitHub Issues track work, Pull Requests review changes, Actions validate documents and run read-only analytics after OAuth setup, and Releases preserve approved versions. External publishing remains owner-approved.
 
 ## Workspace
 - [Content calendar](CONTENT_CALENDAR.md)
