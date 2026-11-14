@@ -38,3 +38,5 @@ Record date ranges and data coverage. Missing analytics are not zero.
 - [Shorts script template](SHORTS_TEMPLATE.md)
 - [Analytics review template](ANALYTICS_REVIEW.md)
 - [Research standards](RESEARCH_STANDARDS.md)
+- [Visual identity system](VISUAL_IDENTITY.md)
+- [Content production pipeline](PRODUCTION_PIPELINE.md)
