@@ -5,6 +5,7 @@ Repo: https://github.com/sahincelil/karicim-gpt
 ## Project cockpit
 
 - [Execution dashboard and verified status](docs/EXECUTION_DASHBOARD.md)
+- [LEGION GitHub control plane and private node operations](docs/LEGION-GITHUB-NODE-OPERATIONS.md)
 - [Landing page preview (HTML file; not deployed)](docs/landing-page-preview.html)
 - [Zero-budget validation kit](docs/ZERO_BUDGET_VALIDATION_KIT.md)
 - [First-customer outreach scripts (drafts only)](docs/FIRST_CUSTOMER_OUTREACH.md)
@@ -12,6 +13,7 @@ Repo: https://github.com/sahincelil/karicim-gpt
 - [90-day product growth plan](docs/PRODUCT_GROWTH_PLAN.md)
 - [Architecture notes](docs/ARCHITECTURE.md)
 - [LEGION AI command center](docs/LEGION_AI.md)
+- [LEGION Runtime v3 planner and specialist workers](docs/LEGION_RUNTIME_V3.md)
 - [LEGION AI Agent Bridge](docs/AGENT_BRIDGE.md)
 - [Signed Node.js bridge client](examples/bridge-client.mjs)
 - [Claude API route](api/claude.js)
@@ -55,7 +57,7 @@ Tamamen kendi bilgisayarında çalıştırmak istersen OpenRouter yerine yerel O
 
 ## Kontrollü Evolution
 
-Sistem, `/api/audit`, `/api/proposals` ve `/api/evolve` üzerinden kendini gözlemleyen bir bakım döngüsü sunar. Council bağımsız model çıktılarından kanıt/iddia sinyalleri çıkarabilir ve yapılandırılmış bir sentez oluşturabilir.
+Sistem, `/api/audit`, `/api/proposals` ve `/api/evolve` üzerinden kendini gözlemleyen bir bakım döngüsü sunar. Council bağımsız model çıktılarından kanıt/iddia sinyalleri çıkarabilir ve yapılandırılmış bir sentez oluşturur.
 
 Otomasyon sınırları bilerek korunur: keyfi shell çalıştırma, gizli bilgi ifşası, yıkıcı işlemler, sınırsız kaynak yazımı, otomatik deploy ve otomatik rollback kapalıdır. GitHub Actions ise test, health-check ve raporlama görevlerini otomatik çalıştırır.
 
