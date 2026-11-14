@@ -40,12 +40,12 @@ Do not request upload or broad account-management scopes for analytics.
 
 To validate OAuth without producing a report:
 ```powershell
-python scripts/youtube_analytics.py --check-only
+& "$env:LOCALAPPDATA\Programs\Python\Python313\python.exe" scripts/youtube_analytics.py --check-only
 ```
 
 Optional custom paths:
 ```powershell
-python scripts/youtube_analytics.py --client-secrets "C:\private\oauth-client.json" --credentials "C:\private\youtube-token.json" --output "C:\private\analytics.json"
+& "$env:LOCALAPPDATA\Programs\Python\Python313\python.exe" scripts/youtube_analytics.py --client-secrets "C:\private\oauth-client.json" --credentials "C:\private\youtube-token.json" --output "C:\private\analytics.json"
 ```
 
 ## Report coverage
