@@ -2,7 +2,7 @@
 
 ## Goal
 
-Provide one provider-neutral integration contract so authorized AI agents, bots, and external services can exchange bounded tasks with KaricimGPT through GitHub. GitHub Issues remain the durable inbox and pull requests remain the code-review boundary. The repository already exposes an authenticated `POST /api/bridge` endpoint for `health` and `agent` actions. That is a working single-agent gateway when deployed with `BRIDGE_SHARED_SECRET` and an AI provider configured. The multi-agent task queue and provider-specific worker adapters described below are the next layer, not yet live.
+Provide one provider-neutral integration contract so authorized AI agents, bots, and external services can exchange bounded tasks with KaricimGPT through GitHub. GitHub Issues remain the durable inbox and pull requests remain the code-review boundary. The repository exposes an authenticated `POST /api/bridge` endpoint for `health` and `agent` actions. The multi-agent task queue and provider-specific worker adapters described below are the next layer, not yet live.
 
 ## Topology
 
@@ -42,10 +42,44 @@ Every adapter MUST:
 
 - GitHub Issues: durable task intake and status.
 - GitHub Actions: schema validation, policy checks, tests, and bounded reporting.
-- Native provider routes: `/api/claude` (Anthropic Messages API) and `/api/gemini` (Google Gemini `generateContent` API) are now implemented on this branch. They require `ANTHROPIC_API_KEY` and `GEMINI_API_KEY` server-side.
-- Existing routes: `/api/chat` supports OpenAI, xAI, and OpenRouter; `/api/grok` uses xAI; `/api/council` now fans out in parallel to xAI, OpenRouter, Anthropic Claude, and Google Gemini when each key is configured. OpenRouter performs the optional synthesis.
+- Native provider routes: `/api/claude` (Anthropic Messages API) and `/api/gemini` (Google Gemini `generateContent` API). Each requires its provider API key and a separate `PROVIDER_SHARED_SECRET` configured server-side.
+- Existing routes: `/api/chat` supports OpenAI, xAI, and OpenRouter; `/api/grok` uses xAI; `/api/council` can call xAI, OpenRouter, Anthropic Claude, and Google Gemini when configured. OpenRouter performs optional synthesis.
 - Additional adapters: OpenRouter, local Ollama gateways, and custom HTTPS bots can be added under the same provider-neutral contract. A code route is not a live connection until credentials and deployment are configured.
 - Results: issue comments or artifacts for reports; feature branches and pull requests for code proposals.
+
+## Provider endpoint authentication
+
+Both native provider endpoints reject unauthenticated requests before calling a paid provider API.
+
+- Required server secret: `PROVIDER_SHARED_SECRET`, a long random value distinct from every provider API key and from `BRIDGE_SHARED_SECRET`.
+- Headers: `X-Provider-Timestamp` (Unix milliseconds) and `X-Provider-Signature` (lowercase or uppercase hex HMAC-SHA256).
+- Signature input: `<timestamp>.<JSON.stringify(requestBody)` using the exact JSON serialization sent in the HTTP body.
+- Replay window: five minutes. Requests must use POST and a JSON object body.
+- Body limit: 180 KB after JSON parsing. A per-IP rate limit is also applied.
+- The caller computes HMAC-SHA256 with `PROVIDER_SHARED_SECRET`; provider API keys remain server-side and are never sent to the caller.
+
+Example Node.js signing snippet:
+
+```js
+import crypto from 'node:crypto';
+
+const timestamp = String(Date.now());
+const body = { messages: [{ role: 'user', content: 'Hello' }] };
+const serialized = JSON.stringify(body);
+const signature = crypto.createHmac('sha256', process.env.PROVIDER_SHARED_SECRET)
+  .update(`${timestamp}.${serialized}`)
+  .digest('hex');
+
+await fetch(`${process.env.APP_URL}/api/claude`, {
+  method: 'POST',
+  headers: {
+    'content-type': 'application/json',
+    'x-provider-timestamp': timestamp,
+    'x-provider-signature': signature
+  },
+  body: serialized
+});
+```
 
 ## Permission tiers
 
@@ -92,27 +126,18 @@ No agent receives production credentials by default. No provider may elevate its
 
 This branch contains native provider routes and a four-provider Council implementation, but this PR is not merged or deployed. No live connection is confirmed until provider credentials are configured in the hosting environment and authenticated smoke tests pass.
 
-
 ## Existing live gateway contract
 
-The current application already routes `POST /api/bridge` to `api/bridge.js`.
+The current application routes `POST /api/bridge` to `api/bridge.js`.
 
 - Actions: `health` and `agent`.
 - Authentication: HMAC-SHA256 over the exact string `<timestamp>.<raw JSON body>`.
 - Headers: `X-Bridge-Timestamp` (Unix milliseconds) and `X-Bridge-Signature` (hex HMAC).
 - Replay window: five minutes.
-- Request body limit: 180 KB in the bridge handler (the server's outer parser applies its own limit).
+- Request body limit: 180 KB.
 - Rate limiting: uses the shared application rate limiter.
-- Agent input: up to 20 messages, each content string bounded to 12,000 characters; the bridge forwards sanitized user/assistant messages to the configured agent handler.
+- Agent input: up to 20 messages, each content string bounded to 12,000 characters.
 
 Configure `BRIDGE_SHARED_SECRET` only in the server environment. The calling bot must receive the same secret through its own secret manager. Configure model-provider API keys separately on the server; do not distribute provider keys to calling bots. Use `examples/bridge-client.mjs` as a minimal Node.js 24 reference client.
-
-Example caller setup (values are placeholders; do not commit them):
-
-```sh
-export BRIDGE_URL="https://YOUR_DEPLOYED_HOST"
-export BRIDGE_SHARED_SECRET="YOUR_LONG_RANDOM_SECRET"
-node examples/bridge-client.mjs "Summarize the approved project status"
-```
 
 The current gateway is not yet a durable multi-agent queue: it forwards one bounded conversation to the configured agent and returns its response. GitHub Issues, the task schema, and reviewed PRs provide the governance foundation for the later dispatcher/worker layer.
