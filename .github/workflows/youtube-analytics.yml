@@ -1,0 +1,37 @@
+name: SYSTEM ARCHIVE YouTube analytics
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: system-archive-youtube-analytics
+  cancel-in-progress: false
+
+jobs:
+  analytics:
+    name: Fetch read-only channel analytics
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install API client
+        run: python -m pip install --disable-pip-version-check google-api-python-client google-auth
+
+      - name: Fetch previous 28 complete days
+        env:
+          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+          GOOGLE_REFRESH_TOKEN: ${{ secrets.GOOGLE_REFRESH_TOKEN }}
+        run: python scripts/youtube_analytics.py
