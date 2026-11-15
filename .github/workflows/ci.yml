@@ -21,6 +21,68 @@ on:
         default: true
 
 jobs:
+  runtime-tests:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+
+      - name: Setup Node
+        uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run unit and regression tests
+        run: npm test
+
+      - name: Start test runtime
+        env:
+          PORT: 3000
+          NODE_ENV: test
+          BRIDGE_REQUIRED: true
+          MEMORY_ADMIN_REQUIRED: true
+          PERSISTENT_MEMORY_REQUIRED: true
+          DATA_DIR: /tmp/karicimgpt-ci-data
+          BODY_ADMIN_TOKEN: ci-admin-token
+          BRIDGE_SHARED_SECRET: ci-bridge-secret
+        run: |
+          node server.js > /tmp/karicimgpt-ci.log 2>&1 &
+          echo $! > /tmp/karicimgpt-ci.pid
+
+      - name: Wait for healthy runtime
+        run: |
+          for i in {1..30}; do
+            if curl --fail --silent --show-error http://127.0.0.1:3000/health > /tmp/karicimgpt-ci-health.json; then
+              cat /tmp/karicimgpt-ci-health.json
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/karicimgpt-ci.log
+          exit 1
+
+      - name: Run authenticated runtime integration tests
+        env:
+          PORT: 3000
+          BRIDGE_SHARED_SECRET: ci-bridge-secret
+        run: node test/integration.test.js
+
+      - name: Stop test runtime
+        if: always()
+        run: |
+          if test -f /tmp/karicimgpt-ci.pid; then
+            kill "$(cat /tmp/karicimgpt-ci.pid)" || true
+          fi
+
   tree:
     uses: ./.github/workflows/reusable-verify.yml
     with:
