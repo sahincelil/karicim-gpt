@@ -67,7 +67,7 @@ jobs:
         if: success()
         run: |
           curl --fail --silent --show-error http://127.0.0.1:3000/api/audit | tee /tmp/audit.json
-          node -e "const x=require('fs').readFileSync('/tmp/audit.json','utf8'); const j=JSON.parse(x); if(!j.ok) process.exit(1); console.log('Audit status:',j.status,'fingerprint:',j.fingerprint)"
+          node -e "const j=JSON.parse(require('fs').readFileSync('/tmp/audit.json','utf8')); if(j.ok!==true || j.status!=='healthy' || !Array.isArray(j.warnings) || j.warnings.length!==0 || typeof j.fingerprint!=='string') process.exit(1); console.log('Audit status:',j.status,'fingerprint:',j.fingerprint)"
 
       - name: Generate improvement proposals
         if: success()
@@ -80,8 +80,8 @@ jobs:
         run: |
           for i in {1..20}; do
             if curl --fail --silent --show-error http://127.0.0.1:3000/api/evolve > /tmp/evolve.json; then
-              cat /tmp/evolve.json
-              exit 0
+              node -e "const j=JSON.parse(require('fs').readFileSync('/tmp/evolve.json','utf8')); if(j.component!=='evolve' || j.health!=='ready' || j.selfTest?.ok!==true || !Array.isArray(j.blockers) || j.blockers.length!==0) { console.error('Evolve is not ready:', JSON.stringify({health:j.health, blockers:j.blockers, selfTest:j.selfTest})); process.exit(1); } console.log('Evolve readiness verified:', j.health, 'audit:', j.auditFingerprint)"
+              exit $?
             fi
             sleep 1
           done
@@ -96,6 +96,7 @@ jobs:
           path: |
             /tmp/audit.json
             /tmp/proposals.json
+            /tmp/evolve.json
           if-no-files-found: ignore
 
       - name: Stop runtime
