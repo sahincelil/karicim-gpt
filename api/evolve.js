@@ -14,9 +14,12 @@ export default async function handler(req, res) {
   if (req.method !== 'GET') return send(res, 405, { ok: false, error: 'Yalnızca GET destekleniyor.' });
   const [audit, proposals, selfTest] = await Promise.all([buildAudit(), buildProposals(), buildSelfTest()]);
   const blockers = [...new Set([...audit.warnings, ...selfTest.checks.filter((check) => !check.ok).map((check) => check.name)])];
+  const health = selfTest.ok && audit.ok && audit.status === 'healthy' && proposals.ok && blockers.length === 0
+    ? 'ready'
+    : 'attention';
   return send(res, 200, {
-    ok: true,
-    health: selfTest.ok && audit.ok && audit.status === 'healthy' ? 'ready' : 'attention',
+    ok: health === 'ready',
+    health,
     blockers,
     auditFingerprint: audit.fingerprint,
     selfTest: { ok: selfTest.ok, status: selfTest.status },
