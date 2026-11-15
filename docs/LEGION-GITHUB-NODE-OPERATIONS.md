@@ -78,6 +78,31 @@ The following checks were performed on the two owner-connected Windows computers
 - Tailscale is not installed. This machine is not approved as a persistent worker or self-hosted runner.
 - Keep this computer read-only until its operating system and hardware suitability are reviewed. Do not place production credentials or a privileged runner on it.
 
+
+### Latest live recheck (2026-11-16)
+
+The following read-only checks were performed through the connected Desktop Commander sessions. This section supersedes the older Tailscale installation statements in the 2026-11-14 snapshot above.
+
+#### DESKTOP-H6KF7OC
+
+- Tailscale is installed and its Windows service is running.
+- Tailscale backend state is `NeedsLogin`; the device is not online in the tailnet and has no Tailscale IP or visible peers.
+- An interactive `tailscale up` was started while preserving the existing `accept-dns=false` and `accept-routes=false` settings. The device remains at `NeedsLogin`; owner sign-in has not completed.
+- Windows PowerShell 5.1 is present. The self-hosted Actions runner is not registered and no runner service is installed.
+
+#### DESKTOP-J07QKBD
+
+- Tailscale is installed, its Windows service is running, and the backend reports `Running`; the device is online with a Tailscale IP and two visible peers.
+- Windows remains at build 16299 (Windows 10 version 1709), so this device is not approved for a persistent runner or production execution role.
+- No self-hosted Actions runner is configured.
+
+#### Current decision
+
+- Tailscale is already installed on both devices; the remaining connectivity task on DESKTOP-H6KF7OC is owner sign-in and confirmation that it appears in the same tailnet.
+- Do not enroll either machine as a persistent runner until its OS support and patch state are acceptable. In particular, keep DESKTOP-J07QKBD out of runner and production roles.
+- Neither machine currently has a registered self-hosted Actions runner.
+- No tailnet IP addresses, login URLs, or reusable credentials are recorded in this document.
+
 ### Readiness decision
 
 - The first computer is suitable for local development and repeatable tests after OS security support is addressed. Windows 10 Home/Pro reached end of support on 2025-10-14; do not treat this build as a hardened, always-on worker without an appropriate supported-OS plan. See [Microsoft Windows 10 release information](https://learn.microsoft.com/windows/release-health/release-information).
