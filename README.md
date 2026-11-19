@@ -4,6 +4,8 @@ Repo: https://github.com/sahincelil/karicim-gpt
 
 ## Project cockpit
 
+- [LEGION Plugin CloneForge registry](plugins.html) · [Architecture](docs/PLUGIN_CLONEFORGE.md)
+
 - [Execution dashboard and verified status](docs/EXECUTION_DASHBOARD.md)
 - [LEGION GODFORGE command center](docs/LEGION-GODFORGE-COMMAND-CENTER.md)
 - [LEGION module status registry](docs/LEGION-MODULE-STATUS.yml)

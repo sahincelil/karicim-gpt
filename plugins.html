@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="LEGION Plugin CloneForge provider registry and adapter status.">
+  <meta name="theme-color" content="#0a1018">
+  <title>LEGION Plugin CloneForge</title>
+  <link rel="stylesheet" href="/plugins.css">
+  <script type="module" src="/plugins.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="/" aria-label="KaricimGPT ana sayfa"><span class="sigil">L∞</span><span><b>LEGION</b><small>PLUGIN CLONEFORGE</small></span></a>
+    <span class="snapshot" id="snapshot">Registry yükleniyor</span>
+  </header>
+  <main class="wrap">
+    <section class="hero">
+      <p class="kicker">CONNECTOR FABRIC / NODE 01</p>
+      <h1>Plugin CloneForge</h1>
+      <p class="intro">Sağlayıcı envanteri, adaptör olgunluğu ve bağlantı durumunu tek ekranda takip et.</p>
+    </section>
+    <section class="metrics" aria-label="Katalog özeti">
+      <article><small>Sağlayıcı</small><strong id="providerCount">—</strong></article>
+      <article><small>Gözlemlenen araç</small><strong id="toolCount">—</strong></article>
+      <article><small>Adaptör kodu mevcut</small><strong id="existingCount">—</strong></article>
+      <article><small>Canlı bağlantı doğrulandı</small><strong>0</strong></article>
+    </section>
+    <aside class="notice"><b>Durum disiplini</b><span>Katalog kaydı veya kod iskeleti, bağlantı doğrulaması değildir. Bu sürüm hiçbir sağlayıcıyı canlı bağlı olarak işaretlemez.</span></aside>
+    <section class="controls">
+      <label class="search"><span aria-hidden="true">⌕</span><input id="search" type="search" placeholder="Sağlayıcı, anahtar veya kategori ara..." autocomplete="off"></label>
+      <select id="category" aria-label="Kategori"><option value="">Tüm kategoriler</option></select>
+      <button id="clear" type="button">Temizle</button>
+    </section>
+    <section class="result-heading"><h2>Sağlayıcı envanteri</h2><span id="resultCount">—</span></section>
+    <section id="providers" class="grid" aria-live="polite"><div class="loading">Katalog yükleniyor…</div></section>
+    <footer>LEGION PLUGIN CLONEFORGE <span>·</span> Envanter anlık görüntüsü <span>·</span> <a href="https://github.com/sahincelil/karicim-gpt/tree/main/integrations/plugin-cloneforge">Kaynak ve mimari</a></footer>
+  </main>
+</body>
+</html>
