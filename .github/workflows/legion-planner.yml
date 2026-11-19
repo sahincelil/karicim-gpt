@@ -25,15 +25,15 @@ jobs:
     timeout-minutes: 5
     permissions:
       contents: none
-      issues: read
+      issues: write
     steps:
       - name: Record durable queue start
         env:
-          GH_TOKEN: \${{ github.token }}
-          GITHUB_REPOSITORY: \${{ github.repository }}
-          ISSUE_NUMBER: \${{ inputs.issue_number || github.event.issue.number }}
-          RUN_ID: \${{ github.run_id }}
-          RUN_ATTEMPT: \${{ github.run_attempt }}
+          GH_TOKEN: ${{ github.token }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          ISSUE_NUMBER: ${{ inputs.issue_number || github.event.issue.number }}
+          RUN_ID: ${{ github.run_id }}
+          RUN_ATTEMPT: ${{ github.run_attempt }}
         run: |
           node --input-type=module <<'NODE'
           const issueNumber = Number(process.env.ISSUE_NUMBER);
@@ -189,17 +189,17 @@ jobs:
       - name: Run bounded specialist workers
         id: workers
         env:
-          OPENROUTER_API_KEY: \${{ secrets.OPENROUTER_API_KEY }}
-          LEGION_MODEL: \${{ vars.OPENROUTER_LEGION_MODEL }}
-          LEGION_MODEL_RESEARCH: \${{ vars.OPENROUTER_LEGION_MODEL_RESEARCH }}
-          LEGION_MODEL_ARCHITECT: \${{ vars.OPENROUTER_LEGION_MODEL_ARCHITECT }}
-          LEGION_MODEL_BUILDER: \${{ vars.OPENROUTER_LEGION_MODEL_BUILDER }}
-          LEGION_MODEL_QA: \${{ vars.OPENROUTER_LEGION_MODEL_QA }}
-          LEGION_MODEL_SECURITY: \${{ vars.OPENROUTER_LEGION_MODEL_SECURITY }}
-          LEGION_MODEL_OPERATIONS: \${{ vars.OPENROUTER_LEGION_MODEL_OPERATIONS }}
-          LEGION_MODEL_ANALYST: \${{ vars.OPENROUTER_LEGION_MODEL_ANALYST }}
-          LEGION_MODEL_DOCUMENTATION: \${{ vars.OPENROUTER_LEGION_MODEL_DOCUMENTATION }}
-          LEGION_MODEL_REVIEWER: \${{ vars.OPENROUTER_LEGION_MODEL_REVIEWER }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          LEGION_MODEL: ${{ vars.OPENROUTER_LEGION_MODEL }}
+          LEGION_MODEL_RESEARCH: ${{ vars.OPENROUTER_LEGION_MODEL_RESEARCH }}
+          LEGION_MODEL_ARCHITECT: ${{ vars.OPENROUTER_LEGION_MODEL_ARCHITECT }}
+          LEGION_MODEL_BUILDER: ${{ vars.OPENROUTER_LEGION_MODEL_BUILDER }}
+          LEGION_MODEL_QA: ${{ vars.OPENROUTER_LEGION_MODEL_QA }}
+          LEGION_MODEL_SECURITY: ${{ vars.OPENROUTER_LEGION_MODEL_SECURITY }}
+          LEGION_MODEL_OPERATIONS: ${{ vars.OPENROUTER_LEGION_MODEL_OPERATIONS }}
+          LEGION_MODEL_ANALYST: ${{ vars.OPENROUTER_LEGION_MODEL_ANALYST }}
+          LEGION_MODEL_DOCUMENTATION: ${{ vars.OPENROUTER_LEGION_MODEL_DOCUMENTATION }}
+          LEGION_MODEL_REVIEWER: ${{ vars.OPENROUTER_LEGION_MODEL_REVIEWER }}
         run: |
           node --input-type=module <<'NODE'
           import { readFile, writeFile } from 'node:fs/promises';
@@ -351,13 +351,13 @@ jobs:
       - name: Record durable queue result
         if: always()
         env:
-          GH_TOKEN: \${{ github.token }}
-          GITHUB_REPOSITORY: \${{ github.repository }}
-          ISSUE_NUMBER: \${{ inputs.issue_number || github.event.issue.number }}
-          RUN_ID: \${{ github.run_id }}
-          RUN_ATTEMPT: \${{ github.run_attempt }}
-          PLANNER_OUTCOME: \${{ steps.planner.outcome || 'skipped' }}
-          WORKER_OUTCOME: \${{ steps.workers.outcome || 'skipped' }}
+          GH_TOKEN: ${{ github.token }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          ISSUE_NUMBER: ${{ inputs.issue_number || github.event.issue.number }}
+          RUN_ID: ${{ github.run_id }}
+          RUN_ATTEMPT: ${{ github.run_attempt }}
+          PLANNER_OUTCOME: ${{ steps.planner.outcome || 'skipped' }}
+          WORKER_OUTCOME: ${{ steps.workers.outcome || 'skipped' }}
         run: |
           node --input-type=module <<'NODE'
           const issueNumber = Number(process.env.ISSUE_NUMBER);
@@ -397,7 +397,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: legion-results-${{ inputs.issue_number }}
+          name: legion-results-${{ github.event.issue.number || inputs.issue_number }}
           path: |
             legion-plan.json
             legion-workers.json
