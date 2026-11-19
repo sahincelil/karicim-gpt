@@ -1,0 +1,66 @@
+schema_version: 1
+project: LEGION GODFORGE
+repository: sahincelil/karicim-gpt
+default_branch: main
+last_reviewed: 2026-11-19
+status_legend:
+  implemented: Source or workflow exists; not necessarily live in production.
+  partial: Some components exist; integration or evidence remains incomplete.
+  planned: Design or documentation only.
+  blocked: Requires external permission, credentials, supported infrastructure, or human action.
+modules:
+  master_brain:
+    status: implemented
+    mode: bounded_issue_planning
+    evidence: docs/LEGION-ASCENSION.md
+  agent_swarm:
+    status: partial
+    mode: read_only_specialists
+    limits:
+      max_concurrent_workers: 3
+      max_subtasks_per_plan: 5
+    evidence: docs/LEGION-ASCENSION.md
+  autonomous_factory:
+    status: partial
+    mode: tests_and_reviewable_change_proposals
+    human_approval_required:
+      - merge
+      - production_deploy
+      - rollback
+    evidence: docs/LEGION-GODFORGE-COMMAND-CENTER.md
+  self_healing:
+    status: partial
+    mode: health_audit_and_maintenance_proposals
+    autonomous_source_mutation: false
+    evidence: docs/LEGION-ASCENSION.md
+  sentinel_core:
+    status: planned
+    mode: repository_security_and_dependency_review
+    evidence: docs/LEGION-GODFORGE-COMMAND-CENTER.md
+  device_mesh:
+    status: blocked
+    mode: owner_enrolled_private_nodes_only
+    blockers:
+      - supported_operating_systems
+      - device_owner_sign_in
+      - least_privilege_tailnet_and_firewall
+      - authenticated_read_only_smoke_test
+    evidence: docs/LEGION-GITHUB-NODE-OPERATIONS.md
+  wealth_engine:
+    status: planned
+    mode: evidence_based_business_experiments
+    verified_revenue: false
+    evidence: docs/LEGION-ASCENSION.md
+  system_archive:
+    status: partial
+    mode: content_research_and_planning
+    publishing_authorization_required: true
+    evidence: docs/LEGION-ASCENSION.md
+governance:
+  model_output_is_untrusted: true
+  require_human_review_before_merge: true
+  require_human_approval_before_production_deploy: true
+  allow_arbitrary_shell_from_model_output: false
+  allow_secret_exfiltration: false
+  allow_public_self_hosted_runners_for_untrusted_code: false
+  credentials_in_git: false
