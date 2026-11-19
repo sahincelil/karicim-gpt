@@ -1,0 +1,91 @@
+{
+  "schema_version": 1,
+  "project": "LEGION GODFORGE",
+  "repository": "sahincelil/karicim-gpt",
+  "default_branch": "main",
+  "status_source": "docs/LEGION-MODULE-STATUS.yml",
+  "purpose": "Machine-readable map of repository modules, evidence entrypoints, and governed automation boundaries.",
+  "modules": [
+    {
+      "id": "master_brain",
+      "status": "implemented",
+      "mode": "bounded_issue_planning",
+      "entrypoints": [
+        "docs/MASTER_BRAIN.md",
+        ".github/workflows/legion-planner.yml"
+      ]
+    },
+    {
+      "id": "agent_swarm",
+      "status": "partial",
+      "mode": "read_only_specialists",
+      "entrypoints": [
+        "docs/LEGION_RUNTIME_V3.md",
+        "docs/LEGION-ASCENSION.md"
+      ]
+    },
+    {
+      "id": "autonomous_factory",
+      "status": "partial",
+      "mode": "tests_and_reviewable_change_proposals",
+      "entrypoints": [
+        "docs/LEGION-GODFORGE-COMMAND-CENTER.md",
+        ".github/workflows/check.yml"
+      ]
+    },
+    {
+      "id": "self_healing",
+      "status": "partial",
+      "mode": "health_audit_and_maintenance_proposals",
+      "entrypoints": [
+        "api/evolve.js",
+        "api/health.js",
+        "lib/audit.js",
+        "lib/proposals.js"
+      ]
+    },
+    {
+      "id": "sentinel_core",
+      "status": "planned",
+      "mode": "repository_security_and_dependency_review",
+      "entrypoints": [
+        "lib/security.js",
+        "docs/LEGION-GODFORGE-COMMAND-CENTER.md"
+      ]
+    },
+    {
+      "id": "device_mesh",
+      "status": "blocked",
+      "mode": "owner_enrolled_private_nodes_only",
+      "entrypoints": [
+        "docs/LEGION-GITHUB-NODE-OPERATIONS.md"
+      ]
+    },
+    {
+      "id": "wealth_engine",
+      "status": "planned",
+      "mode": "evidence_based_business_experiments",
+      "entrypoints": [
+        "docs/PRODUCT_GROWTH_PLAN.md",
+        "docs/ZERO_BUDGET_VALIDATION_KIT.md"
+      ]
+    },
+    {
+      "id": "system_archive",
+      "status": "partial",
+      "mode": "content_research_and_planning",
+      "entrypoints": [
+        "docs/LEGION-ASCENSION.md"
+      ]
+    }
+  ],
+  "governance": {
+    "model_output_is_untrusted": true,
+    "require_human_review_before_merge": true,
+    "require_human_approval_before_production_deploy": true,
+    "allow_arbitrary_shell_from_model_output": false,
+    "allow_secret_exfiltration": false,
+    "allow_public_self_hosted_runners_for_untrusted_code": false,
+    "credentials_in_git": false
+  }
+}
