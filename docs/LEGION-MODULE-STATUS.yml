@@ -34,9 +34,16 @@ modules:
     autonomous_source_mutation: false
     evidence: docs/LEGION-ASCENSION.md
   sentinel_core:
-    status: planned
-    mode: repository_security_and_dependency_review
-    evidence: docs/LEGION-GODFORGE-COMMAND-CENTER.md
+    status: partial
+    mode: synthetic_read_only_security_dashboard
+    live_connectors: false
+    evidence: docs/CYBER_SHIELD_MVP.md
+  cyber_shield:
+    status: partial
+    mode: static_demo_synthetic_fixtures_only
+    live_integrations: false
+    automated_response: false
+    evidence: cyber-shield/index.html
   device_mesh:
     status: blocked
     mode: owner_enrolled_private_nodes_only
