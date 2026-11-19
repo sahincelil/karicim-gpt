@@ -35,12 +35,23 @@ modules:
     evidence: docs/LEGION-ASCENSION.md
   sentinel_core:
     status: partial
-    mode: synthetic_read_only_security_dashboard
+    mode: read_only_soc_dashboard_with_adapter_parsers_and_authenticated_ephemeral_ingest
+    parsers:
+      - wazuh
+      - suricata
+      - sentinel
+    correlation_engine: true
     live_connectors: false
     evidence: docs/CYBER_SHIELD_MVP.md
   cyber_shield:
     status: partial
-    mode: static_demo_synthetic_fixtures_only
+    mode: soc_dashboard_with_synthetic_demo_and_read_only_adapter_scaffold
+    parsers:
+      - wazuh
+      - suricata
+      - sentinel
+    authenticated_ingest: opt_in_server_side_token
+    event_persistence: false
     live_integrations: false
     automated_response: false
     evidence: cyber-shield/index.html
