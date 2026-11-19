@@ -6,6 +6,7 @@ Repo: https://github.com/sahincelil/karicim-gpt
 
 - [Execution dashboard and verified status](docs/EXECUTION_DASHBOARD.md)
 - [LEGION GODFORGE command center](docs/LEGION-GODFORGE-COMMAND-CENTER.md)
+- [LEGION GODFORGE operations and preflight](docs/LEGION-GODFORGE-OPERATIONS.md)
 - [LEGION module status registry](docs/LEGION-MODULE-STATUS.yml)
 - [LEGION GitHub control plane and private node operations](docs/LEGION-GITHUB-NODE-OPERATIONS.md)
 - [Landing page preview (HTML file; not deployed)](docs/landing-page-preview.html)

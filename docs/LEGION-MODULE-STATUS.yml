@@ -27,7 +27,7 @@ modules:
       - merge
       - production_deploy
       - rollback
-    evidence: docs/LEGION-GODFORGE-COMMAND-CENTER.md
+    evidence:\n      - docs/LEGION-GODFORGE-OPERATIONS.md\n      - .github/workflows/legion-factory.yml\n      - lib/legion-factory.js
   self_healing:
     status: partial
     mode: health_audit_and_maintenance_proposals

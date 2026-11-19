@@ -55,7 +55,7 @@ The GitHub queue is durable enough for a controlled pilot, but it is not a Redis
 | MASTER BRAIN | Intake, task planning, routing and lifecycle state | PR #58, draft and unmerged |
 | AGENT SWARM | Specialist decomposition, bounded parallel work and structured results | Worker code in PR #58; analysis-only, max 3 |
 | MULTI-GPT NETWORK | Provider abstraction and role-based model choice | OpenRouter role routing in PR #58; native OpenAI/xAI/Claude/Gemini routes exist in source, live credentials not verified |
-| AUTONOMOUS FACTORY | Propose changes, run tests, package artifacts and open PRs | GitHub branch/PR workflow and CI; no autonomous production code mutation |
+| AUTONOMOUS FACTORY | Turn successful planner/swarm artifacts into reviewable proposal PRs | Manual, provenance-checked, documentation-only draft PR generation; application source mutation and deployment remain human-controlled |
 | SELF-HEALING | Health, self-test, audit, maintenance proposals and readiness reporting | Existing runtime endpoints; repair/deploy/rollback remain human-controlled |
 | MEMORY CORE | Conversation/application memory and user profile persistence | File-backed memory plus versioned digital-twin profile; not a distributed agent memory bus |
 | DEVICE MESH | Owner-enrolled private compute nodes | Not ready for worker execution; PR #57 records one node awaiting tailnet sign-in, one obsolete Windows build, and no self-hosted runners |

@@ -1,0 +1,44 @@
+name: LEGION GODFORGE preflight
+run-name: "LEGION GODFORGE / preflight / ${{ github.sha }}"
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "config/legion/**"
+      - "scripts/legion-preflight.mjs"
+      - "tests/legion-godforge.test.mjs"
+      - "docs/LEGION-MODULE-STATUS.yml"
+      - ".github/workflows/legion-godforge.yml"
+  pull_request:
+    paths:
+      - "config/legion/**"
+      - "scripts/legion-preflight.mjs"
+      - "tests/legion-godforge.test.mjs"
+      - "docs/LEGION-MODULE-STATUS.yml"
+      - ".github/workflows/legion-godforge.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: legion-godforge-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  preflight:
+    name: Registry and governance checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v5
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 24
+      - name: Validate module registry and evidence
+        run: node scripts/legion-preflight.mjs
+      - name: Run focused tests
+        run: node --test tests/legion-godforge.test.mjs
