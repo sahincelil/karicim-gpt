@@ -349,7 +349,7 @@ export const pluginCatalog = [
   {
     "id": "github",
     "key": "GitHub",
-    "name": "Git Hub",
+    "name": "GitHub",
     "category": "Yazılım & DevOps",
     "toolCount": 89,
     "adapterPhase": "catalogued",
