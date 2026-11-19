@@ -37,7 +37,7 @@ Human review before any privileged action
 
 ## Durable task lifecycle
 
-1. **Submitted:** a user opens an Issue whose title starts with `[LEGION]`.
+1. **Submitted:** a trusted repository owner, member, or collaborator opens an Issue whose title starts with `[LEGION]`; manual dispatch is separately protected by GitHub Actions permissions.
 2. **Running:** the workflow writes a status comment containing the run ID and attempt number.
 3. **Planned:** the planner produces a bounded JSON plan and validates role, risk, task type, and output limits.
 4. **Dispatched:** specialist workers execute in batches of at most three.
@@ -74,18 +74,25 @@ Each worker can use a different OpenRouter model through repository Actions vari
 
 Unset role variables fall back to `OPENROUTER_LEGION_MODEL`, then the planner's selected model, then `openrouter/free`. This is multi-model routing through one gateway. It does **not** prove direct live connectivity to OpenAI, Anthropic, Google, or xAI. The repository's separate native provider routes remain subject to their own server-side credentials and authenticated smoke tests.
 
+## Intake authorization
+
+- Issue-triggered model runs require both the `[LEGION]` title prefix and an author association of `OWNER`, `MEMBER`, or `COLLABORATOR`.
+- Public contributors and first-time reporters cannot start provider-backed runs, preventing arbitrary public Issues from consuming the repository's model budget.
+- Manual workflow dispatch remains subject to GitHub's workflow-dispatch permission boundary.
+- The authorization is evaluated at the job level before a runner is started and before provider secrets are exposed to a step.
+
 ## Permissions and data handling
 
 - The workflow receives `issues: write` only to append queue status comments; it has no repository contents write permission.
 - Workers receive no tools, shell, browser, repository-write permission, or production credentials.
 - Worker output is data, never executable instructions.
 - High-risk, ambiguous, financial, deployment, account/security, or external communication tasks require human review.
-- The repository is public. Never place secrets, patient data, workplace-confidential information, or private customer data in Issues. Provider calls may process issue text.
+- The repository is public. Never place secrets, patient data, workplace-confidential information, or private customer data in Issues. Authorized provider calls process the submitted issue text.
 - No automatic merge, deploy, rollback, purchase, payment, or external message is enabled.
 
 ## Operational checks
 
-1. Create an Issue using the `[LEGION]` title prefix.
+1. A repository owner, member, or collaborator creates an Issue using the `[LEGION]` title prefix.
 2. Confirm the workflow posts a RUNNING comment.
 3. Confirm the planner and workers complete.
 4. Confirm the final issue comment links the run and reports outcomes.
