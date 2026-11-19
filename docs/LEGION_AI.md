@@ -4,7 +4,7 @@
 
 LEGION is a GitHub-first task control plane for KaricimGPT. GitHub Issues are the durable task inbox, GitHub Actions validates intake packets, and pull requests are the review boundary for proposed code changes.
 
-This first release is deliberately an **intake and governance layer**. It does not claim to run thousands of independent agents, does not invoke an LLM, and does not execute issue instructions. Provider-backed worker execution can be added later behind a separately reviewed sandbox and explicit secret configuration.
+LEGION is a GitHub-first control plane integrated with the KaricimGPT runtime. The default branch and the draft MASTER BRAIN change are distinct rollout states: PR #58 adds a provider-backed, bounded planner/worker queue, but it remains unmerged until review and CI pass. LEGION does not claim thousands of always-on agents and never executes issue or model instructions as code.
 
 ## Existing KaricimGPT foundation
 
@@ -59,9 +59,9 @@ Suggested labels for maintainers to create in GitHub:
 
 - Treat issue titles, bodies, comments, branch names, and artifacts as untrusted input.
 - Never interpolate issue text into shell commands, JavaScript source, SQL, or file paths.
-- The intake workflow has read-only permissions and does not check out or execute repository code.
+- The original intake workflow is read-only. The provider-backed queue uses `issues: write` only for status comments and keeps `contents: none`; it does not check out or execute repository code.
 - Do not use `pull_request_target` to run untrusted pull-request code.
-- Do not expose provider keys, personal tokens, deployment credentials, or other secrets to issue-triggered workflows.
+- Do not expose provider keys, personal tokens, deployment credentials, or other secrets to untrusted issue events. The provider-backed planner job must pass its OWNER/MEMBER/COLLABORATOR author gate before provider secrets are exposed.
 - Do not allow an agent to run arbitrary shell commands, access arbitrary URLs, or write arbitrary repository paths.
 - Use allowlisted tools and task types; impose time, token, output-size, and concurrency limits.
 - Code changes must be proposed through a branch and reviewed pull request.
@@ -77,13 +77,14 @@ Suggested labels for maintainers to create in GitHub:
 - Explicit task type and impact declaration.
 - No LLM calls, code execution, or external side effects.
 
-### Stage 2: Provider-backed planner (implemented on feature branch)
+### Stage 2: MASTER BRAIN queue and bounded specialist workers (draft PR #58)
 
-- Manual GitHub Actions dispatch reads one selected Issue with read-only permissions.
+- GitHub Issues provide durable task identity; issue-scoped Actions concurrency serializes attempts for the same Issue.
+- Issue-triggered provider calls require the `[LEGION]` title prefix and an OWNER/MEMBER/COLLABORATOR author association. Manual dispatch remains protected by GitHub Actions permissions.
 - OpenRouter is called using the `OPENROUTER_API_KEY` repository Actions secret.
-- Planner emits a bounded JSON plan; fixed allowlists validate task types, roles, and risk.
-- Plan is stored as a seven-day workflow artifact.
-- This stage is planning-only: no worker processes, code changes, issue comments, deployments, or external side effects.
+- The planner emits a validated plan with at most five subtasks; role-routed workers run in batches of at most three.
+- Durable status comments report RUNNING and terminal outcomes; detail artifacts are retained for seven days.
+- Workers remain analysis-only. They do not receive tools, shell, browser, repository-write permission, or production credentials.
 
 See `docs/LEGION_RUNTIME_V2.md` for setup and operation.
 
@@ -113,3 +114,6 @@ Scale worker count only after task success rate, review rejection rate, latency,
 - Existing CI remains the source of truth for tests.
 - All code modifications flow through pull requests.
 - No deployment or destructive action is automated.
+
+
+See [LEGION ASCENSION](LEGION-ASCENSION.md) for the consolidated module map and current integration gates.
