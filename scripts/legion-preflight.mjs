@@ -45,13 +45,13 @@ const governance = registry.governance ?? {};
 for (const key of [
   "model_output_is_untrusted",
   "require_human_review_before_merge",
-  "require_human_approval_before_production_deploy",
-  "allow_secret_exfiltration"
+  "require_human_approval_before_production_deploy"
 ]) {
   if (governance[key] !== true) fail(`Required governance control must be true: ${key}`);
 }
 for (const key of [
   "allow_arbitrary_shell_from_model_output",
+  "allow_secret_exfiltration",
   "allow_public_self_hosted_runners_for_untrusted_code",
   "credentials_in_git"
 ]) {
