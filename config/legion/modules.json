@@ -93,4 +93,4 @@
     "allow_public_self_hosted_runners_for_untrusted_code": false,
     "credentials_in_git": false
   }
-}\n
+}
