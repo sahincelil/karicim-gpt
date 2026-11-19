@@ -7,7 +7,7 @@ on:
     inputs:
       issue_number:
         description: "GitHub Issue number to plan"
-        required: false
+        required: true
         type: string
 
 permissions:
