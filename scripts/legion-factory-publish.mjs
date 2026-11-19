@@ -7,9 +7,9 @@ const issueNumber = Number(process.env.ISSUE_NUMBER);
 const plannerRunId = String(process.env.PLANNER_RUN_ID || "");
 const runId = String(process.env.GITHUB_RUN_ID || "");
 const token = process.env.GITHUB_TOKEN;
-if (!/^[A-Za-z0-9_.-]+\\/[A-Za-z0-9_.-]+$/.test(repository)) fail("Repository context is invalid.");
-if (!Number.isSafeInteger(issueNumber) || issueNumber < 1 || !/^\\d+$/.test(plannerRunId) ||
-    !/^\\d+$/.test(runId) || !token) fail("Publish metadata or GitHub token is missing.");
+if (!/^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/.test(repository)) fail("Repository context is invalid.");
+if (!Number.isSafeInteger(issueNumber) || issueNumber < 1 || !/^\d+$/.test(plannerRunId) ||
+    !/^\d+$/.test(runId) || !token) fail("Publish metadata or GitHub token is missing.");
 
 let payload;
 try { payload = JSON.parse(await fs.readFile("factory-proposal/legion-factory-proposal.json", "utf8")); }
@@ -82,7 +82,7 @@ const body = [
   "This is a **draft proposal PR**. It contains one generated Markdown blueprint only; it does not modify application source code, run generated commands, merge, or deploy.", "",
   "Please verify all claims and acceptance criteria before implementation.", "",
   "Proposal file: " + proposalPath
-].join("\\n");
+].join("\n");
 const pullRequest = await githubApi("/pulls", {
   method: "POST",
   body: { title, head: branchName, base: baseBranch, body, draft: true, maintainer_can_modify: true }
@@ -96,6 +96,6 @@ const summary = [
   "- Proposal file: " + proposalPath,
   "- Mode: documentation-only implementation blueprint.",
   "- Merge/deploy: not performed."
-].join("\\n");
-if (process.env.GITHUB_STEP_SUMMARY) await fs.writeFile(process.env.GITHUB_STEP_SUMMARY, summary + "\\n", { flag: "a" });
+].join("\n");
+if (process.env.GITHUB_STEP_SUMMARY) await fs.writeFile(process.env.GITHUB_STEP_SUMMARY, summary + "\n", { flag: "a" });
 console.log("LEGION factory draft pull request created: " + pullRequest.html_url);

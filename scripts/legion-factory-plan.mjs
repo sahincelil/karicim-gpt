@@ -20,9 +20,9 @@ const issueNumber = Number(process.env.ISSUE_NUMBER);
 const plannerRunId = String(process.env.PLANNER_RUN_ID || "");
 const githubToken = process.env.GITHUB_TOKEN;
 const openRouterKey = process.env.OPENROUTER_API_KEY;
-if (!/^[A-Za-z0-9_.-]+\\/[A-Za-z0-9_.-]+$/.test(repository)) fail("Repository context is invalid.");
+if (!/^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/.test(repository)) fail("Repository context is invalid.");
 if (!Number.isSafeInteger(issueNumber) || issueNumber < 1) fail("A positive issue number is required.");
-if (!/^\\d+$/.test(plannerRunId)) fail("A valid MASTER BRAIN workflow run ID is required.");
+if (!/^\d+$/.test(plannerRunId)) fail("A valid MASTER BRAIN workflow run ID is required.");
 if (!githubToken || !openRouterKey) fail("Required server-side workflow credentials are not configured.");
 
 const [owner, repo] = repository.split("/");
@@ -113,7 +113,7 @@ const payload = {
   agentSwarm: { worker_count: workers.worker_count, completed_count: workers.completed_count, failed_count: workers.failed_count },
   proposal
 };
-await fs.writeFile("legion-factory-proposal.json", JSON.stringify(payload, null, 2) + "\\n", { mode: 0o600 });
+await fs.writeFile("legion-factory-proposal.json", JSON.stringify(payload, null, 2) + "\n", { mode: 0o600 });
 const summary = [
   "# LEGION Autonomous Factory", "",
   "- Source issue: #" + issueNumber,
@@ -121,6 +121,6 @@ const summary = [
   "- Specialist workers completed: " + workers.completed_count + "/" + workers.worker_count,
   "- Output: review-ready proposal package; no application source code was changed.",
   "- Approval: human review required before implementation, merge, or deployment.", ""
-].join("\\n");
+].join("\n");
 if (process.env.GITHUB_STEP_SUMMARY) await fs.writeFile(process.env.GITHUB_STEP_SUMMARY, summary, { flag: "a" });
 console.log("LEGION factory proposal validated and packaged.");
