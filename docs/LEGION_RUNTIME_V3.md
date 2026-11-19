@@ -2,7 +2,7 @@
 
 ## What is connected
 
-The manual GitHub Actions workflow `.github/workflows/legion-planner.yml` reads one selected GitHub Issue and calls OpenRouter using the server-side `OPENROUTER_API_KEY` repository secret.
+The GitHub Actions workflow `.github/workflows/legion-planner.yml` can process a manually selected Issue or an automatically opened `[LEGION]` Issue. Issue-triggered runs are restricted to authors with OWNER, MEMBER, or COLLABORATOR repository association. The provider-backed durable queue and role routing are tracked in the draft [MASTER BRAIN PR](https://github.com/sahincelil/karicim-gpt/pull/58) and are not yet merged into `main`.
 
 The workflow now has two model stages:
 
@@ -24,7 +24,7 @@ Never paste the key into an Issue, pull request, chat message, workflow file, co
 
 ## Run the system
 
-**Automatic intake:** create a task using the [LEGION issue form](https://github.com/sahincelil/karicim-gpt/issues/new?template=legion-task.yml). The form creates a `[LEGION]`-prefixed Issue; opening that Issue automatically starts the planner and specialist workers when the provider secret is configured.
+**Automatic intake:** create a task using the [LEGION issue form](https://github.com/sahincelil/karicim-gpt/issues/new?template=legion-task.yml). The form creates a `[LEGION]`-prefixed Issue; only an Issue opened by a repository owner, member, or collaborator passes the job-level gate and can start provider calls.
 
 **Manual retry:** open **Actions → LEGION Agent Planner → Run workflow**, enter the Issue number, and start the workflow.
 
@@ -36,7 +36,7 @@ Download the `legion-results-N` artifact from the completed run. It contains `le
 - Maximum three simultaneous specialist calls.
 - Workers receive only the task summary, role, objective, expected deliverable, and acceptance criteria.
 - Workers have no tools, browser, shell, GitHub write permission, or production credentials.
-- The workflow has `contents: none` and `issues: read` permissions.
+- The queue workflow has `contents: none` and `issues: write` only to append durable status comments.
 - No source files are changed; no issue comments, deployments, financial actions, account changes, or external messages are performed.
 - Worker outputs are recommendations, not verified facts or executed work. Research requiring live sources must be checked separately.
 - If worker calls fail, their per-role status is recorded in the artifact. A run with no completed workers fails.
@@ -47,3 +47,6 @@ Because the repository is public, do not put confidential, personal, customer, o
 ## Future stage
 
 The next stage, if enabled, is isolated tool-using workers with per-role allowlists, ephemeral environments, short-lived credentials, branch/PR-only code proposals, and explicit approval gates. This version deliberately does not grant those permissions.
+
+
+See [LEGION ASCENSION](LEGION-ASCENSION.md) for the integrated architecture, connected-app status and rollout gates.
