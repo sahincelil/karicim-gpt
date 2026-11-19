@@ -8,7 +8,7 @@ This document turns the existing command-center design into a repeatable reposit
 - `docs/LEGION-MODULE-STATUS.yml`: canonical human-maintained module status.
 - `scripts/legion-preflight.mjs`: checks module IDs, status values, evidence paths, and required governance controls.
 - `tests/legion-godforge.test.mjs`: focused Node.js regression test for the preflight.
-- `.github/workflows/legion-godforge.yml`: read-only CI workflow for pull requests and main-branch changes.
+- `.github/workflows/legion-godforge.yml`: read-only CI workflow for pull requests and main-branch changes.\n- `.github/workflows/legion-factory.yml`: manually dispatched factory that consumes a successful planner/swarm artifact and opens a documentation-only draft PR.\n- `lib/legion-factory.js`: validates planner/swarm provenance, bounds proposal text, redacts credential patterns, and renders the review document.\n- `scripts/legion-factory-plan.mjs` / `scripts/legion-factory-publish.mjs`: separated proposal generation and GitHub publishing stages.
 
 ## Operating sequence
 
@@ -39,4 +39,4 @@ node --test tests/legion-godforge.test.mjs
 npm run check
 ```
 
-The GitHub Actions workflow uses read-only repository permissions and does not consume secrets or execute deployment steps.
+The GODFORGE preflight uses read-only repository permissions. The factory is a separate manual workflow: its planning job has read-only issue/artifact access and the provider secret; its publishing job has narrowly scoped contents and pull-request write access but no provider secret. The publishing job treats the generated artifact only as text data and writes one fixed-path Markdown proposal file. No application source code, deployment, merge, or external side effect is performed.

@@ -1,0 +1,98 @@
+name: LEGION Autonomous Factory
+run-name: "LEGION Factory / issue ${{ inputs.issue_number }} / planner ${{ inputs.planner_run_id }}"
+
+on:
+  workflow_dispatch:
+    inputs:
+      issue_number:
+        description: "[LEGION] issue number processed by MASTER BRAIN"
+        required: true
+        type: number
+      planner_run_id:
+        description: "Successful LEGION Agent Planner Actions run ID"
+        required: true
+        type: string
+
+permissions: {}
+
+concurrency:
+  group: legion-factory-${{ inputs.issue_number }}
+  cancel-in-progress: false
+
+jobs:
+  prepare-proposal:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      actions: read
+      contents: read
+      issues: read
+    steps:
+      - name: Checkout trusted main source
+        uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+          ref: main
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 24
+      - name: Download MASTER BRAIN and AGENT SWARM results
+        uses: actions/download-artifact@v4
+        with:
+          name: legion-results-${{ inputs.issue_number }}
+          path: planner-results
+          github-token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          run-id: ${{ inputs.planner_run_id }}
+      - name: Validate provenance and generate proposal
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          ISSUE_NUMBER: ${{ inputs.issue_number }}
+          PLANNER_RUN_ID: ${{ inputs.planner_run_id }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          OPENROUTER_LEGION_MODEL: ${{ vars.OPENROUTER_LEGION_MODEL }}
+          OPENROUTER_LEGION_FACTORY_MODEL: ${{ vars.OPENROUTER_LEGION_FACTORY_MODEL }}
+        run: node scripts/legion-factory-plan.mjs
+      - name: Upload validated proposal package
+        uses: actions/upload-artifact@v4
+        with:
+          name: legion-factory-proposal
+          path: legion-factory-proposal.json
+          if-no-files-found: error
+          retention-days: 7
+
+  publish-draft:
+    needs: prepare-proposal
+    if: needs.prepare-proposal.result == 'success' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      actions: read
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Checkout trusted main source
+        uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+          ref: main
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 24
+      - name: Download proposal as data
+        uses: actions/download-artifact@v4
+        with:
+          name: legion-factory-proposal
+          path: factory-proposal
+      - name: Create documentation-only draft pull request
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_RUN_ID: ${{ github.run_id }}
+          ISSUE_NUMBER: ${{ inputs.issue_number }}
+          PLANNER_RUN_ID: ${{ inputs.planner_run_id }}
+        run: node scripts/legion-factory-publish.mjs

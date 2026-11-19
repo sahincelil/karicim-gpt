@@ -30,7 +30,12 @@
       "mode": "tests_and_reviewable_change_proposals",
       "entrypoints": [
         "docs/LEGION-GODFORGE-COMMAND-CENTER.md",
-        ".github/workflows/check.yml"
+        ".github/workflows/check.yml",
+        ".github/workflows/legion-factory.yml",
+        "lib/legion-factory.js",
+        "scripts/legion-factory-plan.mjs",
+        "scripts/legion-factory-publish.mjs",
+        "tests/legion-factory.test.mjs"
       ]
     },
     {
@@ -88,4 +93,4 @@
     "allow_public_self_hosted_runners_for_untrusted_code": false,
     "credentials_in_git": false
   }
-}
+}\n
