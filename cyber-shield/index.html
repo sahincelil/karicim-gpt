@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="LEGION CYBER SHIELD — sentetik verilerle çalışan, salt okunur güvenlik operasyonları demosu.">
+<title>LEGION CYBER SHIELD</title>
+<style>
+:root{color-scheme:dark;--bg:#090d14;--panel:#111a27;--panel2:#0d1520;--line:#243247;--text:#e8eef7;--muted:#91a2b9;--cyan:#69d7e8;--green:#80d6a3;--amber:#f4c36a;--red:#ff7d86}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 15% 0,#14283b 0,transparent 35%),var(--bg);color:var(--text);font:14px/1.5 Inter,ui-sans-serif,system-ui,sans-serif}
+.shell{max-width:1280px;margin:auto;padding:24px}.top{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}.brand{display:flex;align-items:center;gap:12px}.mark{width:42px;height:42px;border:1px solid #3d7180;border-radius:13px;display:grid;place-items:center;color:var(--cyan);font-weight:900;font-size:20px;background:#102431}h1{font-size:20px;letter-spacing:.12em;margin:0}.sub{color:var(--muted);font-size:12px}.status{border:1px solid #35516b;border-radius:999px;padding:6px 10px;color:var(--cyan);font-size:11px;letter-spacing:.08em}
+.notice{margin:20px 0;padding:12px 14px;border:1px solid #725b32;background:#211b10;color:#f2d9a7;border-radius:12px}.nav{display:flex;gap:8px;flex-wrap:wrap;margin:18px 0}.nav button,.filters button{background:#111a27;border:1px solid var(--line);color:var(--muted);border-radius:9px;padding:8px 12px;cursor:pointer}.nav button[aria-current=true],.filters button.active{border-color:#3e9cac;color:var(--cyan);background:#102631}
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.panel,.metric{background:linear-gradient(145deg,var(--panel),var(--panel2));border:1px solid var(--line);border-radius:14px;padding:16px}.metric small{display:block;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.09em}.metric strong{display:block;font-size:28px;margin-top:5px}.metric em{font-style:normal;color:var(--muted);font-size:11px}.section{margin-top:16px}.section h2{font-size:14px;letter-spacing:.08em;text-transform:uppercase;margin:0 0 12px;color:#c7d8eb}.split{display:grid;grid-template-columns:1.25fr .75fr;gap:12px}.table-wrap{overflow:auto}table{width:100%;border-collapse:collapse;min-width:560px}th,td{text-align:left;padding:10px;border-bottom:1px solid var(--line);font-size:12px}th{color:var(--muted);font-weight:600}td{color:#dce6f2}.pill{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:2px 7px;font-size:10px}.critical{color:var(--red);border-color:#75434b}.high{color:#ffae83;border-color:#754f40}.medium{color:var(--amber);border-color:#756139}.low{color:var(--green);border-color:#3c6b53}.muted{color:var(--muted)}.filters{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:10px}.list{display:grid;gap:9px}.event{padding:12px;border:1px solid var(--line);border-radius:11px;background:#0e1723}.event-head{display:flex;justify-content:space-between;gap:12px;align-items:center}.event p{margin:7px 0 0;color:var(--muted);font-size:12px}.bars{display:grid;gap:11px}.barrow{display:grid;grid-template-columns:110px 1fr 28px;gap:8px;align-items:center;font-size:12px}.bar{height:8px;border-radius:99px;background:#1b2a3a;overflow:hidden}.bar i{display:block;height:100%;background:linear-gradient(90deg,#3a9db0,#80d6a3)}.timeline{border-left:1px solid #36536b;margin-left:7px;padding-left:16px;display:grid;gap:14px}.timeitem{position:relative}.timeitem:before{content:"";position:absolute;left:-21px;top:5px;width:8px;height:8px;border-radius:50%;background:var(--cyan);box-shadow:0 0 0 4px #19313c}.timeitem time{color:var(--muted);font-size:11px}.timeitem strong{display:block;font-size:12px}.timeitem span{color:var(--muted);font-size:11px}.audit{font:11px/1.6 ui-monospace,monospace;color:#a9bacd;white-space:pre-wrap}.foot{margin:24px 0 8px;color:var(--muted);font-size:11px;text-align:center}
+[hidden]{display:none!important}
+@media(max-width:850px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.split{grid-template-columns:1fr}}@media(max-width:520px){.shell{padding:15px}.grid{gap:8px}.metric{padding:12px}.metric strong{font-size:23px}}
+</style>
+</head>
+<body><main class="shell">
+<header class="top"><div class="brand"><div class="mark">L</div><div><h1>LEGION CYBER SHIELD</h1><div class="sub">SECURITY OPERATIONS CONSOLE · DEMO 0.1</div></div></div><div id="connectionStatus" class="status">● SIMULATION / READ ONLY</div></header>
+<div class="notice"><strong>DEMO DATA ONLY.</strong> Bu panel sentetik olaylar kullanır. Gerçek ağa, SIEM'e veya uç noktalara bağlı değildir. Müdahale, tarama ve otomatik engelleme yapmaz.</div>
+<nav class="nav" aria-label="Ana bölümler">
+<button data-view="overview" aria-current="true">Genel Bakış</button><button data-view="assets" aria-current="false">Varlıklar</button><button data-view="detections" aria-current="false">Tespitler</button><button data-view="timeline" aria-current="false">Olay Zaman Çizelgesi</button><button data-view="attack" aria-current="false">ATT&CK Kapsamı</button><button data-view="correlations" aria-current="false">Korelasyon</button><button data-view="audit" aria-current="false">Denetim Kaydı</button>
+</nav>
+<section id="overview" class="view">
+<div class="grid">
+<div class="metric"><small>Sentetik varlık</small><strong>08</strong><em>Örnek envanter</em></div>
+<div class="metric"><small>Açık tespit</small><strong id="openCount">04</strong><em>Örnek olay verisi</em></div>
+<div class="metric"><small>Yüksek / kritik</small><strong id="priorityCount">02</strong><em>İnsan incelemesi gerekir</em></div>
+<div class="metric"><small>Veri kaynağı</small><strong>03</strong><em>Fixture: EDR · IDS · IAM</em></div>
+</div>
+<div class="split section">
+<div class="panel"><h2>Son güvenlik olayları</h2><div id="recentEvents" class="list"></div></div>
+<div class="panel"><h2>Önem dağılımı</h2><div id="severityBars" class="bars"></div></div>
+</div>
+</section>
+<section id="assets" class="view" hidden><div class="panel section"><h2>Sentetik varlık envanteri</h2><div class="table-wrap"><table><thead><tr><th>Varlık</th><th>Tür</th><th>Ortam</th><th>Sahip ekip</th><th>Durum</th></tr></thead><tbody id="assetRows"></tbody></table></div></div></section>
+<section id="detections" class="view" hidden><div class="panel section"><h2>Tespit kuyruğu</h2><div class="filters" id="severityFilters"><button class="active" data-severity="all">Tümü</button><button data-severity="critical">Kritik</button><button data-severity="high">Yüksek</button><button data-severity="medium">Orta</button><button data-severity="low">Düşük</button></div><div id="detectionList" class="list"></div></div></section>
+<section id="timeline" class="view" hidden><div class="panel section"><h2>Olay zaman çizelgesi</h2><div id="timelineList" class="timeline"></div></div></section>
+<section id="attack" class="view" hidden><div class="panel section"><h2>MITRE ATT&CK teknik eşleştirmesi</h2><p class="sub">Eşleştirmeler yalnızca örnek olay açıklamalarına dayalı demo etiketleridir; doğrulanmış tehdit istihbaratı değildir.</p><div class="table-wrap"><table><thead><tr><th>Teknik</th><th>Ad</th><th>Taktik</th><th>İlişkili tespit</th><th>Güven</th></tr></thead><tbody id="attackRows"></tbody></table></div></div></section>
+<section id="correlations" class="view" hidden><div class="panel section"><h2>Olay korelasyonu</h2><p class="sub">Aynı varlıkta 10 dakika içinde görülen sentetik olaylar bir araya getirilir. Bu bir önceliklendirme sinyalidir, doğrulanmış saldırı hükmü değildir.</p><div id="correlationList" class="list"></div></div></section>
+<section id="audit" class="view" hidden><div class="panel section"><h2>Denetim izi</h2><p class="sub">Demo oturumu ve veri kaynağı hakkında değiştirilemezmiş gibi sunulmayan örnek kayıtlar.</p><div id="auditLog" class="audit"></div></div></section>
+<footer class="foot">LEGION CYBER SHIELD · SYNTHETIC FIXTURES · NO LIVE CONNECTORS · NO RESPONSE ACTIONS</footer>
+</main>
+<script type="module">
+const assets=[
+{id:"AST-001",name:"CORE-DC-01",type:"Directory server",env:"Production (demo)",team:"Identity",status:"Monitored"},
+{id:"AST-002",name:"FIN-APP-02",type:"Application",env:"Production (demo)",team:"Finance IT",status:"Monitored"},
+{id:"AST-003",name:"WS-042",type:"Workstation",env:"Corporate (demo)",team:"End-user IT",status:"Review"},
+{id:"AST-004",name:"EDGE-GW-01",type:"Network gateway",env:"Perimeter (demo)",team:"Network",status:"Monitored"},
+{id:"AST-005",name:"DB-REPORT-01",type:"Database",env:"Internal (demo)",team:"Data",status:"Monitored"},
+{id:"AST-006",name:"CI-RUNNER-03",type:"Build runner",env:"Engineering (demo)",team:"Platform",status:"Review"},
+{id:"AST-007",name:"MAIL-01",type:"Messaging",env:"Production (demo)",team:"Workplace",status:"Monitored"},
+{id:"AST-008",name:"BACKUP-02",type:"Backup server",env:"Recovery (demo)",team:"Infrastructure",status:"Monitored"}];
+const events=[
+{id:"DET-2401",time:"2026-11-19T19:42:00Z",severity:"high",title:"Repeated authentication failures",asset:"CORE-DC-01",source:"IAM fixture",description:"Sentetik hesap üzerinde kısa aralıklarla başarısız oturum açma denemeleri.",technique:"T1110",tactic:"Credential Access",status:"Open"},
+{id:"DET-2402",time:"2026-11-19T19:36:00Z",severity:"medium",title:"Unusual outbound connection pattern",asset:"WS-042",source:"IDS fixture",description:"İş istasyonundan beklenmeyen hedefe periyodik bağlantı örüntüsü.",technique:"T1071",tactic:"Command and Control",status:"Open"},
+{id:"DET-2403",time:"2026-11-19T19:21:00Z",severity:"critical",title:"Privileged group membership changed",asset:"CORE-DC-01",source:"IAM fixture",description:"Ayrıcalıklı gruba üyelik değişikliği. İş gerekçesi ve onay kaydı incelenmeli.",technique:"T1098",tactic:"Persistence",status:"Open"},
+{id:"DET-2404",time:"2026-11-19T18:58:00Z",severity:"low",title:"Endpoint policy check passed",asset:"FIN-APP-02",source:"EDR fixture",description:"Örnek uç nokta politika kontrolü başarıyla tamamlandı.",technique:"Tactical",tactic:"",status:"Closed"},
+{id:"DET-2405",time:"2026-11-19T18:44:00Z",severity:"medium",title:"Build artifact provenance missing",asset:"CI-RUNNER-03",source:"EDR fixture",description:"Sentetik derleme çıktısında imza/provenance metaverisi eksik.",technique:"T1195",tactic:"Initial Access",status:"Open"}];
+const audit=[
+"2026-11-19T20:00:00Z  DEMO_INIT       fixtures_loaded=assets:8,detections:5",
+"2026-11-19T20:00:01Z  SOURCE_STATUS   EDR=synthetic IDS=synthetic IAM=synthetic",
+"2026-11-19T20:00:02Z  ACCESS_MODE     read_only=true live_connectors=0",
+"2026-11-19T20:00:03Z  RESPONSE_POLICY automated_actions=disabled",
+"2026-11-19T20:00:04Z  DATA_CLASS      synthetic_only=true"];
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const pill=s=>'<span class="pill '+esc(s)+'">'+esc(s.toUpperCase())+'</span>';
+function renderOverview(){const open=events.filter(e=>e.status==="Open");$("#openCount").textContent=open.length;$("#priorityCount").textContent=open.filter(e=>["high","critical"].includes(e.severity)).length;$("#recentEvents").innerHTML=open.slice(0,4).map(e=>'<article class="event"><div class="event-head"><strong>'+esc(e.title)+'</strong>'+pill(e.severity)+'</div><p>'+esc(e.id+' · '+e.asset+' · '+e.source)+'</p></article>').join("");const counts=["critical","high","medium","low"].map(s=>({s,n:events.filter(e=>e.severity===s).length}));$("#severityBars").innerHTML=counts.map(x=>'<div class="barrow"><span>'+x.s.toUpperCase()+'</span><div class="bar"><i style="width:'+(x.n/events.length*100)+'%"></i></div><b>'+x.n+'</b></div>').join("")}
+function renderAssets(){$("#assetRows").innerHTML=assets.map(a=>'<tr><td><strong>'+esc(a.name)+'</strong><div class="muted">'+esc(a.id)+'</div></td><td>'+esc(a.type)+'</td><td>'+esc(a.env)+'</td><td>'+esc(a.team)+'</td><td>'+esc(a.status)+'</td></tr>').join("")}
+function renderDetections(filter="all"){const list=events.filter(e=>filter==="all"||e.severity===filter);$("#detectionList").innerHTML=list.map(e=>'<article class="event"><div class="event-head"><strong>'+esc(e.title)+'</strong>'+pill(e.severity)+'</div><p>'+esc(e.id+' · '+e.asset+' · '+e.source+' · '+e.status)+'</p><p>'+esc(e.description)+'</p></article>').join("")||'<p class="muted">Bu filtrede olay yok.</p>'}
+function renderTimeline(){$("#timelineList").innerHTML=[...events].sort((a,b)=>b.time.localeCompare(a.time)).map(e=>'<div class="timeitem"><time>'+esc(new Date(e.time).toLocaleString("tr-TR",{timeZone:"Europe/Istanbul"}))+'</time><strong>'+esc(e.title)+'</strong><span>'+esc(e.asset+' · '+e.id)+'</span></div>').join("")}
+function renderAttack(){$("#attackRows").innerHTML=events.filter(e=>e.technique.startsWith("T")).map(e=>'<tr><td>'+esc(e.technique)+'</td><td>'+esc(({T1110:"Brute Force",T1071:"Application Layer Protocol",T1098:"Account Manipulation",T1195:"Supply Chain Compromise"})[e.technique]||"Technique reference")+'</td><td>'+esc(e.tactic)+'</td><td>'+esc(e.id)+'</td><td>Demo / low</td></tr>').join("")}
+function renderCorrelations(){const groups=new Map();for(const event of events){const list=groups.get(event.asset)||[];list.push(event);groups.set(event.asset,list)}const rows=[];for(const [asset,items] of groups){const sorted=items.sort((a,b)=>Date.parse(a.time)-Date.parse(b.time));for(let i=1;i<sorted.length;i++){const delta=(Date.parse(sorted[i].time)-Date.parse(sorted[i-1].time))/60000;if(delta<=10)rows.push({asset,items:[sorted[i-1],sorted[i]],delta})}}$("#correlationList").innerHTML=rows.length?rows.map(row=>'<article class="event"><div class="event-head"><strong>'+esc(row.asset)+' · '+row.items.length+' olay</strong><span class="pill high">'+row.delta+' dk aralık</span></div><p>'+row.items.map(e=>esc(e.id+' · '+e.title)).join(' / ')+'</p><p>İnsan analist incelemesi önerilir.</p></article>').join(""):'<p class="muted">Korelasyon bulunamadı.</p>'}
+async function refreshConnectorStatus(){try{const response=await fetch('/api/cyber-shield',{headers:{Accept:'application/json'}});if(!response.ok)throw new Error('status unavailable');const data=await response.json();const label=$("#connectionStatus");label.textContent=data.adapters&&Object.values(data.adapters).every(x=>x.parser)?'● PARSERS READY / LIVE CONNECTORS OFF':'● DEMO MODE'}catch{$("#connectionStatus").textContent='● OFFLINE DEMO'}}
+function renderAudit(){$("#auditLog").textContent=audit.join("\n")}
+document.querySelectorAll("[data-view]").forEach(b=>b.addEventListener("click",()=>{document.querySelectorAll("[data-view]").forEach(x=>x.setAttribute("aria-current",String(x===b)));document.querySelectorAll(".view").forEach(v=>v.hidden=v.id!==b.dataset.view)}));
+$("#severityFilters").addEventListener("click",e=>{const b=e.target.closest("button[data-severity]");if(!b)return;document.querySelectorAll("[data-severity]").forEach(x=>x.classList.toggle("active",x===b));renderDetections(b.dataset.severity)});
+renderOverview();renderAssets();renderDetections();renderTimeline();renderAttack();renderCorrelations();renderAudit();refreshConnectorStatus();
+</script></body></html>
