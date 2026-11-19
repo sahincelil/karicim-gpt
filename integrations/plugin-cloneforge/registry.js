@@ -7,7 +7,7 @@ export const registrySnapshot = {
   observedToolCount: 3309,
   source: 'Available connector/tool registry at build time',
   statusSemantics: {
-    existing-code: 'Some provider-specific code exists elsewhere in the repository; live connection is not implied.',
+    'existing-code': 'Some provider-specific code exists elsewhere in the repository; live connection is not implied.',
     catalogued: 'Provider was observed in the tool inventory; no cloned adapter is claimed.'
   }
 };
