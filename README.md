@@ -15,6 +15,7 @@ Repo: https://github.com/sahincelil/karicim-gpt
 - [LEGION AI command center](docs/LEGION_AI.md)
 - [LEGION Runtime v3 planner and specialist workers](docs/LEGION_RUNTIME_V3.md)
 - [LEGION SINGULARITY MASTER BRAIN queue and model routing](docs/MASTER_BRAIN.md)
+- [LEGION ASCENSION integrated architecture and rollout status](docs/LEGION-ASCENSION.md)
 - [LEGION AI Agent Bridge](docs/AGENT_BRIDGE.md)
 - [Signed Node.js bridge client](examples/bridge-client.mjs)
 - [Claude API route](api/claude.js)
