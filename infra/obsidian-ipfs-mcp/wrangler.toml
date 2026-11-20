@@ -1,0 +1,6 @@
+name = "obsidian-global-ipfs-mcp"
+main = "worker.js"
+compatibility_date = "2026-11-05"
+
+[vars]
+SERVICE_NAME = "OBSIDIAN Global IPFS MCP"

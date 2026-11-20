@@ -1,0 +1,30 @@
+name: IPFS MCP gateway checks
+
+on:
+  pull_request:
+    paths:
+      - "infra/obsidian-ipfs-mcp/**"
+  push:
+    branches:
+      - main
+      - feat/obsidian-global-ipfs-mcp
+    paths:
+      - "infra/obsidian-ipfs-mcp/**"
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Syntax check
+        run: node --check worker.js
+        working-directory: infra/obsidian-ipfs-mcp
+      - name: Unit tests
+        run: node --test worker.test.js
+        working-directory: infra/obsidian-ipfs-mcp
