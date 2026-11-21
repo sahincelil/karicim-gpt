@@ -56,14 +56,6 @@ modules:
     mode: content_research_and_planning
     publishing_authorization_required: true
     evidence: docs/LEGION-ASCENSION.md
-governance:
-  model_output_is_untrusted: true
-  require_human_review_before_merge: true
-  require_human_approval_before_production_deploy: true
-  allow_arbitrary_shell_from_model_output: false
-  allow_secret_exfiltration: false
-  allow_public_self_hosted_runners_for_untrusted_code: false
-  credentials_in_git: false
 
   osint_intelligence:
     status: partial
@@ -77,3 +69,11 @@ governance:
       - OSINT_ADMIN_TOKEN
       - OSINT_ALLOWED_DOMAINS
     evidence: docs/LEGION-OSINT-INTELLIGENCE.md
+governance:
+  model_output_is_untrusted: true
+  require_human_review_before_merge: true
+  require_human_approval_before_production_deploy: true
+  allow_arbitrary_shell_from_model_output: false
+  allow_secret_exfiltration: false
+  allow_public_self_hosted_runners_for_untrusted_code: false
+  credentials_in_git: false
