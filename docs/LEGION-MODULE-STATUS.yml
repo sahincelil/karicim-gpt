@@ -2,7 +2,7 @@ schema_version: 1
 project: LEGION GODFORGE
 repository: sahincelil/karicim-gpt
 default_branch: main
-last_reviewed: 2026-11-19
+last_reviewed: 2026-11-21
 status_legend:
   implemented: Source or workflow exists; not necessarily live in production.
   partial: Some components exist; integration or evidence remains incomplete.
@@ -64,3 +64,16 @@ governance:
   allow_secret_exfiltration: false
   allow_public_self_hosted_runners_for_untrusted_code: false
   credentials_in_git: false
+
+  osint_intelligence:
+    status: partial
+    mode: passive_authorized_domain_recon
+    capabilities:
+      - certificate_transparency_lookup
+      - public_archive_host_coverage
+    active_scanning: false
+    personal_profiling: false
+    credentials_required:
+      - OSINT_ADMIN_TOKEN
+      - OSINT_ALLOWED_DOMAINS
+    evidence: docs/LEGION-OSINT-INTELLIGENCE.md
