@@ -14,6 +14,7 @@ Repo: https://github.com/sahincelil/karicim-gpt
 - [Demo examples](docs/DEMO_EXAMPLES.md)
 - [90-day product growth plan](docs/PRODUCT_GROWTH_PLAN.md)
 - [Architecture notes](docs/ARCHITECTURE.md)
+- [LEGION open-source stack review (five candidates; documentation only)](docs/OPEN_SOURCE_STACK_REVIEW.md)
 - [LEGION AI command center](docs/LEGION_AI.md)
 - [LEGION Runtime v3 planner and specialist workers](docs/LEGION_RUNTIME_V3.md)
 - [LEGION SINGULARITY MASTER BRAIN queue and model routing](docs/MASTER_BRAIN.md)
