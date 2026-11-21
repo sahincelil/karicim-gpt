@@ -2,7 +2,7 @@ schema_version: 1
 project: LEGION GODFORGE
 repository: sahincelil/karicim-gpt
 default_branch: main
-last_reviewed: 2026-11-19
+last_reviewed: 2026-11-21
 status_legend:
   implemented: Source or workflow exists; not necessarily live in production.
   partial: Some components exist; integration or evidence remains incomplete.
@@ -37,6 +37,17 @@ modules:
     status: planned
     mode: repository_security_and_dependency_review
     evidence: docs/LEGION-GODFORGE-COMMAND-CENTER.md
+  cyber_shield:
+    status: planned
+    mode: read_only_agentic_threat_intelligence_and_patch_window_defense
+    first_build: patch_window_sentinel
+    no_automated_exploitation: true
+    human_approval_required:
+      - production_remediation
+      - containment
+      - credential_rotation
+      - deployment
+    evidence: docs/LEGION_CYBER_SHIELD_AGENTIC_DEFENSE.md
   device_mesh:
     status: blocked
     mode: owner_enrolled_private_nodes_only
