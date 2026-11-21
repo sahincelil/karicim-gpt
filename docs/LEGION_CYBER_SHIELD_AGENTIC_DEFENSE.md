@@ -1,6 +1,6 @@
 # LEGION CYBER SHIELD — Agentic Threat Defense Blueprint
 
-**Status:** Design proposal (not implemented or deployed)  
+**Status:** Read-only MVP prototype implemented on a feature branch; not merged or production deployed  
 **Prepared:** 21 November 2026  
 **Repository:** `sahincelil/karicim-gpt`  
 **Decision:** Build a defensive patch-window and behavior-detection module. Do not replicate or deploy offensive exploit automation.
@@ -233,4 +233,4 @@ These are packaging hypotheses, not validated prices or revenue forecasts. Valid
 
 It is the smallest defensible wedge from the Google finding: it addresses the shrinking patch window, produces a measurable customer outcome, fits the current controlled-autonomy architecture, and avoids turning LEGION into an offensive exploitation framework.
 
-**Current status:** proposal only. No code, customer connector, production monitoring, or remediation automation is claimed to exist until implemented and tested.
+**Current status:** a read-only prototype now exists on the feature branch. It accepts an explicitly supplied asset/CVE inventory, enriches CVE identifiers with CISA KEV and FIRST EPSS, and returns an explainable priority list. It has not been merged or production deployed. It does not discover products or versions, scan networks, persist inventory, connect to customer telemetry, or perform remediation. The prototype requires automated tests and a preview smoke test before it can be considered verified.
