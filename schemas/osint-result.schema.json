@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "LEGION OSINT passive domain report",
+  "type": "object",
+  "required": ["ok", "module", "mode", "targetDomain", "collectedAt", "sources", "findings", "caveats"],
+  "properties": {
+    "ok": { "type": "boolean" },
+    "module": { "const": "LEGION OSINT" },
+    "mode": { "const": "passive_authorized_domain_recon" },
+    "targetDomain": { "type": "string" },
+    "collectedAt": { "type": "string", "format": "date-time" },
+    "sources": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "status"],
+        "properties": {
+          "name": { "enum": ["crt.sh", "Internet Archive CDX"] },
+          "status": { "enum": ["ok", "unavailable"] },
+          "records": { "type": "integer", "minimum": 0 },
+          "hosts": { "type": "integer", "minimum": 0 },
+          "sourceUrl": { "type": "string", "format": "uri" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "findings": {
+      "type": "object",
+      "required": ["subdomains", "archivedHosts"],
+      "properties": {
+        "subdomains": { "type": "array", "items": { "type": "string" } },
+        "archivedHosts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["host", "snapshots"],
+            "properties": {
+              "host": { "type": "string" },
+              "snapshots": { "type": "integer", "minimum": 1 },
+              "oldestSnapshot": { "type": ["string", "null"] },
+              "newestSnapshot": { "type": ["string", "null"] }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "caveats": { "type": "array", "items": { "type": "string" } }
+  },
+  "additionalProperties": false
+}

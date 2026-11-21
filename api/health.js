@@ -26,7 +26,8 @@ export default async function handler(req, res) {
       chat: Boolean(process.env.OPENROUTER_API_KEY || process.env.XAI_API_KEY),
       agent: Boolean(process.env.OPENROUTER_API_KEY),
       webTools: webEnabled,
-      githubRead: Boolean(process.env.OPENROUTER_API_KEY)
+      githubRead: Boolean(process.env.OPENROUTER_API_KEY),
+      osint: Boolean(process.env.OSINT_ADMIN_TOKEN && process.env.OSINT_ALLOWED_DOMAINS)
     }
   });
 }
