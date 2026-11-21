@@ -9,7 +9,7 @@ assert.equal(isAllowedDomain('api.example.com', ['example.com']), true);
 assert.equal(isAllowedDomain('notexample.com', ['example.com']), false);
 
 const ct = parseCtRecords([
-  { name_value: 'example.com\\nwww.example.com\\n*.mail.example.com\\nbadexample.com' },
+  { name_value: 'example.com\nwww.example.com\n*.mail.example.com\nbadexample.com' },
   { name_value: 'docs.example.com' }
 ], 'example.com');
 assert.deepEqual(ct, ['docs.example.com', 'mail.example.com', 'www.example.com']);
@@ -63,7 +63,7 @@ try {
   globalThis.fetch = async (input) => {
     const url = new URL(input);
     if (url.hostname === 'crt.sh') {
-      return { ok: true, json: async () => [{ name_value: 'www.example.com\\napi.example.com' }] };
+      return { ok: true, json: async () => [{ name_value: 'www.example.com\napi.example.com' }] };
     }
     if (url.hostname === 'web.archive.org') {
       return { ok: true, json: async () => [['original', 'timestamp', 'statuscode'], ['https://example.com/', '20250101000000', '200']] };
