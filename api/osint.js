@@ -21,13 +21,13 @@ function safeEqual(left, right) {
 
 function authorized(req) {
   const expected = process.env.OSINT_ADMIN_TOKEN;
-  const provided = String(req.headers.authorization || '').replace(/^Bearer\\s+/i, '');
+  const provided = String(req.headers.authorization || '').replace(/^Bearer\s+/i, '');
   return Boolean(expected && provided && safeEqual(provided, expected));
 }
 
 export function normalizeDomain(input) {
   if (typeof input !== 'string') return null;
-  const domain = input.trim().toLowerCase().replace(/\\.$/, '');
+  const domain = input.trim().toLowerCase().replace(/\.$/, '');
   if (domain.length > 253 || !domain || domain.includes('://') || domain.includes('/') || domain.includes(':')) return null;
   const labels = domain.split('.');
   if (labels.length < 2 || labels.some((label) => !/^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/.test(label))) return null;
@@ -44,8 +44,8 @@ export function parseCtRecords(payload, targetDomain) {
   const names = new Set();
   for (const record of payload) {
     const value = typeof record?.name_value === 'string' ? record.name_value : '';
-    for (const rawName of value.split(/\\r?\\n/)) {
-      const name = normalizeDomain(rawName.replace(/^\\*\\./, ''));
+    for (const rawName of value.split(/\r?\n/)) {
+      const name = normalizeDomain(rawName.replace(/^\*\./, ''));
       if (name && name !== targetDomain && name.endsWith('.' + targetDomain)) names.add(name);
     }
   }
@@ -53,7 +53,7 @@ export function parseCtRecords(payload, targetDomain) {
 }
 
 function formatCdxDate(value) {
-  const match = /^(\\d{4})(\\d{2})(\\d{2})/.exec(String(value || ''));
+  const match = /^(\d{4})(\d{2})(\d{2})/.exec(String(value || ''));
   return match ? match[1] + '-' + match[2] + '-' + match[3] : null;
 }
 
