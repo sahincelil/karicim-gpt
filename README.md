@@ -15,6 +15,7 @@ Repo: https://github.com/sahincelil/karicim-gpt
 - [90-day product growth plan](docs/PRODUCT_GROWTH_PLAN.md)
 - [Architecture notes](docs/ARCHITECTURE.md)
 - [LEGION open-source stack review (10-slide Instagram list; license and integration decisions)](docs/OPEN_SOURCE_STACK_REVIEW.md)
+- [Plausible Analytics integration setup and privacy boundaries](docs/PLAUSIBLE_ANALYTICS_SETUP.md)
 - [LEGION AI command center](docs/LEGION_AI.md)
 - [LEGION Runtime v3 planner and specialist workers](docs/LEGION_RUNTIME_V3.md)
 - [LEGION SINGULARITY MASTER BRAIN queue and model routing](docs/MASTER_BRAIN.md)
