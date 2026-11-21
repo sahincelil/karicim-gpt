@@ -24,7 +24,7 @@ export default async function handler(req, res) {
       boundaries: {
         networkScanning: false,
         exploitExecution: false,
-       ProductionChanges: false,
+        productionChanges: false,
         inventoryPersistence: false,
         humanApprovalRequiredForAnyRemediation: true
       }
