@@ -1,146 +1,114 @@
 # LEGION Open-Source Stack Review
 
 **Review date:** 21 November 2026  
-**Scope:** Five high-confidence candidates inferred from the publicly visible @hfnhq Instagram carousel. This is not a reconstruction of the promised ten-item PDF: the public carousel did not expose all repository names, so unverified identities are deliberately excluded.  
+**Source:** Instagram carousel by @web_development_legend: https://www.instagram.com/p/Dfm_FsEgAq4/  
+**Scope:** All 10 carousel slides checked. The post does not contain a PDF. Nine slides point to identifiable software repositories; the Buddy slide does not resolve to the claimed open-source GitHub repository.  
 **Repository:** `sahincelil/karicim-gpt`  
-**Decision:** Document and stage candidates; do not deploy or connect production credentials as part of this review.
+**Decision:** Keep the existing LEGION control plane. Adopt only narrowly useful integrations after a separate deployment and license gate. This review is not a deployment.
 
 ## Executive decision
 
-Do not install all five projects as one local stack. They solve different problems, duplicate parts of the existing KaricimGPT/LEGION platform, and have materially different operating requirements.
+Do not clone or deploy all ten entries. Several are complete products unrelated to the command core, and three have important licensing qualifications that the Instagram caption omits.
 
-Recommended order for a future, separately approved pilot:
+**Recommended disposition**
 
-1. **Twenty** — best direct business-operations fit if a real customer pipeline is validated.
-2. **Documenso** — useful for document workflow after signing, email, storage, and jurisdictional requirements are confirmed.
-3. **AppFlowy** — optional team knowledge workspace; avoid duplicating the existing LEGION memory/digital-twin layer without a clear data contract.
-4. **Immich** — optional media archive, not a LEGION control-plane dependency.
-5. **Stalwart** — defer. Running an internet-facing mail server is mainly a networking and deliverability project, not just a Docker install.
+1. **Plausible — evaluate first for public-site analytics.** Useful for the KaricimGPT public website if a verified production domain exists. It does not replace YouTube analytics; retain the existing YouTube/Supermetrics workflow.
+2. **Anytype — optional human knowledge vault, not the LEGION memory database.** It is local-first and exposes a local API / agent extension points, but the desktop application is source-available, not OSI open source. Confirm allowed-network and commercial-use terms before business use.
+3. **Twenty — optional CRM pilot only after a real lead/customer pipeline exists.** The main project is mostly AGPL-3.0 with commercially licensed enterprise-marked files and MIT packages. If HubSpot is already serving CRM needs, do not create a second CRM.
+4. **Documenso — future document-signing workflow.** Useful only when there is a concrete need for signature collection. It needs PostgreSQL, SMTP, TLS/reverse proxy, and a signing certificate; AGPL-3.0 community edition and commercial enterprise edition are distinct.
+5. **Papermark — defer.** Document analytics/sharing is not currently a core need. Its repository is mixed-license; official self-hosting guidance says personal self-hosting is for personal/non-commercial use and commercial team use needs a self-hosting license.
+6. **Nuxt — do not migrate the current app now.** It is MIT-licensed and capable, but the existing Node.js + static frontend works as a small control plane. A framework migration adds risk without a proven product requirement.
+7. **tldraw — prototype only until license is resolved.** Its SDK's default license is development-only; production use requires a valid trial, commercial, or hobby license key.
+8. **Immich — separate personal media archive only.** Not a LEGION runtime dependency. Official guidance asks for at least 6 GB RAM (8 GB recommended) and a stable local SSD for PostgreSQL.
+9. **Jellyfin — separate media streaming service only.** GPL-2.0 server; useful for a personal media library, not an AI orchestration capability.
+10. **Buddy — do not classify as open source or a GitHub repository.** The carousel's `buddy-works/buddy` URL returns 404 in the connected GitHub check. Buddy's official self-hosted license is a paid, limited-term proprietary license. Keep the current GitHub Actions CI unless a specific Buddy feature justifies the cost.
 
-Use the existing Node.js application as the orchestration/control plane. Treat each external project as an independently deployed service connected through narrow, authenticated adapters. The user's desktop should remain a control surface, not the host for the complete stack.
+## Ten-slide source register
 
-## Candidate register
+| Slide | Name shown | Repository / official destination | License / verification | LEGION disposition |
+|---:|---|---|---|---|
+| 1 | Immich | https://github.com/immich-app/immich | AGPL-3.0; official hardware requirements: 6 GB RAM minimum, 8 GB recommended | Separate media archive; no control-plane integration |
+| 2 | Anytype | Canonical repository: https://github.com/anyproto/anytype-ts. The carousel URL `anytype-io/anytype` is not the canonical repo. | Any Source Available License 1.0 for client; protocols such as any-sync / any-block are MIT. Not OSI open source as a whole. | Optional human knowledge vault; license check and local API boundary first |
+| 3 | Twenty CRM | https://github.com/twentyhq/twenty | Mostly AGPL-3.0; some MIT packages and commercially licensed enterprise-marked files | CRM pilot only if existing CRM is insufficient |
+| 4 | Papermark | https://github.com/papermark/papermark (historical path in carousel: `mfts/papermark`) | AGPLv3 outside enterprise-marked paths; official guidance restricts free self-hosting to personal/non-commercial use, commercial team use needs a self-hosting license | Defer; no current document-analytics requirement |
+| 5 | Jellyfin | https://github.com/jellyfin/jellyfin | GPL-2.0 | Personal media service, outside LEGION core |
+| 6 | tldraw | https://github.com/tldraw/tldraw | Proprietary tldraw SDK license; development use by default, production requires license key | Prototype only; do not embed in production before licensing |
+| 7 | Documenso | https://github.com/documenso/documenso | Community edition AGPL-3.0; Enterprise commercial | Future signature workflow, approval-gated |
+| 8 | Nuxt | https://github.com/nuxt/nuxt | MIT | Future frontend option; no migration now |
+| 9 | Plausible Analytics | https://github.com/plausible/analytics | Community edition AGPLv3-or-later; JS tracker MIT | First analytics candidate for public website only |
+| 10 | Buddy | Claimed URL https://github.com/buddy-works/buddy returns 404; official product: https://buddy.works/ | Proprietary paid self-hosted license, not an open-source repo | Reject as open-source integration; current GitHub Actions remains |
 
-| Candidate | Category fit | Repository signal observed 21 Nov 2026 | License signal | Fit for LEGION |
-|---|---|---|---|---|
-| [Twenty](https://github.com/twentyhq/twenty) | Open-source CRM | Active; latest inspected commit 21 Nov 2026, `80f03c8` | Mostly AGPL-3.0; repository notes MIT-licensed packages and commercially licensed enterprise-marked files | **P1 — pilot candidate** |
-| [Documenso](https://github.com/documenso/documenso) | Electronic document signing | Active; latest inspected commit 20 Nov 2026, `80550e7` | Community edition AGPL-3.0; Enterprise edition commercial | **P2 — pilot after requirements check** |
-| [AppFlowy](https://github.com/AppFlowy-IO/AppFlowy) | Notion-like workspace | Latest inspected commit 28 Oct 2026, `8fcee27` | AGPL-3.0 badge and root license | **P3 — optional workspace** |
-| [Immich](https://github.com/immich-app/immich) | Self-hosted photos and video | Active; latest inspected commit 20 Nov 2026, `9b3d3d8` | AGPL-3.0 | **P4 — separate media service** |
-| [Stalwart](https://github.com/stalwartlabs/stalwart) | Mail and collaboration server | Active; latest inspected release commit 16 Nov 2026, `3adead9` (v1.1.1) | README shows AGPL-3.0; verify release-specific terms before use | **P5 — defer** |
+## Architecture decisions
 
-Repository activity and license labels above are discovery signals, not a security audit or legal opinion. Recheck the exact tag, dependency tree, license notices, and advisories before pinning a production version.
-
-## Deployment and operational constraints
-
-### Twenty — CRM
-
-- Official self-hosting documentation states at least **2 GB RAM**, with Docker and Docker Compose.
-- Generate and protect the `ENCRYPTION_KEY`; the vendor warns that losing it can make stored OAuth tokens, application variables, and TOTP secrets inaccessible.
-- The repository is mostly AGPL-3.0 but explicitly identifies MIT packages and files marked for commercial licensing. Review the actual files and packages used by any fork, hosted service, or proprietary integration.
-- LEGION integration proposal: store business leads and customer lifecycle records in Twenty; keep model orchestration and internal system state in KaricimGPT. Do not copy sensitive health, patient, or workplace records into a general CRM.
-
-Sources:
-- https://github.com/twentyhq/twenty
-- https://github.com/twentyhq/twenty/blob/main/LICENSE
-- https://github.com/twentyhq/twenty/blob/main/packages/twenty-docs/developers/self-host/capabilities/docker-compose.mdx
-
-### Documenso — document signing
-
-- Current self-hosting requirements list PostgreSQL 14+, an SMTP service, reverse proxy/TLS, and a `.p12` signing certificate.
-- The app may start without a signing certificate, but document signing will fail until one is configured.
-- Published hardware guidance: 1 CPU core / 1 GB RAM / 10 GB storage for testing; 2+ CPU cores / 2+ GB RAM / 20+ GB storage recommended for production.
-- The official docs warn that outbound-request checks for webhooks are not a complete SSRF mitigation and fail open. Production deployment therefore needs outbound network restrictions and an explicit egress policy.
-- LEGION integration proposal: use only for a user-approved document workflow. Add an approval step before sending a signature request; record document ID, signer status, timestamps, and a stable audit reference. Do not treat a self-hosted signature workflow as proof of jurisdiction-specific legal compliance.
-
-Sources:
-- https://docs.documenso.com/docs/self-hosting/getting-started/requirements
-- https://docs.documenso.com/docs/policies/licenses
-- https://docs.documenso.com/docs/self-hosting
-
-### AppFlowy — knowledge workspace
-
-- AppFlowy describes itself as an open-source Notion alternative and an AI workspace.
-- Its Cloud self-hosting architecture is a multi-service Docker deployment. The docs identify GoTrue authentication, AppFlowy Cloud HTTP/WebSocket services, PostgreSQL, MinIO, and administration interfaces.
-- That creates a separate identity, database, object-storage, and backup surface. This may be worthwhile for a shared human team workspace, but is not a replacement for LEGION's existing runtime memory or versioned digital-twin API.
-- LEGION integration proposal: defer until there is a specific need for a staff-facing wiki or task workspace. Use a dedicated service account and a one-way, selected-document sync rather than syncing all conversation or profile data.
-
-Sources:
-- https://github.com/AppFlowy-IO/AppFlowy
-- https://github.com/AppFlowy-IO/AppFlowy/blob/main/LICENSE
-- https://docs.appflowy.io/docs/documentation/appflowy-cloud/deployment
-
-### Immich — photo and video archive
-
-- The current official requirements specify **6 GB RAM minimum and 8 GB recommended**, and 2 CPU cores minimum / 4 recommended.
-- For a 4 GB host, the docs say it can be run with machine-learning features disabled. PostgreSQL needs a stable local SSD; its database should not be placed on a network share. Thumbnails and transcoded video can add roughly 10–20% to library storage.
-- Immich's README warns users to keep a 3-2-1 backup strategy and not to treat the application as the only copy of important media.
-- LEGION integration proposal: keep this out of the command core. Consider it only as an independent media/archive service with a tested backup and restore process.
-
-Sources:
-- https://docs.immich.app/install/requirements/
-- https://github.com/immich-app/immich
-- https://github.com/immich-app/immich/blob/main/LICENSE
-
-### Stalwart — mail server
-
-- Stalwart supports SMTP, IMAP, JMAP, CalDAV, CardDAV, and WebDAV.
-- Production mail delivery depends on a domain, static public IP, matching reverse-DNS/PTR, DNS control, and port 25 open in both directions. Many residential and cloud providers block port 25 by default.
-- The current memory guidance says the default configured limits can total about 2.4 GiB on a 2 GiB host; small deployments need explicit tuning.
-- LEGION integration proposal: do not replace managed email or an already functioning email connector with a new mail server yet. First prove DNS, PTR, port 25, abuse handling, spam controls, backups, and deliverability from the intended hosting provider.
-
-Sources:
-- https://www.stalwart.email/docs/install/requirements/
-- https://www.stalwart.email/docs/performance/memory/
-- https://github.com/stalwartlabs/stalwart
-
-## Proposed LEGION integration architecture
+KaricimGPT remains the orchestration and policy control plane. External products must remain separate services with explicit adapters. Do not import their application source code into the core repository merely to claim an integration.
 
 ```text
 KaricimGPT / LEGION control plane
-  ├─ existing MASTER BRAIN + guarded task queue
-  ├─ existing audit / self-test / maintenance endpoints
-  └─ integration adapter layer (proposed)
-       ├─ Twenty adapter       [CRM records, customer status]
-       ├─ Documenso adapter    [approved document workflows]
-       ├─ AppFlowy adapter     [selected team knowledge, optional]
-       ├─ Immich adapter       [media metadata, optional]
-       └─ Stalwart adapter     [mail protocols, deferred]
+  ├─ MASTER BRAIN, task queue, audit and maintenance
+  ├─ provider and service adapter boundary
+  │    ├─ Plausible       [website events and aggregated metrics]
+  │    ├─ Twenty          [optional CRM records]
+  │    ├─ Documenso       [approved signature requests]
+  │    └─ Anytype         [selected knowledge objects, optional]
+  └─ GitHub Actions      [existing CI; retain]
+  
+Separate optional services, not control-plane dependencies:
+  ├─ Papermark          [document sharing]
+  ├─ Immich             [photo/video archive]
+  └─ Jellyfin           [media streaming]
+  
+Not approved for production integration:
+  ├─ tldraw             [license key required]
+  ├─ Nuxt               [no migration case]
+  └─ Buddy              [claimed repo invalid; proprietary product]
 ```
 
-Adapter contract for any later implementation:
+### First implementation slice: analytics adapter
 
-- Configure base URL, credential reference, timeout, and allowed endpoints in server-side environment/configuration only.
-- Never put tokens, signing certificates, SMTP passwords, or encryption keys in Git, issues, browser code, logs, or model prompts.
-- Use least-privilege service identities, scoped API tokens, request-size limits, rate limits, and explicit outbound host allowlists.
-- Verify webhook signatures where supported; reject replayed events with idempotency keys.
-- Keep service data in its own database/storage. Only pass the minimum fields needed to LEGION.
-- Add a health check and a non-destructive authenticated smoke test for every adapter.
-- Default all write actions to disabled until a separate approval gate is added and tested.
-- Keep backup, restore, upgrade, and incident runbooks independent for each service.
+Plausible is the best first candidate only if the public KaricimGPT website has a stable production domain and a need for first-party site metrics.
 
-## Release gates
+- Start with a narrowly scoped page-view and event integration; do not ingest personal or sensitive user data.
+- Keep YouTube channel performance in the existing YouTube/Supermetrics reporting flow.
+- Prefer a pinned, documented release and a separate deployment over bundling Plausible into the Node.js application.
+- Before enabling a tracker, confirm the exact production domain, data-retention needs, privacy notice, consent requirements, and hosting capacity.
+- Plausible Community Edition uses AGPLv3-or-later. Review obligations before modifying or offering a network-accessible modified service.
 
-No service is considered integrated or production-ready until all applicable checks pass:
+No tracker was added to the frontend in this documentation-only change because the production domain and privacy configuration have not been verified.
 
-1. Exact release tag and commit are pinned; dependency and license review is complete.
-2. A deployment target with measured CPU/RAM/storage capacity is identified.
-3. Secrets are provisioned in the target's secret manager, not in the repository.
-4. Network exposure, TLS, DNS, webhook ingress, and outbound egress are reviewed.
-5. Backups are created and a restore test is recorded.
-6. Health, authentication, permissions, and API smoke tests pass.
-7. LEGION adapter tests cover timeouts, malformed payloads, duplicate events, denied permissions, and provider outages.
-8. A human approves production enablement and any external write action.
+## Deployment and integration gates
+
+Any future service pilot must satisfy all applicable gates:
+
+1. Pin a reviewed release tag and commit; inspect dependency and license notices.
+2. Identify the target host and measure CPU, RAM, storage, and network requirements.
+3. Put credentials in the target secret manager or server environment only; never commit keys, tokens, signing certificates, or SMTP passwords.
+4. Define TLS, DNS, ingress, outbound egress, webhook signature checks, and rate limits.
+5. Keep each service's data in its own database/storage and sync only the minimum fields needed.
+6. Test backup and restore before importing real data.
+7. Add health checks and non-destructive authenticated smoke tests.
+8. Make external writes approval-gated and idempotent.
+9. Record service owner, upgrade path, incident runbook, and rollback plan.
+10. Obtain human approval before production enablement.
+
+## Verified repository facts and official references
+
+- Anytype application licensing and architecture: https://github.com/anyproto/anytype-ts ; https://anytype.io/faq/ ; https://github.com/anyproto/legal-docs
+- Twenty repository and license: https://github.com/twentyhq/twenty ; https://github.com/twentyhq/twenty/blob/main/LICENSE
+- Papermark repository, license, and self-hosting terms: https://github.com/papermark/papermark ; https://github.com/papermark/papermark/blob/main/LICENSE ; https://www.papermark.com/help/article/self-hosting
+- Immich requirements and license: https://github.com/immich-app/immich/blob/main/docs/docs/install/requirements.md ; https://github.com/immich-app/immich/blob/main/LICENSE
+- Jellyfin license and overview: https://github.com/jellyfin/jellyfin ; https://github.com/jellyfin/jellyfin/blob/master/LICENSE
+- tldraw production license: https://tldraw.dev/community/license ; https://github.com/tldraw/tldraw/blob/main/LICENSE.md
+- Documenso requirements and license: https://docs.documenso.com/docs/self-hosting/getting-started/requirements ; https://docs.documenso.com/docs/policies/licenses
+- Nuxt README and MIT license: https://github.com/nuxt/nuxt ; https://github.com/nuxt/nuxt/blob/main/LICENSE
+- Plausible self-hosting and license: https://github.com/plausible/analytics ; https://plausible.github.io/docs/self-hosting
+- Buddy self-hosted license: https://buddy.works/enterprise-license
 
 ## Current status
 
-- This review is documentation only.
-- No container has been deployed.
-- No external service has been connected to production.
-- No user or customer records have been copied.
-- No credentials or API keys have been added to Git.
-- The ten-item PDF list remains unverified; this review must be reconciled if the original PDF becomes available.
-
-## Review sources
-
-All official documentation and GitHub repositories linked above were accessed on 21 November 2026. Recheck moving requirements and licensing before a production rollout.
+- Instagram carousel inspected: 10 slides. No PDF was attached to the post.
+- Repository / product identities and license caveats recorded above.
+- This change updates architecture decisions and documentation only.
+- No third-party service has been deployed or connected.
+- No production credentials, user records, or personal data have been copied.
+- Existing GitHub Actions CI remains the automation baseline.
+- The pull request is for review; it has not been merged or deployed.
