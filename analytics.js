@@ -5,10 +5,16 @@
     'Council Mode Enabled',
     'Chat Exported'
   ]);
+  const pendingEvents = [];
+  let trackingEnabled = false;
 
   window.karicimTrack = (eventName) => {
-    if (!allowedEvents.has(eventName) || typeof window.plausible !== 'function') return;
-    window.plausible(eventName);
+    if (!allowedEvents.has(eventName)) return;
+    if (trackingEnabled && typeof window.plausible === 'function') {
+      window.plausible(eventName);
+    } else {
+      pendingEvents.push(eventName);
+    }
   };
 
   async function initializeAnalytics() {
@@ -20,24 +26,34 @@
     if (!response.ok) return;
 
     const config = await response.json();
-    if (config.enabled !== true || !config.domain || location.hostname.toLowerCase() !== config.domain) return;
-    if (config.scriptUrl !== 'https://plausible.io/js/script.js') return;
+    if (config.enabled !== true || !config.domain || location.hostname.toLowerCase() !== config.domain) {
+      pendingEvents.length = 0;
+      return;
+    }
+    if (config.scriptUrl !== 'https://plausible.io/js/script.js') {
+      pendingEvents.length = 0;
+      return;
+    }
 
     window.plausible = window.plausible || function () {
       (window.plausible.q = window.plausible.q || []).push(arguments);
     };
+    trackingEnabled = true;
+    for (const eventName of pendingEvents.splice(0)) window.plausible(eventName);
 
     const script = document.createElement('script');
     script.defer = true;
     script.dataset.domain = config.domain;
     script.src = config.scriptUrl;
     script.onerror = () => {
+      trackingEnabled = false;
       window.karicimTrack = () => {};
     };
     document.head.appendChild(script);
   }
 
   initializeAnalytics().catch(() => {
+    pendingEvents.length = 0;
     window.karicimTrack = () => {};
   });
 })();
