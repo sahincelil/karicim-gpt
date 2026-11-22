@@ -62,10 +62,11 @@ modules:
     personal_data_collection: false
     evidence: docs/FAMILY_SHIELD_MVP.md
   osint_guard:
-    status: planned
-    mode: consent_based_manual_first_self_audit
+    status: partial
+    mode: local_only_consent_based_manual_self_audit
     automated_scanning: false
-    evidence: docs/OSINT_GUARD.md
+    credentials_collected: false
+    evidence: osint-guard/index.html
   device_mesh:
     status: blocked
     mode: owner_enrolled_private_nodes_only
