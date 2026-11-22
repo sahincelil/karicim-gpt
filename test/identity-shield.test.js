@@ -28,6 +28,6 @@ test('OSINT GUARD is manual-first and never performs remote scans or credential 
 });
 
 test('server explicitly serves both Identity Shield static pages', () => {
-  assert.match(server, /family-shield\\\/index\\\.html/);
-  assert.match(server, /osint-guard\\\/index\\\.html/);
+  assert.ok(server.includes('family-shield' + String.fromCharCode(92) + '/index' + String.fromCharCode(92) + '.html'));
+  assert.ok(server.includes('osint-guard' + String.fromCharCode(92) + '/index' + String.fromCharCode(92) + '.html'));
 });
