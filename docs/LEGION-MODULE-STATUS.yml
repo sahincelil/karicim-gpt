@@ -9,6 +9,11 @@ status_legend:
   planned: Design or documentation only.
   blocked: Requires external permission, credentials, supported infrastructure, or human action.
 modules:
+  open_intelligence_network:
+    status: planned
+    mode: provider_neutral_model_registry_and_local_open_model_adapters
+    live_provider_connectivity_verified: false
+    evidence: docs/LEGION-OPEN-INTELLIGENCE.md
   master_brain:
     status: implemented
     mode: bounded_issue_planning
