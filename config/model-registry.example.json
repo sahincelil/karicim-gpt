@@ -1,0 +1,71 @@
+{
+  "schemaVersion": 1,
+  "defaultAlias": "general",
+  "routing": {
+    "mode": "policy",
+    "fallbackOn": ["timeout", "rate_limit", "provider_unavailable"],
+    "maxAttempts": 2,
+    "maxConcurrentPerProvider": 2
+  },
+  "providers": {
+    "ollama-local": {
+      "type": "openai-compatible",
+      "enabled": false,
+      "baseUrlEnv": "OLLAMA_BASE_URL",
+      "apiKeyEnv": null,
+      "licenseReviewRequired": true
+    },
+    "vllm-local": {
+      "type": "openai-compatible",
+      "enabled": false,
+      "baseUrlEnv": "VLLM_BASE_URL",
+      "apiKeyEnv": "VLLM_API_KEY",
+      "licenseReviewRequired": true
+    },
+    "openrouter": {
+      "type": "openai-compatible",
+      "enabled": false,
+      "baseUrl": "https://openrouter.ai/api/v1",
+      "apiKeyEnv": "OPENROUTER_API_KEY",
+      "licenseReviewRequired": false
+    },
+    "openai": {
+      "type": "responses-api",
+      "enabled": false,
+      "apiKeyEnv": "OPENAI_API_KEY",
+      "licenseReviewRequired": false
+    }
+  },
+  "models": {
+    "general": {
+      "provider": "ollama-local",
+      "model": "REPLACE_WITH_INSTALLED_MODEL_ID",
+      "enabled": false,
+      "roles": ["general", "research", "analysis"]
+    },
+    "coder": {
+      "provider": "ollama-local",
+      "model": "REPLACE_WITH_CODE_MODEL_ID",
+      "enabled": false,
+      "roles": ["engineering"]
+    },
+    "commercial-fallback": {
+      "provider": "openrouter",
+      "model": "REPLACE_WITH_APPROVED_MODEL_ID",
+      "enabled": false,
+      "roles": ["general", "research", "analysis", "engineering"]
+    },
+    "openai-reasoning": {
+      "provider": "openai",
+      "model": "SET_APPROVED_OPENAI_MODEL_ID",
+      "enabled": false,
+      "roles": ["reasoning", "review"]
+    }
+  },
+  "budgets": {
+    "maxOutputTokens": 2048,
+    "requestTimeoutMs": 45000,
+    "dailySpendLimitUsd": 0,
+    "requireExplicitEnablement": true
+  }
+}
