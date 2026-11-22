@@ -55,6 +55,17 @@ modules:
     live_integrations: false
     automated_response: false
     evidence: cyber-shield/index.html
+  family_shield:
+    status: partial
+    mode: local_only_family_identity_verification_education
+    backend: false
+    personal_data_collection: false
+    evidence: docs/FAMILY_SHIELD_MVP.md
+  osint_guard:
+    status: planned
+    mode: consent_based_manual_first_self_audit
+    automated_scanning: false
+    evidence: docs/OSINT_GUARD.md
   device_mesh:
     status: blocked
     mode: owner_enrolled_private_nodes_only
@@ -71,9 +82,9 @@ modules:
     evidence: docs/LEGION-ASCENSION.md
   system_archive:
     status: partial
-    mode: content_research_and_planning
+    mode: identity_safety_content_packages_prepared
     publishing_authorization_required: true
-    evidence: docs/LEGION-ASCENSION.md
+    evidence: docs/SYSTEM_ARCHIVE_IDENTITY_SERIES.md
 governance:
   model_output_is_untrusted: true
   require_human_review_before_merge: true
