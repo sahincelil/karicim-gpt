@@ -40,3 +40,5 @@ startHeartbeat({ health: async () => { await memoryHealth(); }, memoryMaintenanc
 server.listen(port, '0.0.0.0', () => console.log(`KaricimGPT Body listening on ${port}`));
 process.on('SIGTERM', () => { stopHeartbeat(); server.close(() => process.exit(0)); });
 process.on('SIGINT', () => { stopHeartbeat(); server.close(() => process.exit(0)); });
+process.on('SIGTERM', () => { stopHeartbeat(); server.close(() => process.exit(0)); });
+process.on('SIGINT', () => { stopHeartbeat(); server.close(() => process.exit(0)); });
