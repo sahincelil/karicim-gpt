@@ -14,6 +14,7 @@ Repo: https://github.com/sahincelil/karicim-gpt
 - [LEGION FAMILY SHIELD MVP documentation](docs/FAMILY_SHIELD_MVP.md)
 - [LEGION IDENTITY SHIELD roadmap](docs/IDENTITY_SHIELD_ROADMAP.md)
 - [LEGION OSINT GUARD specification](docs/OSINT_GUARD.md)
+- [LEGION OSINT GUARD app](osint-guard/index.html)
 - [SYSTEM ARCHIVE identity safety series](docs/SYSTEM_ARCHIVE_IDENTITY_SERIES.md)
 - [Landing page preview (HTML file; not deployed)](docs/landing-page-preview.html)
 - [Zero-budget validation kit](docs/ZERO_BUDGET_VALIDATION_KIT.md)
