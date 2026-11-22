@@ -1,0 +1,47 @@
+name: COMMAND-0 Compute Sandbox
+
+on:
+  pull_request:
+    paths:
+      - "command0_compute/**"
+      - ".github/workflows/command0-compute.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  shard:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { shard: 0, start: 0, stop: 10000 }
+          - { shard: 1, start: 10000, stop: 20000 }
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run bounded CPU shard
+        run: python3 command0_compute/worker.py run --start ${{ matrix.start }} --stop ${{ matrix.stop }} --node cloud-${{ matrix.shard }} --output result-${{ matrix.shard }}.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: command0-shard-${{ matrix.shard }}
+          path: result-${{ matrix.shard }}.json
+          retention-days: 1
+
+  verify:
+    needs: shard
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: command0-shard-*
+          path: results
+          merge-multiple: true
+      - name: Verify complete distributed result
+        run: |
+          python3 command0_compute/worker.py self-test
+          python3 command0_compute/worker.py verify --start 0 --stop 20000 --files results/result-0.json results/result-1.json
