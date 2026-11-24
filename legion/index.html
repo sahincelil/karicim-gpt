@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0b0d14">
+  <meta name="description" content="LEGION INDEPENDENT AI hybrid command center">
+  <title>LEGION INDEPENDENT AI</title>
+  <link rel="stylesheet" href="./styles.css">
+  <script src="./app.js" defer></script>
+</head>
+<body>
+  <div class="layout">
+    <aside class="rail">
+      <a class="brand" href="#overview"><span class="sigil">L</span><span><b>LEGION</b><small>INDEPENDENT AI</small></span></a>
+      <p class="eyebrow">COMMAND DECK</p>
+      <nav>
+        <a class="nav active" href="#overview" data-view="overview">◈ <span>Overview</span></a>
+        <a class="nav" href="#intelligence" data-view="intelligence">✳ <span>Intelligence</span></a>
+        <a class="nav" href="#agents" data-view="agents">⌘ <span>Agent Forge</span></a>
+        <a class="nav" href="#audit" data-view="audit">◎ <span>Audit trail</span></a>
+        <a class="nav" href="#control" data-view="control">⚙ <span>Control plane</span></a>
+      </nav>
+      <div class="rail-foot"><span class="pulse"></span><div><b>OWNER CONTROL</b><small>All privileged actions gated</small></div></div>
+    </aside>
+    <main>
+      <header><div class="crumb">LEGION OS <span>/</span> <b id="crumb">Overview</b></div><div class="top-right"><span class="mode">HYBRID MODE</span><button id="refresh" class="quiet">↻ Refresh</button></div></header>
+      <section id="overview" class="view active">
+        <div class="hero">
+          <div><p class="eyebrow">INDEPENDENT INTELLIGENCE NETWORK</p><h1>Your intelligence.<br><em>Your infrastructure.</em></h1><p class="lead">One control plane for local models, cloud intelligence and bounded autonomous workflows. Your keys, your data, your decisions.</p><div class="actions"><a class="button primary" href="#agents">Open Agent Forge ↗</a><a class="button secondary" href="#intelligence">Configure models</a></div></div>
+          <div class="core-art"><div class="ring r1"></div><div class="ring r2"></div><div class="ring r3"></div><div class="core">L<span>CORE</span></div><i class="sat s1">⌘</i><i class="sat s2">◉</i><i class="sat s3">⌬</i></div>
+        </div>
+        <div class="section-title"><div><p class="eyebrow">LIVE SYSTEM SNAPSHOT</p><h2>Command overview</h2></div><small>Runtime checks · Live</small></div>
+        <div class="stats">
+          <article class="stat"><span>Cloud gateway</span><strong id="cloud-state">Checking…</strong><small id="cloud-detail">Waiting for health response</small></article>
+          <article class="stat"><span>Local inference</span><strong id="local-state">Not connected</strong><small id="local-detail">Ollama · local device</small></article>
+          <article class="stat"><span>Agent queue</span><strong id="queue-count">00</strong><small id="queue-detail">0 active · 0 completed</small></article>
+          <article class="stat"><span>Governance</span><strong>Owner-led</strong><small>Approval required for external writes</small></article>
+        </div>
+        <div class="columns">
+          <article class="panel"><div class="panel-head"><div><p class="eyebrow">INFRASTRUCTURE</p><h3>Hybrid topology</h3></div><span>⌬</span></div>
+            <div class="node"><i>☁</i><div><b>Cloud gateway</b><small>Vercel serverless health endpoint</small></div><span id="cloud-badge" class="badge pending">CHECKING</span></div>
+            <div class="connector"></div>
+            <div class="node"><i>⌘</i><div><b>Local inference node</b><small>Ollama · user-owned machine</small></div><span id="local-badge" class="badge pending">UNTESTED</span></div>
+            <div class="connector"></div>
+            <div class="node"><i>▣</i><div><b>Mobile command surface</b><small>Responsive web app · iPhone ready</small></div><span class="badge ready">READY</span></div>
+          </article>
+          <article class="panel"><div class="panel-head"><div><p class="eyebrow">OPERATIONS</p><h3>Quick actions</h3></div><span>↗</span></div>
+            <a class="quick" href="#intelligence"><i>✳</i><span><b>Model registry</b><small>Local and cloud providers</small></span>›</a>
+            <a class="quick" href="#agents"><i>⌘</i><span><b>Launch workflow</b><small>Create and track tasks</small></span>›</a>
+            <a class="quick" href="#control"><i>⚙</i><span><b>Governance policies</b><small>Permissions and approvals</small></span>›</a>
+          </article>
+        </div>
+      </section>
+
+      <section id="intelligence" class="view">
+        <div class="page-head"><p class="eyebrow">MODEL ORCHESTRATION</p><h1>Intelligence registry</h1><p>Connect engines without surrendering control of credentials or compute.</p></div>
+        <div class="notice">Provider adapters are not active yet. This release verifies local reachability and cloud health; it does not claim that model inference is connected.</div>
+        <div class="providers">
+          <article class="panel"><div class="provider-icon">⌘</div><h3>Ollama · Local</h3><p>Private inference on your own computer.</p><span id="ollama-status" class="badge pending">NOT CONNECTED</span></article>
+          <article class="panel"><div class="provider-icon">☁</div><h3>Cloud model APIs</h3><p>OpenAI-compatible and other providers.</p><span class="badge pending">NOT CONFIGURED</span></article>
+          <article class="panel"><div class="provider-icon">⌬</div><h3>Open model gateways</h3><p>Self-hosted or third-party inference gateways.</p><span class="badge pending">NOT CONFIGURED</span></article>
+        </div>
+        <article class="panel form-panel"><p class="eyebrow">LOCAL RUNTIME</p><h3>Ollama connection</h3><label for="ollama-url">Local endpoint</label><div class="inline"><input id="ollama-url" value="http://localhost:11434" spellcheck="false"><button id="test-ollama" class="button primary">Test node</button></div><small>Run this dashboard on the same computer as Ollama. Configure OLLAMA_ORIGINS with this exact site origin if browser CORS blocks the request.</small><p id="ollama-result" class="result" aria-live="polite"></p></article>
+      </section>
+
+      <section id="agents" class="view">
+        <div class="page-head"><p class="eyebrow">BOUNDED AUTONOMOUS WORKFLOWS</p><h1>Agent Forge</h1><p>Create task packets and track their state. This MVP queues work locally; it does not execute background agents.</p></div>
+        <article class="panel form-panel"><p class="eyebrow">NEW OPERATION</p><h3>Queue a task</h3><label for="task-title">Task name</label><input id="task-title" placeholder="e.g. Compare local model options" maxlength="120"><label for="task-detail">Instructions</label><textarea id="task-detail" rows="3" placeholder="Define the expected outcome and constraints" maxlength="1200"></textarea><button id="add-task" class="button primary">＋ Add to queue</button><p id="task-result" class="result" aria-live="polite"></p></article>
+        <div class="section-title"><div><p class="eyebrow">WORKFLOW BOARD</p><h2>Task queue <span id="task-total" class="count">0</span></h2></div></div><div id="tasks" class="task-list"></div>
+      </section>
+
+      <section id="audit" class="view">
+        <div class="page-head"><p class="eyebrow">TRANSPARENCY LAYER</p><h1>Audit trail</h1><p>Local record of operator actions in this browser.</p></div>
+        <div class="stats compact"><article class="stat"><span>Recorded events</span><strong id="audit-count">0</strong></article><article class="stat"><span>Storage scope</span><strong>Browser-local</strong></article></div><article class="panel"><div id="audit-list" class="audit-list"></div></article>
+      </section>
+
+      <section id="control" class="view">
+        <div class="page-head"><p class="eyebrow">OWNER CONTROL PLANE</p><h1>Control & governance</h1><p>Owner-defined policy, explicit approval gates and visible integration state.</p></div>
+        <div class="columns">
+          <article class="panel"><p class="eyebrow">AUTONOMY POLICY</p><h3>Approval boundaries</h3>
+            <div class="policy"><b>✓</b><span><strong>External actions require approval</strong><small>Publishing, messages, purchases and account changes.</small></span></div>
+            <div class="policy"><b>✓</b><span><strong>Credentials stay server-side</strong><small>Never store provider keys in browser storage or Git.</small></span></div>
+            <div class="policy"><b>✓</b><span><strong>Audit visibility</strong><small>Operator actions produce readable local events.</small></span></div>
+            <div class="policy"><b>✓</b><span><strong>Least-privilege integrations</strong><small>Enable only the tools and scopes required by each task.</small></span></div>
+          </article>
+          <article class="panel"><p class="eyebrow">RUNTIME ENDPOINTS</p><h3>Connection map</h3>
+            <div class="endpoint"><span>Cloud health</span><code>/api/legion-health</code><b id="endpoint-cloud" class="badge pending">CHECKING</b></div>
+            <div class="endpoint"><span>Local inference</span><code id="endpoint-local">localhost:11434</code><b id="endpoint-local-state" class="badge pending">UNTESTED</b></div>
+            <div class="endpoint"><span>Persistent cloud memory</span><code>Not connected</code><b class="badge pending">PENDING</b></div>
+          </article>
+        </div>
+        <article class="panel form-panel"><p class="eyebrow">DATA & PRIVACY</p><h3>Workspace storage</h3><p class="muted">Tasks, endpoint preference and audit entries are stored in this browser. Supabase/PostgreSQL persistence, authentication and cross-device sync are not connected in this MVP.</p><button id="clear-data" class="button secondary">Clear local workspace data</button></article>
+      </section>
+      <footer><span>LEGION INDEPENDENT AI · MVP 0.1</span><span>OWNER-CONTROLLED · HYBRID BY DESIGN</span></footer>
+    </main>
+  </div>
+  <div id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
