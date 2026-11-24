@@ -128,7 +128,10 @@ async function callWithAutoFallback(messages, controller) {
       console.warn('OpenAI unavailable; trying OpenRouter fallback.', { status: error?.status, message: error?.message });
     }
   }
-  if (process.env.OPENROUTER_API_KEY) return callOpenRouter(messages, process.env.OPENROUTER_API_KEY, controller);
+  if (process.env.OPENROUTER_API_KEY) {
+    try { return await callOpenRouter(messages, process.env.OPENROUTER_API_KEY, controller); }
+    catch (error) { if (error?.name === 'AbortError') throw error; console.warn('OpenRouter unavailable; continuing provider fallback.', { status: error?.status }); }
+  }
   if (process.env.XAI_API_KEY) {
     try { return await callXai(messages, process.env.XAI_API_KEY, controller); }
     catch (error) { if (error?.name === 'AbortError') throw error; console.warn('xAI unavailable; trying local Ollama fallback.', { status: error?.status }); }
