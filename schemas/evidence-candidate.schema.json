@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/sahincelil/karicim-gpt/blob/main/schemas/evidence-candidate.schema.json",
+  "title": "LEGION RAG Evidence Candidate",
+  "description": "Bounded retrieval result passed to the LEGION evidence gate before model generation.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["title", "content", "source_url"],
+  "properties": {
+    "id": { "type": "string", "maxLength": 128 },
+    "title": { "type": "string", "minLength": 1, "maxLength": 240 },
+    "content": { "type": "string", "minLength": 1, "maxLength": 8000 },
+    "source_name": { "type": "string", "maxLength": 120 },
+    "source_url": { "type": "string", "format": "uri", "maxLength": 2048 },
+    "published_at": { "type": "string", "format": "date-time" }
+  }
+}

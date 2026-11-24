@@ -2,7 +2,7 @@ schema_version: 1
 project: LEGION GODFORGE
 repository: sahincelil/karicim-gpt
 default_branch: main
-last_reviewed: 2026-11-19
+last_reviewed: 2026-11-22
 status_legend:
   implemented: Source or workflow exists; not necessarily live in production.
   partial: Some components exist; integration or evidence remains incomplete.
@@ -20,6 +20,17 @@ modules:
       max_concurrent_workers: 3
       max_subtasks_per_plan: 5
     evidence: docs/LEGION-ASCENSION.md
+  rag_evidence_gate:
+    status: partial
+    mode: bounded_source_validation_and_ranked_prompt_context
+    limits:
+      max_candidates: 12
+      max_selected_sources: 6
+      max_excerpt_chars: 8000
+    evidence:
+      - docs/RAG_EVIDENCE_GATE.md
+      - lib/evidence-gate.js
+      - api/agent.js
   autonomous_factory:
     status: partial
     mode: tests_and_reviewable_change_proposals
