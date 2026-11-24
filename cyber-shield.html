@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="LEGION CYBER SHIELD Patch Window Sentinel: read-only vulnerability prioritization.">
+<meta name="theme-color" content="#0b0d10">
+<title>LEGION CYBER SHIELD | Patch Window Sentinel</title>
+<style>
+:root{color-scheme:dark;--bg:#0b0d10;--panel:#14191f;--line:#2a333c;--text:#edf2f6;--muted:#9aa8b5;--accent:#b9e3c6;--red:#ff8c8c;--orange:#ffbd75;--yellow:#f3df82;--green:#90d4a5}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 10% 0,#19221e 0,#0b0d10 44%);color:var(--text);font:15px/1.55 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+main{max-width:1100px;margin:auto;padding:26px 18px 48px}header{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:20px}
+.brand{font-size:12px;letter-spacing:.16em;color:var(--accent);font-weight:700}.back{color:var(--muted);text-decoration:none;border:1px solid var(--line);border-radius:10px;padding:8px 12px}
+h1{font-size:clamp(28px,5vw,44px);line-height:1.08;margin:10px 0 8px;letter-spacing:-.035em}.sub{color:var(--muted);max-width:790px;margin:0 0 22px}
+.panel{background:rgba(20,25,31,.94);border:1px solid var(--line);border-radius:16px;padding:18px;margin:16px 0}
+.panel h2{font-size:17px;margin:0 0 7px}.hint{font-size:13px;color:var(--muted);margin:0 0 12px}
+textarea{display:block;width:100%;min-height:270px;resize:vertical;background:#0a0e12;color:#e8eef3;border:1px solid #34404a;border-radius:12px;padding:13px;font:12px/1.5 ui-monospace,SFMono-Regular,Consolas,monospace}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}button{border:1px solid var(--line);border-radius:10px;background:#1b2922;color:var(--accent);font-weight:700;padding:11px 15px;cursor:pointer}button.secondary{background:#161c23;color:var(--text)}button:disabled{opacity:.55;cursor:wait}
+#status{font-size:13px;color:var(--muted);min-height:22px;margin-top:12px}.error{color:var(--red)!important}
+#results[hidden]{display:none}.metrics{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:9px;margin:12px 0 16px}
+.metric{border:1px solid var(--line);border-radius:12px;padding:12px;background:#10151a}.metric strong{display:block;font-size:23px}.metric span{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.result-list{display:grid;gap:10px}.finding{border:1px solid var(--line);border-radius:12px;padding:14px;background:#10151a}.finding-top{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}.finding h3{margin:0;font-size:15px}.meta{color:var(--muted);font-size:12px;margin-top:4px}
+.priority{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;border-radius:999px;padding:4px 8px;border:1px solid var(--line)}
+.critical{color:var(--red);border-color:#774444}.high{color:var(--orange);border-color:#755638}.medium{color:var(--yellow);border-color:#716533}.low{color:var(--green);border-color:#3d6a4a}.resolved{color:var(--green);border-color:#3d6a4a}
+.evidence{margin:10px 0 0;padding-left:18px;color:#c5d0d9;font-size:13px}.recommend{font-size:13px;margin:10px 0 0;color:var(--accent)}
+.sources{display:flex;gap:12px;flex-wrap:wrap;margin-top:12px}.sources a{font-size:12px;color:var(--accent)}
+.footer{font-size:12px;color:var(--muted);padding:8px 2px}
+@media(max-width:640px){main{padding:18px 12px 36px}.metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.metric:last-child{grid-column:span 2}}
+</style>
+</head>
+<body>
+<main>
+<header><div class="brand">LEGION / CYBER SHIELD</div><a class="back" href="/">← KaricimGPT</a></header>
+<h1>Patch Window Sentinel</h1>
+<p class="sub">Envanterindeki CVE bulgularını CISA KEV ve FIRST EPSS verileriyle zenginleştir, açıklanabilir öncelik sırasına koy ve yama yaşam döngüsünü takip et.</p>
+<section class="panel">
+<h2>1. Varlık envanterini gir</h2>
+<p class="hint">Bu prototip yalnızca senin verdiğin CVE kimliklerini değerlendirir. Ağ taraması yapmaz, ürün/sürüm keşfetmez ve envanteri kalıcı olarak saklamaz. Örnek kayıt sentetiktir.</p>
+<textarea id="inventory" spellcheck="false" aria-label="JSON varlık envanteri"></textarea>
+<div class="actions"><button id="analyze" type="button">Envanteri analiz et</button><button id="demo" class="secondary" type="button">Demo envanterini yükle</button></div>
+<div id="status" role="status" aria-live="polite"></div>
+</section>
+<section id="results" class="panel" hidden>
+<h2>2. Önceliklendirme sonucu</h2>
+<p id="summary-text" class="hint"></p>
+<div id="metrics" class="metrics"></div>
+<div id="finding-list" class="result-list"></div>
+<div id="source-links" class="sources"></div>
+</section>
+<p class="footer">Read-only MVP · Üretim değişikliği, yama, hesap kapatma veya containment işlemi yapmaz. Herhangi bir düzeltme işlemi müşteri onayı ve mevcut değişiklik yönetimi süreci gerektirir.</p>
+</main>
+<script src="/cyber-shield.js" defer></script>
+</body></html>

@@ -7,6 +7,8 @@ Repo: https://github.com/sahincelil/karicim-gpt
 - [Execution dashboard and verified status](docs/EXECUTION_DASHBOARD.md)
 - [LEGION GODFORGE command center](docs/LEGION-GODFORGE-COMMAND-CENTER.md)
 - [LEGION module status registry](docs/LEGION-MODULE-STATUS.yml)
+- [LEGION Cyber Shield — Agentic Threat Defense Blueprint](docs/LEGION_CYBER_SHIELD_AGENTIC_DEFENSE.md)
+- [Patch Window Sentinel prototype page](cyber-shield.html)
 - [LEGION GitHub control plane and private node operations](docs/LEGION-GITHUB-NODE-OPERATIONS.md)
 - [Landing page preview (HTML file; not deployed)](docs/landing-page-preview.html)
 - [Zero-budget validation kit](docs/ZERO_BUDGET_VALIDATION_KIT.md)
