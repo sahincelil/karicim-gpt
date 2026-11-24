@@ -4,6 +4,7 @@ Repo: https://github.com/sahincelil/karicim-gpt
 
 ## Project cockpit
 
+- [LEGION INDEPENDENT AI MVP](docs/LEGION_INDEPENDENT_AI_MVP.md) · [Open command surface](../legion/)
 - [Execution dashboard and verified status](docs/EXECUTION_DASHBOARD.md)
 - [LEGION GODFORGE command center](docs/LEGION-GODFORGE-COMMAND-CENTER.md)
 - [LEGION module status registry](docs/LEGION-MODULE-STATUS.yml)
@@ -28,6 +29,10 @@ Repo: https://github.com/sahincelil/karicim-gpt
 - [Canva editable design](https://www.canva.com/d/5cQoYrVz2r4mFg7)
 
 > Status discipline: GitHub's Vercel integration has reported Ready preview deployments for recent LEGION changes. A production deployment and live provider connectivity are not yet verified; server-side provider credentials and authenticated smoke tests are still required. No customer outreach or revenue is confirmed.
+
+## LEGION INDEPENDENT AI
+
+The hybrid MVP is available under `/legion/`. It includes a serverless health endpoint, local Ollama reachability test, browser-local task queue and audit trail. Persistent cloud memory, provider inference adapters, authentication and autonomous worker execution are explicitly pending. See [the implementation and rollout gates](docs/LEGION_INDEPENDENT_AI_MVP.md).
 
 ## AI motoru
 
