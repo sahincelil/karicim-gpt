@@ -1,5 +1,6 @@
 import { rateLimit, securityHeaders } from '../lib/security.js';
 import { buildDigitalTwinContext } from '../lib/digital-twin.js';
+import { callOllama } from '../lib/ollama-provider.js';
 
 const MAX_MESSAGE_CHARS = 12000;
 const MAX_MESSAGES = 20;
@@ -35,6 +36,7 @@ async function systemPrompt() {
 }
 
 function providerKey(provider) {
+  if (provider === 'ollama') return Boolean(process.env.OLLAMA_BASE_URL);
   return provider === 'openai' ? process.env.OPENAI_API_KEY : provider === 'xai' ? process.env.XAI_API_KEY : process.env.OPENROUTER_API_KEY;
 }
 
@@ -126,8 +128,15 @@ async function callWithAutoFallback(messages, controller) {
       console.warn('OpenAI unavailable; trying OpenRouter fallback.', { status: error?.status, message: error?.message });
     }
   }
-  if (process.env.OPENROUTER_API_KEY) return callOpenRouter(messages, process.env.OPENROUTER_API_KEY, controller);
-  if (process.env.XAI_API_KEY) return callXai(messages, process.env.XAI_API_KEY, controller);
+  if (process.env.OPENROUTER_API_KEY) {
+    try { return await callOpenRouter(messages, process.env.OPENROUTER_API_KEY, controller); }
+    catch (error) { if (error?.name === 'AbortError') throw error; console.warn('OpenRouter unavailable; continuing provider fallback.', { status: error?.status }); }
+  }
+  if (process.env.XAI_API_KEY) {
+    try { return await callXai(messages, process.env.XAI_API_KEY, controller); }
+    catch (error) { if (error?.name === 'AbortError') throw error; console.warn('xAI unavailable; trying local Ollama fallback.', { status: error?.status }); }
+  }
+  if (process.env.OLLAMA_BASE_URL) return callOllama(messages, await systemPrompt(), controller);
   throw Object.assign(new Error('No AI provider configured'), { status: 503 });
 }
 
@@ -141,9 +150,9 @@ export default async function handler(req, res) {
   if (!messages.length || messages[messages.length - 1].role !== 'user') return json(res, 400, { error: 'Son mesaj kullanıcı mesajı olmalı.' });
 
   const requestedProvider = (process.env.AI_PROVIDER || 'auto').toLowerCase();
-  const provider = ['openai', 'xai', 'openrouter', 'auto'].includes(requestedProvider) ? requestedProvider : 'auto';
+  const provider = ['openai', 'xai', 'openrouter', 'ollama', 'auto'].includes(requestedProvider) ? requestedProvider : 'auto';
   if (provider !== 'auto' && !providerKey(provider)) {
-    const keyName = provider === 'openai' ? 'OPENAI_API_KEY' : provider === 'xai' ? 'XAI_API_KEY' : 'OPENROUTER_API_KEY';
+    const keyName = provider === 'ollama' ? 'OLLAMA_BASE_URL' : provider === 'openai' ? 'OPENAI_API_KEY' : provider === 'xai' ? 'XAI_API_KEY' : 'OPENROUTER_API_KEY';
     return json(res, 503, { error: `${keyName} sunucuda yapılandırılmamış.` });
   }
 
@@ -156,7 +165,9 @@ export default async function handler(req, res) {
         ? await callOpenAI(messages, process.env.OPENAI_API_KEY, controller)
         : provider === 'xai'
           ? await callXai(messages, process.env.XAI_API_KEY, controller)
-          : await callOpenRouter(messages, process.env.OPENROUTER_API_KEY, controller);
+          : provider === 'ollama'
+            ? await callOllama(messages, await systemPrompt(), controller)
+            : await callOpenRouter(messages, process.env.OPENROUTER_API_KEY, controller);
     return json(res, 200, result, { 'X-RateLimit-Remaining': limit.remaining });
   } catch (error) {
     console.error('AI backend error:', { provider, status: error?.status, message: error?.message });
