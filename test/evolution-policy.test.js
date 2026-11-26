@@ -55,6 +55,7 @@ const evolvePayload = buildEvolvePayload({
   },
   selfTest: { ok: true, status: 'passed', checks: [] }
 });
+assert.equal(evolvePayload.ok, true);
 assert.equal(evolvePayload.health, 'ready');
 assert.equal(evolvePayload.proposalGate.summary.total, 1);
 assert.equal(evolvePayload.proposalGate.summary.valid, 1);
@@ -65,6 +66,15 @@ assert.equal(evolvePayload.proposalGate.proposals[0].eligibleForMerge, false);
 assert.ok(evolvePayload.proposalGate.proposals[0].requiredHumanActions.includes('run-and-pass-tests'));
 assert.equal(evolvePayload.proposalGate.proposals[0].permissions.sourceWrite, false);
 assert.equal(evolvePayload.automatic.deploy, false);
+
+const attentionPayload = buildEvolvePayload({
+  audit: { ok: true, status: 'attention', warnings: ['provider'] },
+  proposals: { proposals: [] },
+  selfTest: { ok: false, status: 'attention', checks: [{ name: 'provider', ok: false }] }
+});
+assert.equal(attentionPayload.ok, false);
+assert.equal(attentionPayload.health, 'attention');
+assert.ok(attentionPayload.blockers.includes('provider'));
 
 const incompletePayload = buildEvolvePayload({
   audit: { ok: true, status: 'healthy', warnings: [] },
