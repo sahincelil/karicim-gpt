@@ -54,9 +54,10 @@ export function buildEvolvePayload({ audit, proposals, selfTest }) {
     };
   });
 
+  const health = selfTest?.ok && audit?.ok && audit?.status === 'healthy' ? 'ready' : 'attention';
   return {
-    ok: true,
-    health: selfTest?.ok && audit?.ok && audit?.status === 'healthy' ? 'ready' : 'attention',
+    ok: health === 'ready',
+    health,
     blockers,
     auditFingerprint: audit?.fingerprint || null,
     selfTest: { ok: selfTest?.ok === true, status: selfTest?.status || 'unknown' },
