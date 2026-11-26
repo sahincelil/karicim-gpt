@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import { evaluateEvolutionProposal, summarizeEvolutionRun } from '../lib/evolution-policy.js';
+import { buildEvolvePayload } from '../api/evolve.js';
 
 const base = {
   id: 'proposal-1',
@@ -40,4 +41,37 @@ assert.deepEqual(summarizeEvolutionRun([reviewable, approved, untested]), {
   rejectedOrIncomplete: 0
 });
 
-console.log('LEGION evolution policy tests passed');
+const evolvePayload = buildEvolvePayload({
+  audit: { ok: true, status: 'healthy', fingerprint: 'audit-123', warnings: [] },
+  proposals: {
+    proposals: [{
+      id: 'memory-durable-backend',
+      priority: 'high',
+      problem: 'File-backed memory may not persist in serverless runtime.',
+      proposal: 'Add a durable storage backend.',
+      test: 'Run storage round-trip and failure-fallback integration tests.',
+      autoApply: false
+    }]
+  },
+  selfTest: { ok: true, status: 'passed', checks: [] }
+});
+assert.equal(evolvePayload.health, 'ready');
+assert.equal(evolvePayload.proposalGate.summary.total, 1);
+assert.equal(evolvePayload.proposalGate.summary.valid, 1);
+assert.equal(evolvePayload.proposalGate.summary.reviewable, 0);
+assert.equal(evolvePayload.proposalGate.summary.mergeable, 0);
+assert.equal(evolvePayload.proposalGate.proposals[0].eligibleForReview, false);
+assert.equal(evolvePayload.proposalGate.proposals[0].eligibleForMerge, false);
+assert.ok(evolvePayload.proposalGate.proposals[0].requiredHumanActions.includes('run-and-pass-tests'));
+assert.equal(evolvePayload.proposalGate.proposals[0].permissions.sourceWrite, false);
+assert.equal(evolvePayload.automatic.deploy, false);
+
+const incompletePayload = buildEvolvePayload({
+  audit: { ok: true, status: 'healthy', warnings: [] },
+  proposals: { proposals: [{ id: 'missing-evidence', problem: 'No trace', test: 'Run a test' }] },
+  selfTest: { ok: true, status: 'passed', checks: [] }
+});
+assert.equal(incompletePayload.proposalGate.proposals[0].valid, false);
+assert.ok(incompletePayload.proposalGate.proposals[0].errors.includes('evidence-required'));
+
+console.log('LEGION evolution policy and Evolve payload tests passed');
